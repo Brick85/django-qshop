@@ -1,0 +1,17 @@
+{% extends 'qshop/shoppage.html' %}
+{% load sitemenu %}
+
+{% block shopcontent %}
+
+    <h2>{{ product.name }} ({{ product.articul }})</h2>
+
+    {% if product.has_specs %}
+        <dl>
+            {% for spec in product.get_specs %}
+                <dd>{{ spec.name }}</dd>
+                <dt>{{ spec.value }}</dt>
+            {% endfor %}
+        </dl>
+    {% endif %}
+
+{% endblock shopcontent %}

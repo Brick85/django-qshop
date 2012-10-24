@@ -1,0 +1,13 @@
+{% extends 'sitemenu/simplepage.html' %}
+{% load sitemenu %}
+
+{% block content %}
+    <div class="left_column">
+        {% render_sitemenu '_menu' catalogue_root %}
+    </div>
+    <div class="right_column">
+        {{ block.super }}
+
+        {% block shopcontent %}{% endblock shopcontent %}
+    </div>
+{% endblock content %}

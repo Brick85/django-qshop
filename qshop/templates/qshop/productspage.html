@@ -1,0 +1,12 @@
+{% extends 'qshop/shoppage.html' %}
+{% load sitemenu %}
+
+{% block shopcontent %}
+
+    <h2>Products</h2>
+
+    {% for product in products %}
+        <div><a href="{{ product.get_absolute_url }}">{{ product.name }}</a></div>
+    {% endfor %}
+
+{% endblock shopcontent %}

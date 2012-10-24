@@ -1,0 +1,10 @@
+{% extends 'qshop/shoppage.html' %}
+{% load sitemenu %}
+
+{% block shopcontent %}
+
+    {% for child in menu.get_childs %}
+        <a href="{{ child.get_absolute_url }}">{{ child.title }}</a>
+    {% endfor %}
+
+{% endblock shopcontent %}
