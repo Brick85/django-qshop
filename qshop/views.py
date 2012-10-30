@@ -1,7 +1,8 @@
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.http import Http404
-from .functions import get_catalogue_root, CategoryData
+from .functions import get_catalogue_root, get_filter_and_page_from_url
+from .classes import CategoryData
 from .models import Product
 
 
@@ -17,10 +18,12 @@ def render_categorypage(request, menu, url_add):
 
 
 def render_productspage(request, menu, url_add):
-    if not url_add or (url_add[0] == 'filter'):
+    filter_string, page_num, show_product = get_filter_and_page_from_url(url_add)
+
+    if not show_product:
         # render products page
 
-        productdata = CategoryData(request, url_add, menu)
+        productdata = CategoryData(request, filter_string, menu, page_num)
 
         if productdata.need_return:
             return productdata.return_data

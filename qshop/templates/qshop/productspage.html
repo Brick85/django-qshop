@@ -10,11 +10,11 @@
             <div>{{ filter_data.name }}:
                 {% for value_id, value_data in filter_data.values %}
                     {% if value_data.active %}
-                        <a href="?filterdel=f{{ filter_id }}-{{ value_id }}" rel="nofollow">☑ {{ value_data.name }}</a>
+                        <a href="{{ productdata.link_for_page }}?filterdel=f{{ filter_id }}-{{ value_id }}" rel="nofollow">☑ {{ value_data.name }}</a>({{ value_data.count }})
                     {% elif value_data.unaviable %}
-                        ☒ {{ value_data.name }}
+                        ☒ {{ value_data.name }}({{ value_data.count }})
                     {% else %}
-                        <a href="?filteradd=f{{ filter_id }}-{{ value_id }}" rel="nofollow">☐ {{ value_data.name }}</a>
+                        <a href="{{ productdata.link_for_page }}?filteradd=f{{ filter_id }}-{{ value_id }}" rel="nofollow">☐ {{ value_data.name }}</a>({{ value_data.count }})
                     {% endif %}
                 {% endfor %}
             </div>
@@ -27,7 +27,7 @@
             <th>Name</th>
             <th>Price</th>
         </tr>
-    {% for product in productdata.products %}
+    {% for product in productdata.products_page.object_list %}
         <tr>
             <td><a href="{{ product.get_absolute_url }}"><img src="{% thumbnail product.image 100x100 %}" /></a></td>
             <td><a href="{{ product.get_absolute_url }}">{{ product.name }}</a></td>
@@ -42,5 +42,22 @@
         </tr>
     {% endfor %}
     </table>
+
+    <div class="pagination">
+        <span class="step-links">
+            {% if productdata.products_page.has_previous %}
+                <a href="{{ productdata.link_for_page }}page/{{ productdata.products_page.previous_page_number }}/">previous</a>
+            {% endif %}
+
+            <span class="current">
+                Page {{ productdata.products_page.number }} of {{ productdata.products_page.paginator.num_pages }}.
+            </span>
+
+            {% if productdata.products_page.has_next %}
+                <a href="{{ productdata.link_for_page }}page/{{ productdata.products_page.next_page_number }}/">next</a>
+            {% endif %}
+
+        </span>
+    </div>
 
 {% endblock shopcontent %}
