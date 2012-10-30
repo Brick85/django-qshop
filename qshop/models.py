@@ -115,9 +115,16 @@ class Product(models.Model):
         return self.get_price()
 
 
+class ProductVariationValue(models.Model):
+    value = models.CharField(_('name'))
+
+    def __unicode__(self):
+        return "%s" % self.value
+
+
 class ProductVariation(models.Model):
     product = models.ForeignKey(Product)
-    name = models.CharField(_('name'), max_length=128)
+    variation = models.ForeignKey(ProductVariationValue)
     price = models.DecimalField(_('price'), max_digits=8, decimal_places=2)
 
     class Meta:
