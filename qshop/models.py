@@ -10,11 +10,17 @@ Menu = import_item(MENUCLASS)
 
 
 class Product(models.Model):
-    # has_variations = models.BooleanField(default=False) #editable=False,
+    SORT_VARIANTS = (
+        ('price_asc', 'price', _('price low to high')),
+        ('price_desc', '-price', _('price high to low')),
+        ('name', 'name', _('by name')),
+    )
+
+    has_variations = models.BooleanField(default=False, editable=False)
     parameters_set = models.ForeignKey('ParametersSet', verbose_name=_('parameters set'))
     articul = models.SlugField(_('articul'))
     name    = models.CharField(_('name'), max_length=128)
-    price = models.DecimalField(_('price'), max_digits=5, decimal_places=2)
+    price = models.DecimalField(_('price'), max_digits=8, decimal_places=2)
     description = models.TextField(_('description'), default='', blank=True)
     image = ThumbnailerImageField(_('image'), upload_to='products/main', blank=True, resize_source=dict(size=(1024, 1024)))
 
@@ -54,44 +60,34 @@ class Product(models.Model):
     # def save(self, skip_variations=False, *args, **kwargs):
     #     super(Product, self).save(*args, **kwargs)
 
-    # def has_parameters(self):
-    #     if self._get_parameters_for_product():
-    #         return True
-    #     return False
+    def has_parameters(self):
+        if self._get_parameters_for_product():
+            return True
+        return False
 
-    # def get_parameters(self):
-    #     try:
-    #         return self._parameters_list
-    #     except:
-    #         pass
-    #     product_data = {}
-    #     for item in self._get_parameters_for_product():
-    #         product_data[item.type_field.id] = item
+    def get_parameters(self):
+        try:
+            return self._parameters_list
+        except:
+            pass
 
-    #     ret = []
-    #     for item in self.parameters_set.parameter_set.all():
-    #         try:
-    #             value = product_data[item.id].value
-    #         except:
-    #             value = item.default_value
-    #         if value == '':
-    #             value = item.default_value
+        ret = []
+        for item in self._get_parameters_for_product():
+            ret.append({
+                'id': item.value_id,
+                'name': item.parameter.name,
+                'value': item.value.value
+            })
 
-    #         if value != '':
-    #             ret.append({
-    #                 'id': item.id,
-    #                 'name': item.name,
-    #                 'value': value
-    #             })
-    #     self._parameters_list = ret
-    #     return ret
+        self._parameters_list = ret
+        return self._parameters_list
 
-    # def _get_parameters_for_product(self):
-    #     try:
-    #         return self._parameters_for_product
-    #     except:
-    #         self._parameters_for_product = ProductToParameter.objects.filter(product=self)
-    #         return self._parameters_for_product
+    def _get_parameters_for_product(self):
+        try:
+            return self._parameters_for_product
+        except:
+            self._parameters_for_product = ProductToParameter.objects.select_related('parameter', 'value').filter(product=self).exclude(value=None)
+            return self._parameters_for_product
 
     def get_additional_images(self):
         try:
@@ -104,24 +100,6 @@ class Product(models.Model):
         if self.old_parameters_set_id != self.parameters_set_id:
             return True
         return False
-
-    # def get_value_for_parameter(self, parameter):
-    #     try:
-    #         product_data = self._parameters
-    #     except:
-    #         product_data = {}
-    #         for item in ProductToParameter.objects.filter(product=self):
-    #             product_data[item.type_field.id] = item
-    #         self._parameters = product_data
-    #     try:
-    #         ret = product_data[parameter.id].value
-    #     except:
-    #         ret = _('n/a')
-
-    #     return ret
-
-    def has_variations(self):
-        return bool(self.get_variations())
 
     def get_variations(self):
         try:
@@ -140,7 +118,7 @@ class Product(models.Model):
 class ProductVariation(models.Model):
     product = models.ForeignKey(Product)
     name = models.CharField(_('name'), max_length=128)
-    price = models.DecimalField(_('price'), max_digits=5, decimal_places=2)
+    price = models.DecimalField(_('price'), max_digits=8, decimal_places=2)
 
     class Meta:
         verbose_name = _('product variation')

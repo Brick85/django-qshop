@@ -12,24 +12,38 @@ class CategoryData:
     return_data = None
     filters = {}
     products_page = None
-    page_link = ''
 
     request = None
     filter_string = ''
     menu = None
+    sort = None
     page = 1
+    default_sorting = True
 
-    def __init__(self, request, filter_string, menu, page=1):
+    def __init__(self, request, filter_string, menu, sort, page=1):
         self.request = request
         self.filter_string = filter_string
         self.menu = menu
         self.page = page
         self.page_link = menu.get_absolute_url()
-        if self.filter_string:
-            self.page_link += 'filter/%s/' % self.filter_string
+
+        for i, x in enumerate(Product.SORT_VARIANTS):
+            if sort == x[0]:
+                self.sort = x
+                if i==0:
+                    self.default_sorting = True
+                else:
+                    self.default_sorting = False
+                break
+        if not self.sort:
+            raise Http404('Invalid sorting parameter')
 
         self.process_filters()
         self.process_products()
+
+        if self.request.get_full_path() != self.link_for_page(skip_page=False):
+            self.return_data = HttpResponseRedirect(self.link_for_page(skip_page=False))
+            self.need_return = True
 
     def process_products(self):
         products = Product.objects.filter(category=self.menu)
@@ -40,6 +54,8 @@ class CategoryData:
             products = products.filter(filter_item)
 
         self.set_aviable_filters(filter_set, products)
+
+        products = products.order_by(self.sort[1])
 
         paginator = Paginator(products, PRODUCTS_ON_PAGE)
         try:
@@ -57,7 +73,7 @@ class CategoryData:
         filters = {}
 
         filters_qs = ProductToParameter.objects.select_related('parameter', 'value')\
-            .filter(product__category=self.menu).exclude(value=None)\
+            .filter(product__category=self.menu, parameter__is_filter=True).exclude(value=None)\
             .order_by('parameter__parameters_set', 'parameter__order', 'value__value')
         filters_qs.query.group_by = ['value']
 
@@ -93,7 +109,6 @@ class CategoryData:
             if not wrong_data:
                 if action_type == 'add':
                     try:
-                        print filter_value in selected_filters[filter_id]
                         if not filter_value in selected_filters[filter_id]:
                             selected_filters[filter_id].append(filter_value)
                     except:
@@ -107,9 +122,11 @@ class CategoryData:
                         pass
 
             if not selected_filters:
-                self.return_data = HttpResponseRedirect(self.menu.get_absolute_url())
+                self.filter_string = ''
             else:
-                self.return_data = HttpResponseRedirect("%s%s/%s/" % (self.menu.get_absolute_url(), 'filter', self.encode_filters(selected_filters)))
+                self.filter_string = self.encode_filters(selected_filters)
+
+            self.return_data = HttpResponseRedirect(self.link_for_page(skip_page=True))
 
             self.need_return = True
             return
@@ -158,7 +175,7 @@ class CategoryData:
     def encode_filters(self, filters):
         filter_arr = []
         for k, v in filters.items():
-            filter_arr.append("%s-%s" % (k, ':'.join([str(x) for x in v])))
+            filter_arr.append("%s-%s" % (k, ':'.join(sorted([str(x) for x in v]))))
         return '_'.join(filter_arr)
 
     def decode_filters(self, filters):
@@ -168,6 +185,19 @@ class CategoryData:
             filters_ret[int(filter_id)] = [int(x) for x in filter_data.split(':')]
         return filters_ret
 
-    def link_for_page(self):
-        return self.page_link
+    def link_for_page(self, sorting=None, skip_page=True):
+        string = ''
+        if not sorting and not self.default_sorting:
+            string += 'sort-%s/' % self.sort[0]
+        if sorting and (sorting != Product.SORT_VARIANTS[0][0]):
+            string += 'sort-%s/' % sorting
+        if self.filter_string:
+            string += 'filter-%s/' % self.filter_string
+        if not skip_page and int(self.page) != 1:
+            string += 'page-%s/' % self.page
 
+        return self.menu.get_absolute_url() + string
+
+    def get_sorting_variants(self):
+        for variant in Product.SORT_VARIANTS:
+            yield (self.link_for_page(sorting=variant[0], skip_page=True), variant[2])

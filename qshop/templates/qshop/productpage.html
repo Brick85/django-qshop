@@ -37,12 +37,12 @@
         <p>{{ product.get_price_formatted }}</p>
     {% endif %}
 
-    {% if product.has_specs %}
-        <h3>Specifications</h3>
+    {% if product.has_parameters %}
+        <h3>Parameters</h3>
         <dl>
-            {% for spec in product.get_specs %}
-                <dd>{{ spec.name }}</dd>
-                <dt>{{ spec.value }}</dt>
+            {% for parameter in product.get_parameters %}
+                <dd>{{ parameter.name }}</dd>
+                <dt>{{ parameter.value }}</dt>
             {% endfor %}
         </dl>
     {% endif %}

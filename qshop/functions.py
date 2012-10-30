@@ -1,3 +1,4 @@
+from .models import Product
 
 
 def get_catalogue_root(menu):
@@ -8,18 +9,23 @@ def get_catalogue_root(menu):
     return menu
 
 
-def get_filter_and_page_from_url(url_add):
+def get_products_page_data(url_add):
     filter_string = ''
     page_num = 1
     show_product = True
-    if url_add and url_add[0] == 'filter':
-        filter_string = url_add[1]
-        show_product = False
-    if url_add and url_add[0] == 'page':
-        page_num = url_add[1]
-        show_product = False
-    if len(url_add) >= 4 and url_add[2] == 'page':
-        page_num = url_add[3]
+    sort = Product.SORT_VARIANTS[0][0]
     if not url_add:
         show_product = False
-    return (filter_string, page_num, show_product)
+    if url_add and url_add[0].startswith('sort-'):
+        sort = url_add[0].replace('sort-', '')
+        show_product = False
+        del url_add[0]
+    if url_add and url_add[0].startswith('filter-'):
+        filter_string = url_add[0].replace('filter-', '')
+        show_product = False
+        del url_add[0]
+    if url_add and url_add[0].startswith('page-'):
+        page_num = url_add[0].replace('page-', '')
+        show_product = False
+        del url_add[0]
+    return (filter_string, page_num, sort, show_product)

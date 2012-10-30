@@ -21,6 +21,14 @@
         {% endfor %}
     {% endif %}
 
+    <br />
+    <div>
+        Sorting:
+        {% for variant in productdata.get_sorting_variants %}
+            <a href="{{ variant.0 }}">{{ variant.1 }}</a>
+        {% endfor %}
+    </div>
+
     <table width="100%">
         <tr>
             <th>Image</th>
@@ -46,7 +54,7 @@
     <div class="pagination">
         <span class="step-links">
             {% if productdata.products_page.has_previous %}
-                <a href="{{ productdata.link_for_page }}page/{{ productdata.products_page.previous_page_number }}/">previous</a>
+                <a href="{{ productdata.link_for_page }}page-{{ productdata.products_page.previous_page_number }}/">previous</a>
             {% endif %}
 
             <span class="current">
@@ -54,7 +62,7 @@
             </span>
 
             {% if productdata.products_page.has_next %}
-                <a href="{{ productdata.link_for_page }}page/{{ productdata.products_page.next_page_number }}/">next</a>
+                <a href="{{ productdata.link_for_page }}page-{{ productdata.products_page.next_page_number }}/">next</a>
             {% endif %}
 
         </span>

@@ -59,6 +59,13 @@ class ProductAdmin(admin.ModelAdmin):
                     ptp.product = obj
                     ptp.save()
 
+        if formset.model == ProductVariation:
+            obj = formset.instance
+            has_variations = bool(obj.productvariation_set.all())
+            if obj.has_variations != has_variations:
+                obj.has_variations = has_variations
+                obj.save()
+
     class Media:
         js = (
             settings.STATIC_URL + 'admin/qshop/js/products.js',
