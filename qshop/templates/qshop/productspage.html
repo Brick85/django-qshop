@@ -1,12 +1,46 @@
 {% extends 'qshop/shoppage.html' %}
-{% load sitemenu %}
+{% load sitemenu thumbnail %}
 
 {% block shopcontent %}
 
     <h2>Products</h2>
 
-    {% for product in products %}
-        <div><a href="{{ product.get_absolute_url }}">{{ product.name }}</a></div>
+    {% if productdata.filters %}
+        {% for filter_id, filter_data in productdata.filters.items %}
+            <div>{{ filter_data.name }}:
+                {% for value_id, value_data in filter_data.values %}
+                    {% if value_data.active %}
+                        <a href="?filterdel=f{{ filter_id }}-{{ value_id }}" rel="nofollow">☑ {{ value_data.name }}</a>
+                    {% elif value_data.unaviable %}
+                        ☒ {{ value_data.name }}
+                    {% else %}
+                        <a href="?filteradd=f{{ filter_id }}-{{ value_id }}" rel="nofollow">☐ {{ value_data.name }}</a>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    <table width="100%">
+        <tr>
+            <th>Image</th>
+            <th>Name</th>
+            <th>Price</th>
+        </tr>
+    {% for product in productdata.products %}
+        <tr>
+            <td><a href="{{ product.get_absolute_url }}"><img src="{% thumbnail product.image 100x100 %}" /></a></td>
+            <td><a href="{{ product.get_absolute_url }}">{{ product.name }}</a></td>
+            <td>
+                {% if product.has_variations %}
+                    from {{ product.get_price }}
+                {% else %}
+                    {{ product.get_price }}
+                {% endif %}
+
+            </td>
+        </tr>
     {% endfor %}
+    </table>
 
 {% endblock shopcontent %}

@@ -1,41 +1,63 @@
 from django.contrib import admin
-from .models import Product, ProductImage, ProductVariation, ProductType, ProductTypeField, ProductToTypeField
-from django.db import models
+from .models import Product, ProductVariation, ProductImage, ParametersSet, Parameter, ProductToParameter, ParameterValue
+#from django.db import models
 
-from .admin_forms import ProductToTypeFieldFormset
+from .admin_forms import ProductToParameterFormset
 
 from .admin_filters import ProductCategoryListFilter
 
 from django.conf import settings
 
 
-class ProductImageInline(admin.TabularInline):
-    model = ProductImage
-    extra = 1
-
 class ProductVariationInline(admin.TabularInline):
     model = ProductVariation
     extra = 1
 
 
-class ProductToTypeFieldInline(admin.TabularInline):
-    model = ProductToTypeField
-    formset = ProductToTypeFieldFormset
+class ProductImageInline(admin.TabularInline):
+    model = ProductImage
+    extra = 1
+
+
+class ProductToParameterInline(admin.TabularInline):
+    model = ProductToParameter
+    #formset = ProductToTypeFieldFormset
     extra = 0
     can_delete = False
+    #readonly_fields = ('parameter',)
+    formset = ProductToParameterFormset
+    fieldsets = (
+        (None, {
+            'fields': ('parameter', 'value'),
+        }),
+    )
+
     def has_add_permission(self, request):
         return False
 
 
 class ProductAdmin(admin.ModelAdmin):
-    inlines = [ProductVariationInline, ProductImageInline, ProductToTypeFieldInline]
+    inlines = [ProductVariationInline, ProductImageInline, ProductToParameterInline]
     prepopulated_fields = {"articul": ("name",)}
     list_display = ('articul', 'name', 'order')
     list_editable = ('order',)
-    list_filter = ('product_specs_type', ProductCategoryListFilter)
-
+    list_filter = ('parameters_set', ProductCategoryListFilter)
 
     filter_horizontal = ('category',)
+
+    def save_formset(self, request, form, formset, change):
+        super(ProductAdmin, self).save_formset(request, form, formset, change)
+
+        if formset.model == ProductToParameter:
+            obj = formset.instance
+            if obj.is_parametrs_set_changed():
+                for current_ptp in ProductToParameter.objects.filter(product=obj):
+                    current_ptp.delete()
+                for parameter in obj.parameters_set.parameter_set.all():
+                    ptp = ProductToParameter()
+                    ptp.parameter = parameter
+                    ptp.product = obj
+                    ptp.save()
 
     class Media:
         js = (
@@ -49,13 +71,23 @@ class ProductAdmin(admin.ModelAdmin):
 admin.site.register(Product, ProductAdmin)
 
 
-class ProductTypeFieldInline(admin.TabularInline):
-    model = ProductTypeField
+class ParameterInline(admin.TabularInline):
+    model = Parameter
 
 
-class ProductTypeAdmin(admin.ModelAdmin):
-    inlines = [ProductTypeFieldInline]
+class ParametersSetAdmin(admin.ModelAdmin):
+    inlines = [ParameterInline]
 
 
-admin.site.register(ProductType, ProductTypeAdmin)
+admin.site.register(ParametersSet, ParametersSetAdmin)
 
+
+class ParameterValueAdmin(admin.ModelAdmin):
+    list_display = ('value', 'parameter')
+
+    class Media:
+        js = (
+            settings.STATIC_URL + 'admin/qshop/js/products_parametervalues.js',
+        )
+
+admin.site.register(ParameterValue, ParameterValueAdmin)

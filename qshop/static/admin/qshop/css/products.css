@@ -1,1 +1,3 @@
 .aligned label {width: 12em;}
+#producttoparameter_set-group .tabular td.original p {display: none;}
+#producttoparameter_set-group .tabular tr.has_original td {padding-top: 5px;}

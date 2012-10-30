@@ -1,11 +1,44 @@
 {% extends 'qshop/shoppage.html' %}
-{% load sitemenu %}
+{% load sitemenu thumbnail %}
 
 {% block shopcontent %}
 
     <h2>{{ product.name }} ({{ product.articul }})</h2>
 
+    {% if product.image %}
+        <img src="{% thumbnail product.image 100x100 %}" /><br>
+    {% endif %}
+
+    {% if product.get_additional_images %}
+        {% for image in product.get_additional_images %}
+            <img src="{% thumbnail image.image 30x20 %}" />
+        {% endfor %}
+    {% endif %}
+
+    {% if product.description %}
+        <h3>Description</h3>
+        <div>
+            {{ product.description }}
+        </div>
+    {% endif %}
+
+    {% if product.has_variations %}
+        <h3>Prices</h3>
+        <table>
+            {% for variation in product.get_variations %}
+                <tr>
+                    <td>{{ variation.name }}</td>
+                    <td>{{ variation.get_price_formatted }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <h3>Price</h3>
+        <p>{{ product.get_price_formatted }}</p>
+    {% endif %}
+
     {% if product.has_specs %}
+        <h3>Specifications</h3>
         <dl>
             {% for spec in product.get_specs %}
                 <dd>{{ spec.name }}</dd>

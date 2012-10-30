@@ -1,7 +1,7 @@
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
-from django.http import Http404  #, HttpResponseRedirect, HttpResponsePermanentRedirect
-from . import get_catalogue_root
+from django.http import Http404
+from .functions import get_catalogue_root, CategoryData
 from .models import Product
 
 
@@ -17,26 +17,27 @@ def render_categorypage(request, menu, url_add):
 
 
 def render_productspage(request, menu, url_add):
-
-    if not url_add:
+    if not url_add or (url_add[0] == 'filter'):
         # render products page
 
-        products = Product.objects.filter(category=menu)
+        productdata = CategoryData(request, url_add, menu)
 
-        for product in products:
-            product._current_category = menu
+        if productdata.need_return:
+            return productdata.return_data
 
         return render_to_response('qshop/productspage.html', {
                 'menu': menu,
                 'url_add': url_add,
                 'catalogue_root': get_catalogue_root(menu),
-                'products': products,
+                'productdata': productdata,
             }, context_instance=RequestContext(request))
 
     else:
-        # render product page
+        # render single product page
 
         product = get_object_or_404(Product, articul=url_add[0])
+
+        menu._page_title = product.name
 
         return render_to_response('qshop/productpage.html', {
                 'menu': menu,
