@@ -200,4 +200,8 @@ class CategoryData:
 
     def get_sorting_variants(self):
         for variant in Product.SORT_VARIANTS:
-            yield (self.link_for_page(sorting=variant[0], skip_page=True), variant[2])
+            yield {
+                'link': self.link_for_page(sorting=variant[0], skip_page=True),
+                'name': variant[2],
+                'selected': True if variant[0] == self.sort[0] else False
+            }

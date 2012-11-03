@@ -25,7 +25,7 @@
     <div>
         Sorting:
         {% for variant in productdata.get_sorting_variants %}
-            <a href="{{ variant.0 }}">{{ variant.1 }}</a>
+            {% if variant.selected %}<b>{% endif %}<a href="{{ variant.link }}">{{ variant.name }}</a>{% if variant.selected %}</b>{% endif %}
         {% endfor %}
     </div>
 
@@ -40,12 +40,7 @@
             <td><a href="{{ product.get_absolute_url }}"><img src="{% thumbnail product.image 100x100 %}" /></a></td>
             <td><a href="{{ product.get_absolute_url }}">{{ product.name }}</a></td>
             <td>
-                {% if product.has_variations %}
-                    from {{ product.get_price }}
-                {% else %}
-                    {{ product.get_price }}
-                {% endif %}
-
+                {% if product.has_variations %}from {% endif %}{{ product.get_fprice }}{% if product.has_discount %} old price: {{ product.get_fprice_real }}{% endif %}
             </td>
         </tr>
     {% endfor %}

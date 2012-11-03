@@ -1,7 +1,8 @@
 {% extends 'sitemenu/simplepage.html' %}
-{% load sitemenu %}
+{% load sitemenu qshop %}
 
 {% block content %}
+    <div class="cart_icon"><a href="{% url cart %}">Cart ({% qshop_items_in_cart_with_qty %})</a></div>
     <div class="left_column">
         {% render_sitemenu '_menu' catalogue_root %}
     </div>

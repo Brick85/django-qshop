@@ -1,0 +1,174 @@
+import datetime
+import models
+from shop.models import Currency
+
+CART_ID = 'psyreal-CART'
+
+class ItemAlreadyExists(Exception):
+    pass
+
+class ItemDoesNotExist(Exception):
+    pass
+
+class Cart:
+    def __init__(self, request, cart=None):
+        if cart:
+            self.cart = cart
+            return
+        cart_id = request.session.get(CART_ID)
+        if cart_id:
+            try:
+                cart = models.Cart.objects.get(id=cart_id, checked_out=False)
+            except models.Cart.DoesNotExist:
+                cart = self.new(request)
+        else:
+            cart = self.new(request)
+        self.cart = cart
+
+    def __iter__(self):
+        for item in self.get_products():
+            yield item
+
+    def get_cart_user(self):
+        try:
+            return self._user
+        except:
+            self._user = self.cart.order_set.all()[0].user
+            return self._user
+
+    def get_products(self):
+        try:
+            return self._products
+        except:
+            self._products = self.cart.item_set.all()
+            return self._products
+
+    def total_price(self):
+        total_price = 0
+        for item in self.get_products():
+            total_price += item.total_price
+        return total_price
+
+    def total_price_formatted(self):
+        return Currency.format_price(Currency.current_currency, self.total_price(), format_only=True)
+
+    def total_price_with_delivery(self):
+        return self.total_price() + self.delivery_price()
+
+    def total_price_with_delivery_formatted(self):
+        return Currency.format_price(Currency.current_currency, self.total_price_with_delivery(), format_only=True)
+
+    def delivery_price(self):
+        try:
+            self._delivery_price
+        except:
+            profile = self.get_cart_user().get_profile()
+            if profile.other_address:
+                country = profile.delivery_country
+            else:
+                country = profile.country
+            self._delivery_price = country.get_delivery_price(self.total_weight())
+        return Currency.get_price(Currency.current_currency, self._delivery_price)
+
+    def delivery_price_formatted(self):
+        return Currency.format_price(Currency.current_currency, self.delivery_price(), format_only=True)
+
+    def total_products(self):
+        try:
+            return self._count
+        except:
+            self._count = self.cart.item_set.count()
+        return self._count
+
+    def total_weight(self):
+        try:
+            return self._total_weight
+        except:
+            total_weight = 0
+            for item in self.get_products():
+                total_weight += item.product.weight * item.quantity
+            self._total_weight = total_weight
+            return self._total_weight
+
+    def total_weight_formatted(self):
+        return "%.2f"%self.total_weight()
+
+    def total_products_with_qty(self):
+        try:
+            return self._count_with_qty
+        except:
+            self._count_with_qty = 0
+            for item in self.get_products():
+                self._count_with_qty += item.quantity
+        return self._count_with_qty
+
+    def get_description(self):
+        return self.total_price_with_delivery_formatted()
+
+    def new(self, request):
+        cart = models.Cart(creation_date=datetime.datetime.now())
+        cart.save()
+        request.session[CART_ID] = cart.id
+        return cart
+    def get_session_id(self, request):
+        return request.session[CART_ID]
+    def set_session_id(self, request, cart_id):
+        request.session[CART_ID] = cart_id
+
+    def add(self, product, unit_price, quantity=1):
+        try:
+            item = models.Item.objects.get(
+                cart=self.cart,
+                product=product,
+            )
+        except models.Item.DoesNotExist:
+            item = models.Item()
+            item.cart = self.cart
+            item.product = product
+            item.unit_price = str(unit_price)
+            item.quantity = quantity
+            item.save()
+        else:
+            item.quantity += int(quantity)
+            item.save()
+            #raise ItemAlreadyExists
+
+    def remove(self, product):
+        try:
+            item = models.Item.objects.get(
+                cart=self.cart,
+                product=product,
+            )
+        except models.Item.DoesNotExist:
+            raise ItemDoesNotExist
+        else:
+            item.delete()
+
+    def update(self, product, quantity, unit_price=None):
+        try:
+            item = models.Item.objects.get(
+                cart=self.cart,
+                product=product,
+            )
+            item.quantity = int(quantity)
+            item.save()
+        except models.Item.DoesNotExist:
+            raise ItemDoesNotExist
+
+    def clear(self):
+        for item in self.cart.item_set:
+            item.delete()
+
+    def as_table(self, order=False):
+        from django.template.loader import render_to_string
+        from django.contrib.sites.models import Site
+
+
+        return render_to_string('cart/_cart_as_table.html', {
+            'site': Site.objects.get_current(),
+            'cart': self,
+        })
+
+    def check_out(self):
+        self.cart.checked_out = True
+        self.cart.save()

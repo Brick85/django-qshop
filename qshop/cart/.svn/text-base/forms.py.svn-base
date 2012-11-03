@@ -1,0 +1,121 @@
+from django import forms
+from models import Order
+from user.models import UserProfile
+from django.utils.translation import ugettext as _
+from widgets import HiddenInputWithText
+from django.forms import widgets
+
+
+class OrderForm(forms.ModelForm):
+    email = forms.EmailField()
+    firstname = forms.CharField(label=_('firstname'))
+    lastname = forms.CharField(label=_('lastname'))
+    #newsletter = forms.BooleanField(required=False)
+
+    def __init__(self, *args, **kwargs):
+        super(OrderForm, self).__init__(*args, **kwargs)
+        self.fields.insert(1, 'firstname', self.fields['firstname'])
+        self.fields.insert(2, 'lastname', self.fields['lastname'])
+        self.fields.insert(3, 'email', self.fields['email'])
+
+    class Meta:
+        model = UserProfile
+        exclude = ('user', 'subscription', 'symlink',)
+
+    def save(self, user, *args, **kwargs):
+        #pass
+        m = super(OrderForm, self).save(commit=False)
+        profile = user.get_profile()
+        m.user = user
+        m.pk = profile.pk
+        m.save()
+
+    def get_delivery_fields_js(self):
+        return ','.join(["'%s'" % field_name for field_name in self.instance.OTHER_ADDRESS_FIELDS])
+
+    def clean_delivery_street_address(self):
+        need_delivery = self.cleaned_data['other_address']
+        data = self.cleaned_data['delivery_street_address']
+        if need_delivery:
+            if len(data) < 1:
+                raise forms.ValidationError(_('This field is required.'))
+        return data
+
+    def clean_delivery_post_code(self):
+        need_delivery = self.cleaned_data['other_address']
+        data = self.cleaned_data['delivery_post_code']
+        if need_delivery:
+            if len(data) < 1:
+                raise forms.ValidationError(_('This field is required.'))
+        return data
+
+    def clean_delivery_city(self):
+        need_delivery = self.cleaned_data['other_address']
+        data = self.cleaned_data['delivery_city']
+        if need_delivery:
+            if len(data) < 1:
+                raise forms.ValidationError(_('This field is required.'))
+        return data
+
+    def clean_delivery_state(self):
+        need_delivery = self.cleaned_data['other_address']
+        data = self.cleaned_data['delivery_state']
+        if need_delivery:
+            if len(data) < 1:
+                raise forms.ValidationError(_('This field is required.'))
+        return data
+
+    def clean_delivery_country(self):
+        need_delivery = self.cleaned_data['other_address']
+        data = self.cleaned_data['delivery_country']
+        if need_delivery:
+            if not data:
+                raise forms.ValidationError(_('This field is required.'))
+        return data
+
+
+class OrderPaymentForm(forms.ModelForm):
+
+    class Meta:
+        model = Order
+        fields = ('payment_method', 'delayed_option',)
+
+    def __init__(self, *args, **kwargs):
+        super(OrderPaymentForm, self).__init__(*args, **kwargs)
+        self.fields['payment_method'].widget = widgets.RadioSelect(choices=Order.PAYMENT_METHODS)
+        self.fields['payment_method'].required = True
+
+    def clean_delayed_option(self):
+        payment_method = self.cleaned_data.get('payment_method', None)
+        data = self.cleaned_data['delayed_option']
+        if payment_method == 'delayed':
+            if not data:
+                raise forms.ValidationError(_('This field is required.'))
+        return data
+
+
+class OrderAdminForm(forms.ModelForm):
+    set_as_payed = forms.BooleanField(required=False, label=_('set as payed'))
+
+    def save(self, force_insert=False, force_update=False, commit=True):
+        m = super(OrderAdminForm, self).save(commit=False)
+        # do custom stuff
+        if commit:
+            m.save()
+        if self.cleaned_data['set_as_payed'] and not m.payed:
+            m.payed_log += "\n\nPayed from admin\n\n"
+            m.user_payed()
+        return m
+
+    class Meta:
+        model = Order
+        exclude = ('cart',)
+        widgets = {
+            'cart_text': HiddenInputWithText,
+            'name': HiddenInputWithText,
+            'email': HiddenInputWithText,
+            'phone': HiddenInputWithText,
+            'address': HiddenInputWithText,
+            'comments': HiddenInputWithText,
+            'user': widgets.HiddenInput,
+        }

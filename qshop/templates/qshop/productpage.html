@@ -1,5 +1,6 @@
 {% extends 'qshop/shoppage.html' %}
 {% load sitemenu thumbnail %}
+{% load url from future %}
 
 {% block shopcontent %}
 
@@ -28,13 +29,13 @@
             {% for variation in product.get_variations %}
                 <tr>
                     <td>{{ variation.name }}</td>
-                    <td>{{ variation.get_price_formatted }}</td>
+                    <td>{{ variation.get_fprice }}{% if variation.has_discount %} old price: {{ variation.get_fprice_real }}{% endif %}</td>
                 </tr>
             {% endfor %}
         </table>
     {% else %}
         <h3>Price</h3>
-        <p>{{ product.get_price_formatted }}</p>
+        <p>{{ product.get_fprice }}{% if product.has_discount %} old price: {{ product.get_fprice_real }}{% endif %}</p>
     {% endif %}
 
     {% if product.has_parameters %}
@@ -46,5 +47,12 @@
             {% endfor %}
         </dl>
     {% endif %}
+
+    <div>
+        <form method="get" action="{% url 'add_to_cart' product_id=product.pk %}">
+            <label>Quantity: </label><input type="text" name="quantity" value="1" /><br />
+            <input type="submit" value="Add to cart" />
+        </form>
+    </div>
 
 {% endblock shopcontent %}

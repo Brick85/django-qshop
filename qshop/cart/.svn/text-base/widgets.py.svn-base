@@ -1,0 +1,20 @@
+from django import forms
+from django.utils.safestring import mark_safe
+from django.db.models.loading import get_model
+
+class HiddenInputWithText(forms.TextInput):
+    input_type = 'hidden'
+
+    def __init__(self, *args, **kwargs):
+        super(HiddenInputWithText, self).__init__(*args, **kwargs)
+        self.attrs = kwargs.get('attrs', {})
+        self.key = self.attrs.get('key', False)
+        
+    def render(self, name, value, *args, **kwargs):
+        model = get_model('cart', name)
+        if self.key:
+            text = unicode(model.objects.get(pk=value)) if value is not None and value != '' else '-----'
+        else:
+            text = value
+        html = '%s %s' % (super(HiddenInputWithText, self).render(name, value, self.attrs), text)
+        return mark_safe(html)

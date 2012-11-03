@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Product, ProductVariation, ProductImage, ParametersSet, Parameter, ProductToParameter, ParameterValue
+from .models import Product, ProductVariationValue, ProductVariation, ProductImage, ParametersSet, Parameter, ProductToParameter, ParameterValue
 #from django.db import models
 
 from .admin_forms import ProductToParameterFormset
@@ -39,8 +39,8 @@ class ProductToParameterInline(admin.TabularInline):
 class ProductAdmin(admin.ModelAdmin):
     inlines = [ProductVariationInline, ProductImageInline, ProductToParameterInline]
     prepopulated_fields = {"articul": ("name",)}
-    list_display = ('articul', 'name', 'order')
-    list_editable = ('order',)
+    list_display = ('articul', 'name', 'sort')
+    list_editable = ('sort',)
     list_filter = ('parameters_set', ProductCategoryListFilter)
 
     filter_horizontal = ('category',)
@@ -61,10 +61,26 @@ class ProductAdmin(admin.ModelAdmin):
 
         if formset.model == ProductVariation:
             obj = formset.instance
-            has_variations = bool(obj.productvariation_set.all())
-            if obj.has_variations != has_variations:
-                obj.has_variations = has_variations
-                obj.save()
+            variations = obj.productvariation_set.all()
+            price = None
+            discount_price = None
+            for variation in variations:
+                if not price or variation.get_price() < price:
+                    price = variation.get_price_real()
+                    discount_price = variation.get_price_discount()
+
+            obj.has_variations = bool(variations)
+            if price:
+                obj.price = price
+                obj.discount_price = discount_price
+            obj.save()
+
+    def get_readonly_fields(self, request, obj=None):
+        if obj.has_variations:
+            readonly_fields = list(self.readonly_fields) + ['price', 'discount_price']
+        else:
+            readonly_fields = self.readonly_fields
+        return readonly_fields
 
     class Media:
         js = (
@@ -98,3 +114,9 @@ class ParameterValueAdmin(admin.ModelAdmin):
         )
 
 admin.site.register(ParameterValue, ParameterValueAdmin)
+
+
+class ProductVariationValueAdmin(admin.ModelAdmin):
+    list_display = ('value',)
+
+admin.site.register(ProductVariationValue, ProductVariationValueAdmin)
