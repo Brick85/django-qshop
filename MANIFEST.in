@@ -1,0 +1,2 @@
+recursive-include qshop/static *
+recursive-include qshop/templates *

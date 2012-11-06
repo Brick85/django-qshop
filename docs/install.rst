@@ -2,13 +2,13 @@
 Installation
 ============
 
-You can install django-qshop from GitHub_
-
-.. _GitHub: https://github.com/Brick85/django-qshop
-
-Or from PyPI: ::
+You can install django-qshop from GitHub_ or from PyPI_: ::
 
     pip install django-qshop
+
+.. _GitHub: https://github.com/Brick85/django-qshop
+.. _PyPI: http://pypi.python.org/pypi/django-qshop
+
 
 And add to INSTALLED_APPS: ::
 
