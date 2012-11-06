@@ -1,10 +1,14 @@
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
+from django.core.urlresolvers import reverse
+from django.utils.safestring import mark_safe
 
+from sitemenu import import_item
 from ..models import Currency
-from ..models import Product
+from ..models import Product, ProductVariation
 
-#from django.core.urlresolvers import reverse
+from ..qshop_settings import CART_ORDER_CLASS
+
 
 class Cart(models.Model):
     date_added = models.DateTimeField(_('creation date'), auto_now_add=True)
@@ -24,11 +28,23 @@ class Cart(models.Model):
         return CartObject(None, self)
 
 
+class ItemManager(models.Manager):
+    def get(self, *args, **kwargs):
+        if 'product' in kwargs:
+            kwargs['_real_product'] = kwargs['product']
+            kwargs['_real_product_variation'] = kwargs['product'].selected_variation
+            del(kwargs['product'])
+        return super(ItemManager, self).get(*args, **kwargs)
+
+
 class Item(models.Model):
     cart = models.ForeignKey(Cart, verbose_name=_('cart'))
     quantity = models.PositiveIntegerField(verbose_name=_('quantity'))
-    unit_price = models.DecimalField(max_digits=18, decimal_places=2, verbose_name=_('unit price'))
-    product = models.ForeignKey(Product)
+    unit_price = models.DecimalField(max_digits=12, decimal_places=2, verbose_name=_('unit price'))
+    _real_product = models.ForeignKey(Product)
+    _real_product_variation = models.ForeignKey(ProductVariation, blank=True, null=True)
+
+    objects = ItemManager()
 
     class Meta:
         verbose_name = _('item')
@@ -44,133 +60,91 @@ class Item(models.Model):
     def total_fprice(self):
         return Currency.get_fprice(self.total_price(), format_only=True)
 
+    def get_product(self):
+        self._real_product.selected_variation = self._real_product_variation
+        return self._real_product
 
-# class Order(models.Model):
+    def set_product(self, product):
+        self._real_product = product
+        self._real_product_variation = product.selected_variation
 
-#     STATUSES = (
-#         (1, _('New')),
-#         (2, _('In Progress')),
-#         (3, _('Completed')),
-#     )
-#     PAYMENT_METHODS = (
-#         ('paypal', 'paypal'),
-#         ('paypal_cc', 'paypal_cc'),
-#         #('webmoney', 'webmoney'),
-#         #('yandex', 'yandex'),
-#         ('roboxchange', 'roboxchange'),
-#         ('delayed', 'delayed'),
-#     )
-#     PAYMENT_METHODS_KEYS = [x[0] for x in PAYMENT_METHODS]
+    product = property(get_product, set_product)
 
-#     date_added           = models.DateTimeField(_('date added'), auto_now_add=True)
-#     status               = models.PositiveSmallIntegerField(_('status'), choices=STATUSES, default=1)
-#     manager_comments     = models.TextField(_('manager comments'), blank=True)
-#     cart                 = models.ForeignKey(Cart, verbose_name=_('cart'))
-#     cart_text            = models.TextField(_('cart text'))
-#     user                 = models.ForeignKey(User, verbose_name=_('order user'))
-#     payment_method       = models.CharField(_('payment method'), max_length=12, choices=PAYMENT_METHODS)
-#     delayed_option       = models.ForeignKey(DelayedPaymentOption, verbose_name=_('delayed option'), null=True, blank=True)
-#     payment_token        = models.CharField(_('payment token'), max_length=128, editable=False, blank=True, null=True, unique=True)
-#     payed                = models.BooleanField(_('payed'), default=False)
-#     payed_log            = models.TextField(_('payed log'), blank=True, null=True)
-
-#     class Meta:
-#         verbose_name = _('client order')
-#         verbose_name_plural = _('client orders')
+    def get_cartremove_url(self):
+        return reverse('remove_from_cart', args=(self.pk,))
 
 
-#     def __unicode__(self):
-#         return u"%s %s (%s)" % (self.user.first_name, self.user.last_name, self.user.email)
+class OrderAbstract(models.Model):
+
+    STATUSES = (
+        (1, _('New')),
+        (2, _('In Progress')),
+        (3, _('Completed')),
+    )
+
+    date_added           = models.DateTimeField(_('date added'), auto_now_add=True)
+    status               = models.PositiveSmallIntegerField(_('status'), choices=STATUSES, default=1)
+    manager_comments     = models.TextField(_('manager comments'), blank=True)
+    cart                 = models.ForeignKey(Cart, verbose_name=_('cart'), editable=False)
+    cart_text            = models.TextField(_('cart text'), editable=False)
+
+    class Meta:
+        verbose_name = _('client order')
+        verbose_name_plural = _('client orders')
+        abstract = True
+
+    def __unicode__(self):
+        return u"%s (%s)" % (self.pk, self.date_added)
+
+    def get_id(self):
+        return "QS%d" % self.pk
+
+    def get_redirect(self):
+        return reverse('cart_order_success')
+
+    def get_cart_text(self):
+        return mark_safe(self.cart_text)
+    get_cart_text.short_description = _('cart text')
 
 
-#     def pay(self):
-#         if self.payment_method == 'paypal' or self.payment_method == 'paypal_cc':
-#             from vendors.paypal import Paypal
-#             p = Paypal()
-#             try:
-#                 self.payment_token = p.set_checkout(self.cart.get_cartobject())
-#                 self.save()
-#                 self._redirect = p.REDIRECTURL % self.payment_token
-#             except TypeError as e:
-#                 self.payed_log = str(self.payed_log) + str(e)
-#                 self.save()
-#                 self._redirect = reverse('cart_order_error')
+class OrderAbstractDefault(OrderAbstract):
+    # PAYMENT_METHODS = (
+    #     ('paypal', 'paypal'),
+    #     #('webmoney', 'webmoney'),
+    #     #('yandex', 'yandex'),
+    #     ('roboxchange', 'roboxchange'),
+    #     ('delayed', 'delayed'),
+    # )
+    # PAYMENT_METHODS_KEYS = [x[0] for x in PAYMENT_METHODS]
+    # payed                = models.BooleanField(_('payed'), default=False)
+    # payed_log            = models.TextField(_('payed log'), blank=True, null=True)
 
-#         if self.payment_method == 'webmoney':
-#             self._redirect = reverse('weboney_redirect', args=[self.pk])
+    name = models.CharField(_('name'), max_length=128)
+    phone = models.CharField(_('phone'), max_length=32, blank=True, null=True)
+    email = models.EmailField(_('email'))
+    address = models.CharField(_('address'), max_length=128)
+    comments = models.TextField(_('comments'), blank=True, null=True)
 
-#         if self.payment_method == 'roboxchange':
-#             self._redirect = reverse('roboxchange_redirect', args=[self.pk])
+    class Meta:
+        abstract = True
 
-#         if self.payment_method == 'delayed':
-#             self._redirect = self.delayed_option.get_absolute_url()
+    def __unicode__(self):
+        return u"%s (%s)" % (self.name, self.email)
 
-#     def get_redirect(self):
-#         return self._redirect
+    def save(self, *args, **kwargs):
+        self.payed = True
+        super(OrderAbstractDefault, self).save(*args, **kwargs)
 
-#     def user_payed(self):
-#         self.payed = True
-#         self.save()
+    def get_comments(self):
+        return mark_safe("<br />".join(self.comments.split("\n")))
+    get_comments.short_description = _('comments')
 
-#         cart = self.cart.get_cartobject()
-#         products = cart.get_products()
-
-#         subscription_add = 0
-
-#         show_video_message = False
-
-#         for product in products:
-#             real_product = product.get_product()
-#             subscription_add += real_product.subscription * product.quantity
-#             if real_product.video_download:
-#                 show_video_message = True
-#             try:
-#                 purchasedproduct = PurchasedProduct.objects.get(user=self.user, product=real_product)
-#                 purchasedproduct.date = datetime.now()
-#             except:
-#                 purchasedproduct = PurchasedProduct()
-#                 purchasedproduct.user = self.user
-#                 purchasedproduct.product = real_product
-#             if real_product.video_download:
-#                 purchasedproduct.createsymlink()
-
-#             purchasedproduct.save()
-
-#         if subscription_add > 0:
-#             show_video_message = True
-#             profile = self.user.get_profile()
-#             if datetime(profile.subscription.year, profile.subscription.month, profile.subscription.day) < datetime.today():
-#                 profile.subscription = datetime.now()
-#             profile.subscription = profile.subscription + timedelta(days=subscription_add)
-#             profile.createsymlink()
-#             profile.save()
-
-#         from misc.functions import sendMailFromShop
-#         from options.models import Option
-
-#         opts = {
-#             'cart_text': self.cart_text,
-#             'order': self,
-#             'user': self.user,
-#             'show_video_message': show_video_message,
-#         }
-
-#         sendMailFromShop([self.user.email], _('Your order from Psyreal'), 'mails/order_to_user.html', opts)
-#         sendMailFromShop(Option.getValues('mail_order'), _('[PSYREAL] Order %d payed') % self.id, 'mails/order_to_admin_payed.html', opts)
+    # def user_payed(self, payed_log=None):
+    #     self.payed = True
+    #     if payed_log:
+    #         self.payed_log = payed_log
+    #     self.save()
 
 
-# class PurchasedProduct(models.Model):
-#     user = models.ForeignKey(User)
-#     product = models.ForeignKey(Product)
-#     date = models.DateTimeField(auto_now=True)
-#     symlink = models.CharField(max_length=128, blank=True, null=True, default=None)
-
-#     class Meta:
-#         unique_together = ("user", "product")
-
-#     def createsymlink(self):
-#         if not self.symlink and self.product.video_download:
-#             self.symlink = self.product.video_download.createsymlink(self.user)
-
-#     def expires(self):
-#         return self.date + timedelta(days=DAYS_TO_SHOW_PURCHASED_PRODUCTS)
+class Order(import_item(CART_ORDER_CLASS) if CART_ORDER_CLASS else OrderAbstractDefault):
+    pass

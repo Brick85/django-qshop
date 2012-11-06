@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% load i18n %}
+{% load url from future %}
+
+{% block body_id %}cart_order_body{% endblock %}
+
+{% block content %}
+<div class="cart" id="step2">
+
+    <form method="post" action="{% url 'order_cart' %}">
+        {% csrf_token %}
+        <div>
+            {{ order_form.as_p }}
+        </div>
+
+        {{ cart.as_table }}
+
+        <div class="checkout">
+            <input type="submit" value="{% trans "Process order" %}" />
+        </div>
+
+    </form>
+    <div class="clear"></div>
+</div>
+{% endblock content %}

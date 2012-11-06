@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block content %}
+<div id="order_success">
+	<h1>{% trans "Thank You for Your purchase!" %}</h1>
+	<p>{% blocktrans with order.pk as num %}Your order Nr. {{ num }} confirmed!{% endblocktrans %}</p>
+</div>
+{% endblock content %}

@@ -12,22 +12,28 @@ Menu = import_item(MENUCLASS)
 
 
 class PricingModel:
+    def _get_price(self):
+        return self.price
+
+    def _get_discount_price(self):
+        return self.discount_price
+
     def has_discount(self):
-        if self.discount_price:
+        if self._get_discount_price():
             return True
         else:
             return False
 
     def get_price(self):
         if self.has_discount():
-            return Currency.get_price(self.discount_price)
-        return Currency.get_price(self.price)
+            return Currency.get_price(self._get_discount_price())
+        return Currency.get_price(self._get_price())
 
     def get_price_real(self):
-        return Currency.get_price(self.price)
+        return Currency.get_price(self._get_price())
 
     def get_price_discount(self):
-        return Currency.get_price(self.discount_price)
+        return Currency.get_price(self._get_discount_price())
 
     def get_fprice(self):
         return Currency.get_fprice(self.get_price(), True)
@@ -47,6 +53,9 @@ class PricingModel:
 
 
 class ProductAbstract(models.Model, PricingModel):
+
+    selected_variation = None
+
     SORT_VARIANTS = (
         ('natural', 'sort', _('natural')),
         ('price_asc', 'price', _('price low to high')),
@@ -58,8 +67,9 @@ class ProductAbstract(models.Model, PricingModel):
     parameters_set = models.ForeignKey('ParametersSet', verbose_name=_('parameters set'))
     articul = models.SlugField(_('articul'))
     name    = models.CharField(_('name'), max_length=128)
-    price = models.DecimalField(_('price'), max_digits=8, decimal_places=2)
-    discount_price = models.DecimalField(_('discount price'), max_digits=8, decimal_places=2, blank=True, null=True)
+    price = models.DecimalField(_('price'), max_digits=12, decimal_places=2)
+    weight = models.FloatField(_('weight'), default=0, blank=True)
+    discount_price = models.DecimalField(_('discount price'), max_digits=12, decimal_places=2, blank=True, null=True)
     description = models.TextField(_('description'), default='', blank=True)
     image = ThumbnailerImageField(_('image'), upload_to='products/main', blank=True, resize_source=dict(size=(1024, 1024)))
 
@@ -99,6 +109,26 @@ class ProductAbstract(models.Model, PricingModel):
 
     # def save(self, skip_variations=False, *args, **kwargs):
     #     super(Product, self).save(*args, **kwargs)
+
+    def _get_price(self):
+        if self.selected_variation:
+            return self.selected_variation.price
+        return self.price
+
+    def _get_discount_price(self):
+        if self.selected_variation:
+            return self.selected_variation.discount_price
+        return self.discount_price
+
+    def select_variation(self, variation_id):
+        if not self.has_variations:
+            return False
+        try:
+            variation = ProductVariation.objects.get(pk=variation_id)
+        except ProductVariation.DoesNotExist:
+            variation = ProductVariation.objects.filter(product=self)[0]
+        self.selected_variation = variation
+        return True
 
     def has_parameters(self):
         if self._get_parameters_for_product():
@@ -165,8 +195,8 @@ class ProductVariationValueAbstract(models.Model):
 class ProductVariationAbstract(models.Model, PricingModel):
     product = models.ForeignKey('Product')
     variation = models.ForeignKey('ProductVariationValue')
-    price = models.DecimalField(_('price'), max_digits=8, decimal_places=2)
-    discount_price = models.DecimalField(_('discount price'), max_digits=8, decimal_places=2, blank=True, null=True)
+    price = models.DecimalField(_('price'), max_digits=12, decimal_places=2)
+    discount_price = models.DecimalField(_('discount price'), max_digits=12, decimal_places=2, blank=True, null=True)
     sort = models.IntegerField(_('sort'), default=0)
 
     class Meta:

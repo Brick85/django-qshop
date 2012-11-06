@@ -23,20 +23,28 @@
         </div>
     {% endif %}
 
-    {% if product.has_variations %}
-        <h3>Prices</h3>
-        <table>
-            {% for variation in product.get_variations %}
-                <tr>
-                    <td>{{ variation.name }}</td>
-                    <td>{{ variation.get_fprice }}{% if variation.has_discount %} old price: {{ variation.get_fprice_real }}{% endif %}</td>
-                </tr>
-            {% endfor %}
-        </table>
-    {% else %}
-        <h3>Price</h3>
-        <p>{{ product.get_fprice }}{% if product.has_discount %} old price: {{ product.get_fprice_real }}{% endif %}</p>
-    {% endif %}
+    <form method="get" action="{% url 'add_to_cart' product_id=product.pk %}">
+        {% if product.has_variations %}
+            <h3>Prices</h3>
+            <table>
+                {% for variation in product.get_variations %}
+                    <tr>
+                        <td><input type="radio" name="variation" value="{{ variation.pk }}" /></td>
+                        <td>{{ variation.name }}</td>
+                        <td>{{ variation.get_fprice }}{% if variation.has_discount %} old price: {{ variation.get_fprice_real }}{% endif %}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% else %}
+            <h3>Price</h3>
+            <p>{{ product.get_fprice }}{% if product.has_discount %} old price: {{ product.get_fprice_real }}{% endif %}</p>
+        {% endif %}
+
+        <div>
+                <label>Quantity: </label><input type="text" name="quantity" value="1" /><br />
+                <input type="submit" value="Add to cart" />
+        </div>
+    </form>
 
     {% if product.has_parameters %}
         <h3>Parameters</h3>
@@ -47,12 +55,5 @@
             {% endfor %}
         </dl>
     {% endif %}
-
-    <div>
-        <form method="get" action="{% url 'add_to_cart' product_id=product.pk %}">
-            <label>Quantity: </label><input type="text" name="quantity" value="1" /><br />
-            <input type="submit" value="Add to cart" />
-        </form>
-    </div>
 
 {% endblock shopcontent %}

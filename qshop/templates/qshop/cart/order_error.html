@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block content %}
+<div id="order_error">
+	<h1>{% trans "Error while paying!" %}</h1>
+	<p>{% trans "You didn't buy products" %}</p>
+</div>
+{% endblock content %}

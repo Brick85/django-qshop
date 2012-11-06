@@ -1,18 +1,23 @@
 {% load i18n %}
-<table style="border-collapse: collapse; width: 650px; font-size: 12px; ">
+<table>
     <thead>
-        <tr style="border-bottom: 1px dotted #CCC; background-color: #F0EFEF;">
-            <th style="padding: 2px 15px; ">{% trans "Product" %}</th>
-            <th style="padding: 2px 15px; ">{% trans "Price" %}</th>
-            <th style="padding: 2px 15px; ">{% trans "Qty" %}</th>
-            <th style="padding: 2px 15px; ">{% trans "Sum" %}</th>
+        <tr>
+            <th>{% trans "Product" %}</th>
+            <th>{% trans "Price" %}</th>
+            <th>{% trans "Qty" %}</th>
+            <th>{% trans "Sum" %}</th>
         </tr>
     </thead>
     <tbody>
         {% for item in cart %}
-        <tr style="border-bottom: 1px dotted #CCC; text-align: center">
-            <td><a href="http://{{ site.domain }}{{ item.product.get_absolute_url }}">{{ item.product.name }}</a><br />{{ item.product.articul }}</td>
-            <td>{{ item.product.get_price }}</td>
+        <tr>
+            <td>
+                <a href="http://{{ site.domain }}{{ item.product.get_absolute_url }}">{{ item.product.name }}</a>
+                <br />
+                {{ item.product.articul }}
+                {% if item.product.has_variations %} / {{ item.product.selected_variation.name }}{% endif %}
+            </td>
+            <td>{{ item.product.get_fprice }}</td>
             <td>{{ item.quantity }}</td>
             <td>{{ item.total_fprice }}</td>
         </tr>
@@ -20,16 +25,16 @@
     </tbody>
     <tfoot>
         <tr>
-            <td colspan="3" style="text-align: right; paddin: 5px 15px">{% trans "Price" %}:</td>
-            <td style="text-align: center"><b style="color: #007CC3;">{{ cart.total_fprice }}</b></td>
+            <td colspan="3">{% trans "Price" %}:</td>
+            <td><b>{{ cart.total_fprice }}</b></td>
         </tr>
         <tr>
-            <td colspan="3" style="text-align: right; paddin: 5px 15px">{% trans "Delivery" %}:</td>
-            <td style="text-align: center"><b style="color: #007CC3;">{{ cart.delivery_fprice }}</b></td>
+            <td colspan="3">{% trans "Delivery" %}:</td>
+            <td><b>{{ cart.delivery_fprice }}</b></td>
         </tr>
         <tr>
-            <td colspan="3" style="text-align: right; paddin: 5px 15px">{% trans "Total price" %}:</td>
-            <td style="text-align: center"><b style="color: #007CC3;">{{ cart.total_fprice_with_delivery }}</b></td>
+            <td colspan="3">{% trans "Total price" %}:</td>
+            <td><b>{{ cart.total_fprice_with_delivery }}</b></td>
         </tr>
     </tfoot>
 </table>

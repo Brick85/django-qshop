@@ -115,7 +115,7 @@ class Cart:
     def set_session_id(self, request, cart_id):
         request.session[CART_ID] = cart_id
 
-    def add(self, product, unit_price, quantity=1):
+    def add(self, product, quantity=1):
         try:
             item = models.Item.objects.get(
                 cart=self.cart,
@@ -125,45 +125,46 @@ class Cart:
             item = models.Item()
             item.cart = self.cart
             item.product = product
-            item.unit_price = str(unit_price)
+            item.unit_price = product.get_price()
             item.quantity = quantity
+            item.product_variation = product.selected_variation
             item.save()
         else:
             item.quantity += int(quantity)
             item.save()
 
-    def remove(self, product):
+    def remove(self, item_id):
         try:
             item = models.Item.objects.get(
                 cart=self.cart,
-                product=product,
+                pk=item_id,
             )
         except models.Item.DoesNotExist:
-            raise ItemDoesNotExist
+            pass
         else:
             item.delete()
 
-    def update(self, product, quantity):
+    def update(self, item_id, quantity):
         try:
             item = models.Item.objects.get(
                 cart=self.cart,
-                product=product,
+                pk=item_id,
             )
             item.quantity = int(quantity)
             item.save()
         except models.Item.DoesNotExist:
-            raise ItemDoesNotExist
+            pass
 
     def clear(self):
         for item in self.cart.item_set:
             item.delete()
 
-    def as_table(self, order=False):
+    def as_table(self):
         return render_to_string('qshop/cart/_cart_as_table.html', {
             'site': Site.objects.get_current(),
             'cart': self,
         })
 
-    def check_out(self):
+    def checkout(self):
         self.cart.checked_out = True
         self.cart.save()

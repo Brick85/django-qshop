@@ -1,16 +1,11 @@
-{% extends 'base.html' %}
+{% extends 'qshop/shoppage.html' %}
 {% load i18n thumbnail %}
 {% load url from future %}
 
 {% block body_id %}cart_show_body{% endblock %}
 
-{% block content %}
-<div class="cart" id="step1">
-    <div id="steps">
-        <div class="step">{% trans "Finish" %}</div>
-        <div class="step" id="active">{% trans "Step 1" %}</div>
-        <span>{% trans "Making your order takes only 2 minutes!" %}</span>
-    </div>
+{% block shopcontent %}
+<div class="cart">
 
         {% if cart.total_products == 0 %}
             <h2>{% trans 'Cart is empty' %}</h2>
@@ -22,6 +17,7 @@
                     <tr>
                         <th class="name">{% trans "Product name" %}</th>
                         <th class="sku">{% trans "SKU" %}</th>
+                        <th class="variation">{% trans "Variation" %}</th>
                         <th class="qty">{% trans "Qty" %}</th>
                         <th class="discount">{% trans "Discount" %}</th>
                         <th class="price">{% trans "Price" %}</th>
@@ -39,9 +35,10 @@
                             {{ item.product.description|striptags|truncatewords:20|safe }}
                         </td>
                         <td class="sku">{{ item.product.articul }}</td>
+                        <td class="sku">{% if item.product.has_variations %}{{ item.product.selected_variation.name }}{% endif %}</td>
                         <td class="qty">
-                            <input type="text" name="quantity.{{ item.product.id }}" value="{{ item.quantity }}" class="j_qty_input" />
-                            <a href="{% url 'remove_from_cart' item.product.id %}">{% trans "remove" %}</a>
+                            <input type="text" name="quantity.{{ item.pk }}" value="{{ item.quantity }}" class="j_qty_input" />
+                            <a href="{{ item.get_cartremove_url }}">{% trans "remove" %}</a>
                         </td>
                         <td class="discount">
                             {% if item.product.get_discount_percent %}{{ item.product.get_discount_percent }}%{% else %}{% endif %}
@@ -65,9 +62,9 @@
                 </tfoot>
             </table>
             <div class="clear"></div>
-            {# <a href="{% url order_cart %}" class="button-forward"><span></span>{% trans "Forward" %}</a> #}
+            <a href="{% url 'order_cart' %}">{% trans "Make Order" %}</a>
             <div class="clear"></div>
             </form>
         {% endif %}
 </div>
-{% endblock content %}
+{% endblock shopcontent %}

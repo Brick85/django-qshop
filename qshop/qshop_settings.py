@@ -1,4 +1,5 @@
 from django.conf import settings
+_ = lambda x: x
 
 if not 'sitemenu' in settings.INSTALLED_APPS:
     raise Exception('Error! qShop requires django-sitemenu!')
@@ -19,3 +20,15 @@ PARAMETERS_SET_CLASS       = getattr(settings, 'QSHOP_PARAMETERS_SET_CLASS',    
 PARAMETER_CLASS            = getattr(settings, 'QSHOP_PARAMETER_CLASS',            None)
 PARAMETER_VALUE_CLASS      = getattr(settings, 'QSHOP_PARAMETER_VALUE_CLASS',      None)
 PRODUCT_TO_PARAMETER_CLASS = getattr(settings, 'QSHOP_PRODUCT_TO_PARAMETER_CLASS', None)
+
+
+CART_ORDER_CLASS = getattr(settings, 'QSHOP_CART_ORDER_CLASS', None)
+
+
+MAIL_TYPES = {
+    'order_sended': {
+        'reply_to_mail': 'qshop@qwe.lv',
+        'subject_prefix': _('[qShop] '),
+        'admin_mails': ['qshop_admin@qwe.lv'],
+    },
+}

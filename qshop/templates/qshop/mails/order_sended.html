@@ -1,0 +1,15 @@
+<h1>Your order accepted!</h1>
+
+<p>Name: {{ order.name }}</p>
+<p>Address: {{ order.address }}</p>
+<p>Email: {{ order.email }}</p>
+<p>Phone: {{ order.phone }}</p>
+
+{% if order.comments %}
+<p>Comments:</p>
+<p>{{ order.get_comments }}</p>
+{% endif %}
+
+<h2>Items ordered</h2>
+
+{{ order.cart_text }}
