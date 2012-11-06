@@ -6,15 +6,11 @@ You can install django-qshop from GitHub_
 
 .. _GitHub: https://github.com/Brick85/django-qshop
 
-Or from PyPi:
-
-.. code:: bash
+Or from PyPI: ::
 
     pip install django-qshop
 
-And add to INSTALLED_APPS:
-
-.. code:: python
+And add to INSTALLED_APPS: ::
 
     INSTALLED_APPS = (
         ...

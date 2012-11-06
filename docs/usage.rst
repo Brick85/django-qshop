@@ -41,9 +41,7 @@ Usage
 
 В случае, если вам нужно добавить к продукту дополнительное поле, то можно воспользоваться абстрактным классом:
 
-qshop_custom/models.py
-
-.. code:: python
+qshop_custom/models.py ::
 
     from django.db import models
     from qshop.models import ProductAbstract
@@ -55,9 +53,7 @@ qshop_custom/models.py
         class Meta:
             abstract = True
 
-settings.py
-
-.. code:: python
+settings.py ::
 
     QSHOP_PRODUCT_CLASS = 'qshop_custom.models.ProductCustom'
 
@@ -88,9 +84,7 @@ settings.py
 
 Вы можете создать класс, который добавит нужные поля в заказ:
 
-qshop_custom/models.py
-
-.. code:: python
+qshop_custom/models.py ::
 
     from django.db import models
     from qshop.cart.models import OrderAbstract
@@ -102,15 +96,11 @@ qshop_custom/models.py
         class Meta:
             abstract = True
 
-settings.py
-
-.. code:: python
+settings.py ::
 
     CART_ORDER_CLASS = 'qshop_custom.cart.models.OrderCustom'
 
-Так же вы можете захотеть изменить процесс покупки (чаще всего для получения оплаты). Добавте к OrderCustom:
-
-.. code:: python
+Так же вы можете захотеть изменить процесс покупки (чаще всего для получения оплаты). Добавте к OrderCustom: ::
 
     def get_redirect(self):
         return reverse(<my view>)
@@ -125,9 +115,7 @@ settings.py
 
 Естественно не стоит забывать о логгировании всех оплат и т.д.
 
-Скорее всего вам захочется изменить форму заказа в админке. Это можно сделать с помощью unregister.
-
-.. code:: python
+Скорее всего вам захочется изменить форму заказа в админке. Это можно сделать с помощью unregister. ::
 
     from django.contrib import admin
     from qshop.cart.models import Order
