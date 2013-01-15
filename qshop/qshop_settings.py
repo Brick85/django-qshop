@@ -32,3 +32,8 @@ MAIL_TYPES = {
         'admin_mails': ['qshop_admin@qwe.lv'],
     },
 }
+
+PAGES = getattr(settings, 'QSHOP_PAGES', (
+    ('pcat', 'Category page', 'qshop.views.render_categorypage'),
+    ('prod', 'Products page', 'qshop.views.render_productspage'),
+))
