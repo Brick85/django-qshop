@@ -76,7 +76,7 @@ class ProductAdmin(admin.ModelAdmin):
             obj.save()
 
     def get_readonly_fields(self, request, obj=None):
-        if obj.has_variations:
+        if obj and obj.has_variations:
             readonly_fields = list(self.readonly_fields) + ['price', 'discount_price']
         else:
             readonly_fields = self.readonly_fields

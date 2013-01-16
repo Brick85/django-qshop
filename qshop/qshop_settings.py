@@ -4,7 +4,7 @@ _ = lambda x: x
 if not 'sitemenu' in settings.INSTALLED_APPS:
     raise Exception('Error! qShop requires django-sitemenu!')
 
-PRODUCTS_ON_PAGE = getattr(settings, 'QSHOP_PRODUCTS_ON_PAGE', 2)
+PRODUCTS_ON_PAGE = getattr(settings, 'QSHOP_PRODUCTS_ON_PAGE', 10)
 
 NEED_COUNT_IN_FILTER = getattr(settings, 'QSHOP_NEED_COUNT_IN_FILTER', True)
 
