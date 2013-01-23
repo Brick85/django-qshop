@@ -24,6 +24,8 @@ PRODUCT_TO_PARAMETER_CLASS = getattr(settings, 'QSHOP_PRODUCT_TO_PARAMETER_CLASS
 
 CART_ORDER_CLASS = getattr(settings, 'QSHOP_CART_ORDER_CLASS', None)
 
+CART_ORDER_FORM = getattr(settings, 'QSHOP_CART_ORDER_FORM', None)
+
 
 MAIL_TYPES = {
     'order_sended': {
@@ -34,6 +36,6 @@ MAIL_TYPES = {
 }
 
 PAGES = getattr(settings, 'QSHOP_PAGES', (
-    ('pcat', 'Category page', 'qshop.views.render_categorypage'),
-    ('prod', 'Products page', 'qshop.views.render_productspage'),
+#    ('pcat', 'Category page', 'qshop.views.render_shopspage'),
+    ('prod', 'Products page', 'qshop.views.render_shopspage'),
 ))

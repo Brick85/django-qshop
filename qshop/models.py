@@ -93,15 +93,21 @@ class ProductAbstract(models.Model, PricingModel):
             return self.absolute_url
         except:
             category = self.get_current_category()
-            self.absolute_url = reverse('dispatcher', kwargs={'url': "%s%s/" % (category.full_url, self.articul)})
+            try:
+                self.absolute_url = reverse('dispatcher', kwargs={'url': "%s%s/" % (category.full_url, self.articul)})
+            except AttributeError:
+                self.absolute_url = reverse('dispatcher', kwargs={'url': ''})
             return self.absolute_url
 
     def get_current_category(self):
         try:
             return self._current_category
         except:
-            self._current_category = self.category.all()[0]
-            return self._current_category
+            try:
+                self._current_category = self.category.all()[0]
+                return self._current_category
+            except:
+                pass
 
     def __init__(self, *args, **kwargs):
         super(ProductAbstract, self).__init__(*args, **kwargs)
@@ -175,7 +181,7 @@ class ProductAbstract(models.Model, PricingModel):
         try:
             return self._get_variations
         except:
-            self._get_variations = self.productvariation_set.all()
+            self._get_variations = self.productvariation_set.select_related('productvariationvalue').all()
             return self._get_variations
 
 
@@ -336,7 +342,10 @@ class Currency(models.Model):
 
     @staticmethod
     def get_price(price):
-        return float(price) / Currency.get_default_currency().rate
+        if price != None:
+            return float(price) / Currency.get_default_currency().rate
+        else:
+            return None
 
     @staticmethod
     def get_fprice(price, format_only=False):

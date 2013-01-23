@@ -116,6 +116,8 @@ class Cart:
         request.session[CART_ID] = cart_id
 
     def add(self, product, quantity=1):
+        if quantity <= 0:
+            return
         try:
             item = models.Item.objects.get(
                 cart=self.cart,

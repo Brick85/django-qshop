@@ -13,23 +13,43 @@ from ..models import Product
 from .forms import OrderForm
 from .models import Order
 
+import re
 
 def add_to_cart(request, product_id):
     cart = Cart(request)
 
     quantity = request.GET.get('quantity', 1)
     variation_id = request.GET.get('variation', None)
+    variation_quantities = {}
+
+    if not variation_id:
+        variation_quantity_re = re.compile('^variation_quantity_(\d+)$')
+        for item in request.GET:
+            match = variation_quantity_re.match(item)
+            if match:
+                try:
+                    variation_quantities[int(match.group(1))] = int(request.GET.get(item))
+                except ValueError:
+                    pass
+
     try:
         product = Product.objects.get(id=product_id)
     except Product.DoesNotExist:
         messages.add_message(request, messages.ERROR, _('Wrong product.'))
     else:
+        result = False
+        if not variation_quantities:
+            product.select_variation(variation_id)
+            if cart.add(product, quantity):
+                result = True
+        else:
+            for k, v in variation_quantities.items():
+                product.select_variation(k)
+                if cart.add(product, v):
+                    result = True
 
-        product.select_variation(variation_id)
-
-        cart.add(product, quantity)
-
-        messages.add_message(request, messages.INFO, _('Product added to <a href="%s">cart</a>.') % reverse('cart'))
+        if result:
+            messages.add_message(request, messages.INFO, _('Product added to <a href="%s">cart</a>.') % reverse('cart'))
 
     return_url = request.GET.get('return_url', None)
     if return_url:

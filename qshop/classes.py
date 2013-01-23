@@ -89,13 +89,19 @@ class CategoryData:
         except:
             selected_filters = {}
 
-        if 'filteradd' in self.request.GET or 'filterdel' in self.request.GET:
+        if 'filteradd' in self.request.GET or 'filterdel' in self.request.GET or 'filterset' in self.request.GET or 'filterclear' in self.request.GET:
             if 'filteradd' in self.request.GET:
                 action_type = 'add'
                 action_value = self.request.GET['filteradd']
-            else:
+            elif 'filterdel' in self.request.GET:
                 action_type = 'del'
                 action_value = self.request.GET['filterdel']
+            elif 'filterset' in self.request.GET:
+                action_type = 'set'
+                action_value = self.request.GET['filterset']
+            else:
+                action_type = 'clear'
+                action_value = ''
 
             wrong_data = False
 
@@ -113,13 +119,17 @@ class CategoryData:
                             selected_filters[filter_id].append(filter_value)
                     except:
                         selected_filters[filter_id] = [filter_value]
-                else:
+                elif action_type == 'del':
                     try:
                         selected_filters[filter_id].remove(filter_value)
                         if not selected_filters[filter_id]:
                             del selected_filters[filter_id]
                     except:
                         pass
+                elif action_type == 'set':
+                    selected_filters[filter_id] = [filter_value]
+            elif 'filterclear' in self.request.GET:
+                selected_filters = {}
 
             if not selected_filters:
                 self.filter_string = ''
