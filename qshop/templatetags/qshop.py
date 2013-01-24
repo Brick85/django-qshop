@@ -6,14 +6,20 @@ register = template.Library()
 
 
 @register.simple_tag(takes_context=True)
-def qshop_items_in_cart_with_qty(context):
+def qshop_items_in_cart_with_qty(context, as_var=None):
     cart = Cart(context['request'])
+    if as_var:
+        context[as_var] = cart.total_products_with_qty()
+        return ''
     return cart.total_products_with_qty()
 
 
 @register.simple_tag(takes_context=True)
-def qshop_items_in_cart(context):
+def qshop_items_in_cart(context, as_var=None):
     cart = Cart(context['request'])
+    if as_var:
+        context[as_var] = cart.total_products()
+        return ''
     return cart.total_products()
 
 
