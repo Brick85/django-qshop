@@ -6,6 +6,7 @@ from django.conf import settings
 
 import models
 from ..models import Currency
+from qshop import qshop_settings
 
 import overloadable_functions
 
@@ -161,9 +162,15 @@ class Cart:
         for item in self.cart.item_set:
             item.delete()
 
-    def as_table(self):
+    def as_table(self, standalone=False):
+        link_add = ''
+        image_add = ''
+        if standalone:
+            link_add = 'http://{0}'.format(Site.objects.get_current().domain if qshop_settings.CART_TABLE_LINK_ADD != None else qshop_settings.CART_TABLE_LINK_ADD)
+            image_add = 'http://{0}'.format(Site.objects.get_current().domain if qshop_settings.CART_TABLE_IMAGE_ADD != None else qshop_settings.CART_TABLE_IMAGE_ADD)
         return render_to_string('qshop/cart/_cart_as_table.html', {
-            'site': Site.objects.get_current(),
+            'LINK_ADD': link_add,
+            'IMAGE_ADD': image_add,
             'cart': self,
         })
 

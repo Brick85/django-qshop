@@ -12,7 +12,7 @@
         {% for item in cart %}
         <tr>
             <td>
-                <a href="http://{{ site.domain }}{{ item.product.get_absolute_url }}">{{ item.product.name }}</a>
+                <a href="{{ LINK_ADD }}{{ item.product.get_absolute_url }}">{{ item.product.name }}</a>
                 <br />
                 {{ item.product.articul }}
                 {% if item.product.has_variations %} / {{ item.product.selected_variation.name }}{% endif %}

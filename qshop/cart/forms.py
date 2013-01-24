@@ -19,7 +19,7 @@ else:
             order = super(OrderForm, self).save(*args, **kwargs)
 
             order.cart = cart.cart
-            order.cart_text = cart.as_table()
+            order.cart_text = cart.as_table(standalone=True)
 
             order.save()
 
