@@ -118,7 +118,7 @@ class Cart:
 
     def add(self, product, quantity=1):
         if quantity <= 0:
-            return
+            return False
         try:
             item = models.Item.objects.get(
                 cart=self.cart,
@@ -135,6 +135,7 @@ class Cart:
         else:
             item.quantity += int(quantity)
             item.save()
+        return True
 
     def remove(self, item_id):
         try:

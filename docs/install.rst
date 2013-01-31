@@ -10,7 +10,7 @@ You can install django-qshop from GitHub_ or from PyPI_: ::
 .. _PyPI: http://pypi.python.org/pypi/django-qshop
 
 
-And add to INSTALLED_APPS: ::
+Add to INSTALLED_APPS: ::
 
     INSTALLED_APPS = (
         ...
@@ -20,6 +20,11 @@ And add to INSTALLED_APPS: ::
         'easy_thumbnails',
         ...
     )
+
+And add to urls.py: ::
+
+    url(r'^cart/', include('qshop.cart.urls')),
+
 
 
 Requirements
