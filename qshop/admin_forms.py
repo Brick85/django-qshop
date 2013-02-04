@@ -1,5 +1,10 @@
 from django.forms.models import BaseInlineFormSet
 from .models import ParameterValue, Parameter
+from sitemenu.sitemenu_settings import MENUCLASS
+from sitemenu import import_item
+from django import forms
+
+Menu = import_item(MENUCLASS)
 
 
 class ProductToParameterFormset(BaseInlineFormSet):
@@ -14,3 +19,17 @@ class ProductToParameterFormset(BaseInlineFormSet):
             else:
                 values = ParameterValue.objects.filter(parameter=parameter)
         form.fields['value'].queryset = values
+
+
+class CategoryForm(forms.Form):
+    category = forms.ModelChoiceField(Menu.objects)
+
+    def __init__(self, *args, **kwargs):
+        qs = kwargs.pop('qs', None)
+        super(CategoryForm, self).__init__(*args, **kwargs)
+        if qs:
+            self.fields['category'].queryset = qs
+
+
+class PriceForm(forms.Form):
+    percent = forms.IntegerField()

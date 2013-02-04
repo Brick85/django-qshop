@@ -88,6 +88,15 @@ class ProductAbstract(models.Model, PricingModel):
     def __unicode__(self):
         return "%s (articul: %s)" % (self.name, self.articul)
 
+    def admin_price_display(self):
+        if self.has_discount():
+            price = '{0} <span style="text-decoration: line-through">{1}</span>'.format(self.get_fprice(), self.get_fprice_real())
+        else:
+            price = self.get_fprice()
+        return price
+    admin_price_display.allow_tags = True
+    admin_price_display.short_description = 'Price'
+
     def get_absolute_url(self):
         try:
             return self.absolute_url
@@ -98,6 +107,9 @@ class ProductAbstract(models.Model, PricingModel):
             except AttributeError:
                 self.absolute_url = reverse('dispatcher', kwargs={'url': ''})
             return self.absolute_url
+
+    def get_absolute_url_fast(self):
+        return reverse('redirect_to_product', kwargs={'product_id': self.pk})
 
     def get_current_category(self):
         try:

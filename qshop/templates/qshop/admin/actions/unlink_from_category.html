@@ -1,0 +1,24 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+
+<p>Select category to unlink:</p>
+
+<form action="" method="post">
+    {% csrf_token %}
+
+    {{ form }}
+
+    <p>Category will be unlinked from:</p>
+
+    <ul>{{ queryset|unordered_list }}</ul>
+
+    {% for obj in queryset %}
+    <input type="hidden" name="{{ action_checkbox_name }}" value="{{ obj.pk }}" />
+    {% endfor %}
+
+    <input type="hidden" name="action" value="unlink_from_category" />
+    <input type="submit" name="apply" value="Apply" />
+</form>
+
+{% endblock %}

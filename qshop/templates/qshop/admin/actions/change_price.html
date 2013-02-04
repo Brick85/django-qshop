@@ -1,0 +1,25 @@
+{% extends "admin/base_site.html" %}
+
+{% block content %}
+
+<p>Change price by:</p>
+
+<form action="" method="post">
+    {% csrf_token %}
+
+    {{ form }}
+
+    <p>If 10 is entered, then price for all products increases by 10%. For product with price 200 new price will be 220.</p>
+    <p>Will be applied to:</p>
+
+    <ul>{{ queryset|unordered_list }}</ul>
+
+    {% for obj in queryset %}
+    <input type="hidden" name="{{ action_checkbox_name }}" value="{{ obj.pk }}" />
+    {% endfor %}
+
+    <input type="hidden" name="action" value="change_price" />
+    <input type="submit" name="apply" value="Apply" />
+</form>
+
+{% endblock %}

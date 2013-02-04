@@ -1,9 +1,10 @@
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
-from django.http import Http404
+#from django.http import Http404
 from .functions import get_products_page_data
 from .classes import CategoryData
 from .models import Product
+from django.http import HttpResponsePermanentRedirect
 
 
 # def render_categorypage(request, menu, url_add):
@@ -46,3 +47,8 @@ def render_shopspage(request, menu, url_add):
                 'url_add': url_add,
                 'product': product,
             }, context_instance=RequestContext(request))
+
+
+def redirect_to_product(request, product_id):
+    product = get_object_or_404(Product, pk=product_id)
+    return HttpResponsePermanentRedirect(product.get_absolute_url())

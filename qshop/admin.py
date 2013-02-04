@@ -2,11 +2,21 @@ from django.contrib import admin
 from .models import Product, ProductVariationValue, ProductVariation, ProductImage, ParametersSet, Parameter, ProductToParameter, ParameterValue
 #from django.db import models
 
-from .admin_forms import ProductToParameterFormset
+from .admin_forms import ProductToParameterFormset, CategoryForm, PriceForm
 
 from .admin_filters import ProductCategoryListFilter
 
 from django.conf import settings
+
+from django.shortcuts import render_to_response
+from django.template import RequestContext
+from django.contrib.admin import helpers
+from django.http import HttpResponseRedirect
+from sitemenu import import_item
+from sitemenu.sitemenu_settings import MENUCLASS
+from decimal import Decimal
+
+Menu = import_item(MENUCLASS)
 
 
 class ProductVariationInline(admin.TabularInline):
@@ -39,9 +49,10 @@ class ProductToParameterInline(admin.TabularInline):
 class ProductAdmin(admin.ModelAdmin):
     inlines = [ProductVariationInline, ProductImageInline, ProductToParameterInline]
     prepopulated_fields = {"articul": ("name",)}
-    list_display = ('articul', 'name', 'sort')
+    list_display = ('articul', 'name', 'has_variations', 'admin_price_display', 'sort')
     list_editable = ('sort',)
     list_filter = ('parameters_set', ProductCategoryListFilter)
+    actions = ['link_to_category', 'unlink_from_category', 'change_price', 'set_discount']
 
     filter_horizontal = ('category',)
 
@@ -90,6 +101,110 @@ class ProductAdmin(admin.ModelAdmin):
         css = {
             'screen': (settings.STATIC_URL + 'admin/qshop/css/products.css', settings.STATIC_URL + 'admin/sitemenu/css/images.css',),
         }
+
+    def link_to_category(self, request, queryset):
+
+        if 'apply' in request.POST:
+            form = CategoryForm(request.POST)
+            if form.is_valid():
+                cat = form.cleaned_data.get('category')
+
+                for obj in queryset:
+                    obj.category.add(cat)
+
+                self.message_user(request, "Successfully linked products to '%s'." % (cat))
+                return HttpResponseRedirect(request.get_full_path())
+        else:
+            form = CategoryForm()
+
+        return render_to_response('qshop/admin/actions/link_to_category.html', {
+            'form': form,
+            'queryset': queryset,
+            'action_checkbox_name': helpers.ACTION_CHECKBOX_NAME,
+        }, context_instance=RequestContext(request))
+    link_to_category.short_description = "Link to category"
+
+    def unlink_from_category(self, request, queryset):
+        cats = Menu.objects.filter(product__in=queryset).distinct()
+
+        if 'apply' in request.POST:
+            form = CategoryForm(request.POST, qs=cats)
+            if form.is_valid():
+                cat = form.cleaned_data.get('category')
+
+                for obj in queryset:
+                    obj.category.remove(cat)
+
+                self.message_user(request, "Successfully unlinked products from '%s'." % (cat))
+                return HttpResponseRedirect(request.get_full_path())
+        else:
+            form = CategoryForm(qs=cats)
+
+        return render_to_response('qshop/admin/actions/unlink_from_category.html', {
+            'form': form,
+            'queryset': queryset,
+            'action_checkbox_name': helpers.ACTION_CHECKBOX_NAME,
+        }, context_instance=RequestContext(request))
+    unlink_from_category.short_description = "Unlink from category"
+
+    def change_price(self, request, queryset):
+        if 'apply' in request.POST:
+            form = PriceForm(request.POST)
+            if form.is_valid():
+                percent = form.cleaned_data.get('percent')
+                percent_multiplier = Decimal(percent / Decimal(100) + Decimal(1))
+                for obj in queryset:
+                    obj.price = obj.price * percent_multiplier
+                    if obj.discount_price:
+                        obj.discount_price = obj.discount_price * percent_multiplier
+                    if obj.has_variations:
+                        for variation in obj.get_variations():
+                            variation.price = variation.price * percent_multiplier
+                            if variation.discount_price:
+                                variation.discount_price = variation.discount_price * percent_multiplier
+                            variation.save()
+                    obj.save()
+
+                self.message_user(request, "Successfully changed prices.")
+                return HttpResponseRedirect(request.get_full_path())
+        else:
+            form = PriceForm()
+
+        return render_to_response('qshop/admin/actions/change_price.html', {
+            'form': form,
+            'queryset': queryset,
+            'action_checkbox_name': helpers.ACTION_CHECKBOX_NAME,
+        }, context_instance=RequestContext(request))
+    change_price.short_description = "Change price by percent"
+
+    def set_discount(self, request, queryset):
+        if 'apply' in request.POST:
+            form = PriceForm(request.POST)
+            if form.is_valid():
+                percent = form.cleaned_data.get('percent')
+                if percent == 0:
+                    get_price = lambda x: None
+                else:
+                    get_price = lambda x: x * Decimal(-percent / Decimal(100) + Decimal(1))
+                for obj in queryset:
+                    obj.discount_price = get_price(obj.price)
+                    if obj.has_variations:
+                        for variation in obj.get_variations():
+                            variation.discount_price = get_price(variation.price)
+                            variation.save()
+                    obj.save()
+
+                self.message_user(request, "Successfully setted discounts.")
+                return HttpResponseRedirect(request.get_full_path())
+        else:
+            form = PriceForm()
+
+        return render_to_response('qshop/admin/actions/set_discount.html', {
+            'form': form,
+            'queryset': queryset,
+            'action_checkbox_name': helpers.ACTION_CHECKBOX_NAME,
+        }, context_instance=RequestContext(request))
+    set_discount.short_description = "Set discount by percent"
 
 admin.site.register(Product, ProductAdmin)
 
