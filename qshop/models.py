@@ -65,7 +65,7 @@ class ProductAbstract(models.Model, PricingModel):
 
     has_variations = models.BooleanField(default=False, editable=False)
     parameters_set = models.ForeignKey('ParametersSet', verbose_name=_('parameters set'))
-    articul = models.SlugField(_('articul'))
+    articul = models.SlugField(_('articul'), unique=True)
     name    = models.CharField(_('name'), max_length=128)
     price = models.DecimalField(_('price'), max_digits=12, decimal_places=2)
     weight = models.FloatField(_('weight'), default=0, blank=True)
