@@ -6,8 +6,6 @@ if not 'sitemenu' in settings.INSTALLED_APPS:
 
 PRODUCTS_ON_PAGE = getattr(settings, 'QSHOP_PRODUCTS_ON_PAGE', 10)
 
-NEED_COUNT_IN_FILTER = getattr(settings, 'QSHOP_NEED_COUNT_IN_FILTER', True)
-
 
 PRODUCT_CLASS              = getattr(settings, 'QSHOP_PRODUCT_CLASS',              None)
 
@@ -28,15 +26,17 @@ CART_ORDER_FORM = getattr(settings, 'QSHOP_CART_ORDER_FORM', None)
 CART_TABLE_LINK_ADD = getattr(settings, 'QSHOP_CART_TABLE_LINK_ADD', None)
 CART_TABLE_IMAGE_ADD = getattr(settings, 'QSHOP_CART_TABLE_IMAGE_ADD', None)
 
-MAIL_TYPES = {
+MAIL_TYPES = getattr(settings, 'QSHOP_MAIL_TYPES', {
     'order_sended': {
         'reply_to_mail': 'qshop@qwe.lv',
         'subject_prefix': _('[qShop] '),
         'admin_mails': ['qshop_admin@qwe.lv'],
     },
-}
+})
 
 PAGES = getattr(settings, 'QSHOP_PAGES', (
-#    ('pcat', 'Category page', 'qshop.views.render_shopspage'),
     ('prod', 'Products page', 'qshop.views.render_shopspage'),
 ))
+
+USING_FILTERS = getattr(settings, 'QSHOP_USING_FILTERS', True)
+NEED_COUNT_IN_FILTER = getattr(settings, 'QSHOP_NEED_COUNT_IN_FILTER', True)
