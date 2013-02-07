@@ -211,6 +211,9 @@ class ProductVariationValueAbstract(models.Model):
     def __unicode__(self):
         return "%s" % self.value
 
+    def get_filter_name(self):
+        return self.value
+
 
 class ProductVariationAbstract(models.Model, PricingModel):
     product = models.ForeignKey('Product', verbose_name=_('product'))

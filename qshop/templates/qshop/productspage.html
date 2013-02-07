@@ -15,7 +15,7 @@
         <h2>Products</h2>
 
         {% if productdata.filters %}
-            {% for filter_id, filter_data in productdata.filters.items %}
+            {% for filter_id, filter_data in productdata.get_filters %}
                 <div>{{ filter_data.name }}:
                     {% for value_id, value_data in filter_data.values %}
                         {% if value_data.active %}

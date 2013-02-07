@@ -38,5 +38,15 @@ PAGES = getattr(settings, 'QSHOP_PAGES', (
     ('prod', 'Products page', 'qshop.views.render_shopspage'),
 ))
 
-USING_FILTERS = getattr(settings, 'QSHOP_USING_FILTERS', True)
-NEED_COUNT_IN_FILTER = getattr(settings, 'QSHOP_NEED_COUNT_IN_FILTER', True)
+FILTERS_ENABLED = getattr(settings, 'QSHOP_FILTERS_ENABLED', True)
+FILTERS_NEED_COUNT = getattr(settings, 'QSHOP_FILTERS_NEED_COUNT', True)
+FILTERS_PRECLUDING = getattr(settings, 'QSHOP_FILTERS_PRECLUDING', True)
+
+FILTERS_FIELDS = getattr(settings, 'QSHOP_FILTERS_FIELDS', [])
+
+FILTERS_ORDER = getattr(settings, 'QSHOP_FILTERS_ORDER', [
+    'p',  # properties
+    'v',  # variations
+])
+
+VARIATION_FILTER_NAME = _('Variation')  # or add "def get_variation_name(self):" to ProductsSet or Menu
