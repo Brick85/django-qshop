@@ -91,7 +91,7 @@ class ProductAbstract(models.Model, PricingModel):
 
     def admin_price_display(self):
         if self.has_discount():
-            price = '{0} <span style="text-decoration: line-through">{1}</span>'.format(self.get_fprice(), self.get_fprice_real())
+            price = u'{0} <span style="text-decoration: line-through">{1}</span>'.format(self.get_fprice(), self.get_fprice_real())
         else:
             price = self.get_fprice()
         return price
