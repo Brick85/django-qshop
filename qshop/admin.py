@@ -19,17 +19,51 @@ from decimal import Decimal
 Menu = import_item(MENUCLASS)
 
 
-class ProductVariationInline(admin.TabularInline):
+parent_classes = {
+    'ModelAdmin': admin.ModelAdmin,
+    'TabularInline': admin.TabularInline,
+    'StackedInline': admin.StackedInline,
+}
+if 'modeltranslation' in settings.INSTALLED_APPS:
+    from modeltranslation.admin import TranslationAdmin, TranslationTabularInline, TranslationStackedInline
+    USE_TRANSLATION = True
+    parent_classes_translation = {
+        'ModelAdmin': TranslationAdmin,
+        'TabularInline': TranslationTabularInline,
+        'StackedInline': TranslationStackedInline,
+    }
+else:
+    USE_TRANSLATION = False
+
+if 'tinymce' in settings.INSTALLED_APPS:
+    from django.db import models
+    from tinymce.widgets import AdminTinyMCE
+    qshop_formfield_overrides = {
+        models.TextField: {'widget': AdminTinyMCE},
+    }
+else:
+    qshop_formfield_overrides = {}
+
+
+def getParentClass(class_type, main_class):
+    if USE_TRANSLATION and hasattr(main_class, '_translation_fields'):
+        use_parent_classes = parent_classes_translation
+    else:
+        use_parent_classes = parent_classes
+    return use_parent_classes[class_type]
+
+
+class ProductVariationInline(getParentClass('TabularInline', ProductVariation)):
     model = ProductVariation
     extra = 1
 
 
-class ProductImageInline(admin.TabularInline):
+class ProductImageInline(getParentClass('TabularInline', ProductImage)):
     model = ProductImage
     extra = 1
 
 
-class ProductToParameterInline(admin.TabularInline):
+class ProductToParameterInline(getParentClass('TabularInline', ProductToParameter)):
     model = ProductToParameter
     #formset = ProductToTypeFieldFormset
     extra = 0
@@ -46,7 +80,7 @@ class ProductToParameterInline(admin.TabularInline):
         return False
 
 
-class ProductAdmin(admin.ModelAdmin):
+class ProductAdmin(getParentClass('ModelAdmin', Product)):
     inlines = [ProductVariationInline, ProductImageInline, ProductToParameterInline]
     prepopulated_fields = {"articul": ("name",)}
     list_display = ('articul', 'name', 'has_variations', 'admin_price_display', 'sort')
@@ -55,6 +89,8 @@ class ProductAdmin(admin.ModelAdmin):
     actions = ['link_to_category', 'unlink_from_category', 'change_price', 'set_discount']
 
     filter_horizontal = ('category',)
+
+    formfield_overrides = qshop_formfield_overrides
 
     def save_formset(self, request, form, formset, change):
         super(ProductAdmin, self).save_formset(request, form, formset, change)
@@ -209,18 +245,18 @@ class ProductAdmin(admin.ModelAdmin):
 admin.site.register(Product, ProductAdmin)
 
 
-class ParameterInline(admin.TabularInline):
+class ParameterInline(getParentClass('TabularInline', Parameter)):
     model = Parameter
 
 
-class ParametersSetAdmin(admin.ModelAdmin):
+class ParametersSetAdmin(getParentClass('ModelAdmin', ParametersSet)):
     inlines = [ParameterInline]
 
 
 admin.site.register(ParametersSet, ParametersSetAdmin)
 
 
-class ParameterValueAdmin(admin.ModelAdmin):
+class ParameterValueAdmin(getParentClass('ModelAdmin', ParameterValue)):
     list_display = ('value', 'parameter')
 
     class Media:
@@ -231,7 +267,7 @@ class ParameterValueAdmin(admin.ModelAdmin):
 admin.site.register(ParameterValue, ParameterValueAdmin)
 
 
-class ProductVariationValueAdmin(admin.ModelAdmin):
+class ProductVariationValueAdmin(getParentClass('ModelAdmin', ProductVariationValue)):
     list_display = ('value',)
 
 admin.site.register(ProductVariationValue, ProductVariationValueAdmin)

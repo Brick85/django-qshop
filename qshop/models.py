@@ -53,6 +53,7 @@ class PricingModel:
 
 
 class ProductAbstract(models.Model, PricingModel):
+    _translation_fields = ['name', 'description']
 
     selected_variation = None
 
@@ -63,7 +64,7 @@ class ProductAbstract(models.Model, PricingModel):
         ('name', 'name', _('by name')),
     )
 
-    has_variations = models.BooleanField(default=False, editable=False)
+    has_variations = models.BooleanField(_('has variations'), default=False, editable=False)
     parameters_set = models.ForeignKey('ParametersSet', verbose_name=_('parameters set'))
     articul = models.SlugField(_('articul'), unique=True)
     name    = models.CharField(_('name'), max_length=128)
@@ -198,7 +199,8 @@ class ProductAbstract(models.Model, PricingModel):
 
 
 class ProductVariationValueAbstract(models.Model):
-    value = models.CharField(_('name'), max_length=128)
+    _translation_fields = ['value']
+    value = models.CharField(_('title'), max_length=128)
 
     class Meta:
         verbose_name = _('product variation value')
@@ -211,8 +213,8 @@ class ProductVariationValueAbstract(models.Model):
 
 
 class ProductVariationAbstract(models.Model, PricingModel):
-    product = models.ForeignKey('Product')
-    variation = models.ForeignKey('ProductVariationValue')
+    product = models.ForeignKey('Product', verbose_name=_('product'))
+    variation = models.ForeignKey('ProductVariationValue', verbose_name=_('product variation value'))
     price = models.DecimalField(_('price'), max_digits=12, decimal_places=2)
     discount_price = models.DecimalField(_('discount price'), max_digits=12, decimal_places=2, blank=True, null=True)
     sort = models.IntegerField(_('sort'), default=0)
@@ -236,7 +238,7 @@ class ProductVariationAbstract(models.Model, PricingModel):
 
 class ProductImageAbstract(models.Model):
     image = ThumbnailerImageField(_('image'), upload_to='products/more', resize_source=dict(size=(1024, 1024)))
-    product = models.ForeignKey('Product')
+    product = models.ForeignKey('Product', verbose_name=_('product'))
 
     class Meta:
         verbose_name = _('product image')
@@ -248,7 +250,8 @@ class ProductImageAbstract(models.Model):
 
 
 class ParametersSetAbstract(models.Model):
-    name = models.CharField(_('name'), max_length=64)
+    _translation_fields = ['name']
+    name = models.CharField(_('title'), max_length=64)
 
     class Meta:
         verbose_name = _('parameters set')
@@ -260,8 +263,9 @@ class ParametersSetAbstract(models.Model):
 
 
 class ParameterAbstract(models.Model):
-    parameters_set = models.ForeignKey('ParametersSet')
-    name = models.CharField(_('name'), max_length=128)
+    _translation_fields = ['name']
+    parameters_set = models.ForeignKey('ParametersSet', verbose_name=_('parameters set'))
+    name = models.CharField(_('title'), max_length=128)
     is_filter = models.BooleanField(_('is filter'), default=True)
     order = models.IntegerField(_('order'))
 
@@ -276,7 +280,8 @@ class ParameterAbstract(models.Model):
 
 
 class ParameterValueAbstract(models.Model):
-    parameter = models.ForeignKey('Parameter')
+    _translation_fields = ['value']
+    parameter = models.ForeignKey('Parameter', verbose_name=_('parameter'))
     value = models.CharField(_('parameter value'), max_length=128)
 
     class Meta:
@@ -290,8 +295,8 @@ class ParameterValueAbstract(models.Model):
 
 
 class ProductToParameterAbstract(models.Model):
-    product = models.ForeignKey('Product')
-    parameter = models.ForeignKey('Parameter')
+    product = models.ForeignKey('Product', verbose_name=_('product'))
+    parameter = models.ForeignKey('Parameter', verbose_name=_('parameter'))
     value = models.ForeignKey('ParameterValue', blank=True, null=True)
 
     class Meta:
@@ -340,7 +345,7 @@ class Currency(models.Model):
     name = models.CharField(_('currency name'), max_length=12)
     rate = models.FloatField(_('rate'))
     sort = models.SmallIntegerField(_('order'))
-    show_string = models.CharField(max_length=16)
+    show_string = models.CharField(_('show string'), max_length=16)
 
     current_currency = None
 
