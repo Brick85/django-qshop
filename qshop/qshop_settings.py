@@ -49,4 +49,4 @@ FILTERS_ORDER = getattr(settings, 'QSHOP_FILTERS_ORDER', [
     'v',  # variations
 ])
 
-VARIATION_FILTER_NAME = _('Variation')  # or add "def get_variation_name(self):" to ProductsSet or Menu
+VARIATION_FILTER_NAME = getattr(settings, 'QSHOP_VARIATION_FILTER_NAME', _('Variation'))  # or add "def get_variation_name(self):" to ProductsSet or Menu
