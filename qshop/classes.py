@@ -92,39 +92,41 @@ class CategoryData:
                         )
                 elif filter_key == 'v':
                     variations = ProductVariationValue.objects.filter(productvariation__product__category=self.menu).distinct()
+                    if variations:
+                        filters_order.append('v')
 
-                    filters_order.append('v')
-
-                    if hasattr(self.menu, 'get_variation_name'):
-                        variation_name = self.menu.get_variation_name()
-                    elif hasattr(ParametersSet, 'get_variation_name'):
-                        try:
-                            variation_name = ParametersSet.objects.filter(product__category=self.menu)[0].get_variation_name()
-                        except:
+                        if hasattr(self.menu, 'get_variation_name'):
+                            variation_name = self.menu.get_variation_name()
+                        elif hasattr(ParametersSet, 'get_variation_name'):
+                            try:
+                                variation_name = ParametersSet.objects.filter(product__category=self.menu)[0].get_variation_name()
+                            except:
+                                variation_name = _(VARIATION_FILTER_NAME)
+                        else:
                             variation_name = _(VARIATION_FILTER_NAME)
-                    else:
-                        variation_name = _(VARIATION_FILTER_NAME)
 
-                    filters['v'] = {'name': variation_name, 'values': [], 'skip_unaviable': False, 'filter_type': 'and', 'filter_aviability_check': self._check_variation_filter}
-                    for variation in variations:
-                        filters['v']['values'].append(
-                            (variation.id, {'name': variation.get_filter_name(), 'active': False, 'unaviable': False, 'count': 0, 'filter': Q(productvariation__variation_id=variation.id)})
-                        )
+                        filters['v'] = {'name': variation_name, 'values': [], 'skip_unaviable': False, 'filter_type': 'and', 'filter_aviability_check': self._check_variation_filter}
+                        for variation in variations:
+                            filters['v']['values'].append(
+                                (variation.id, {'name': variation.get_filter_name(), 'active': False, 'unaviable': False, 'count': 0, 'filter': Q(productvariation__variation_id=variation.id)})
+                            )
                 else:
                     filters_order.append(filter_key)
                     field_name = FILTERS_FIELDS[filter_key]
                     if not hasattr(Product, field_name):
                         raise Exception('[qShop exception] Filter configuration error: there is no {0} in Product class!'.format(field_name))
                     field = Product._meta.get_field_by_name(field_name)[0]
-                    filters[filter_key] = {'name': field.verbose_name, 'values': [], 'skip_unaviable': False, 'filter_type': 'or', 'filter_aviability_check': self._check_foreignkey_filter}
                     model = field.rel.to
-                    for item in model.objects.filter(product__category=self.menu).distinct():
-                        q = {
-                            '{0}_id'.format(field_name): item.id
-                        }
-                        filters[filter_key]['values'].append(
-                            (item.id, {'name': item.__unicode__(), 'active': False, 'unaviable': False, 'count': 0, 'filter': Q(**q)})
-                        )
+                    items = model.objects.filter(product__category=self.menu).distinct()
+                    if items:
+                        filters[filter_key] = {'name': field.verbose_name, 'values': [], 'skip_unaviable': False, 'filter_type': 'or', 'filter_aviability_check': self._check_foreignkey_filter}
+                        for item in items:
+                            q = {
+                                '{0}_id'.format(field_name): item.id
+                            }
+                            filters[filter_key]['values'].append(
+                                (item.id, {'name': item.__unicode__(), 'active': False, 'unaviable': False, 'count': 0, 'filter': Q(**q)})
+                            )
 
         return filters, filters_order
 
