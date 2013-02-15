@@ -49,7 +49,7 @@ class CategoryData:
             self.need_return = True
 
     def process_products(self):
-        products = Product.objects.filter(category=self.menu)
+        products = Product.objects.filter(category=self.menu, hidden=False)
 
         for filter_q in self.get_q_filters():
             products = products.filter(filter_q)
@@ -78,7 +78,7 @@ class CategoryData:
             for filter_key in FILTERS_ORDER:
                 if filter_key == 'p':
                     filters_qs = ProductToParameter.objects.select_related('parameter', 'value')\
-                        .filter(product__category=self.menu, parameter__is_filter=True).exclude(value=None)\
+                        .filter(product__category=self.menu, product__hidden=False, parameter__is_filter=True).exclude(value=None)\
                         .order_by('parameter__parameters_set', 'parameter__order', 'value__value')
                     filters_qs.query.group_by = ['value']
 
@@ -91,7 +91,7 @@ class CategoryData:
                             (item.value.id, {'name': item.value.value, 'active': False, 'unaviable': False, 'count': 0, 'filter': Q(producttoparameter__value_id=item.value.id)})
                         )
                 elif filter_key == 'v':
-                    variations = ProductVariationValue.objects.filter(productvariation__product__category=self.menu).distinct()
+                    variations = ProductVariationValue.objects.filter(productvariation__product__category=self.menu, productvariation__product__hidden=False).distinct()
                     if variations:
                         filters_order.append('v')
 
@@ -117,7 +117,7 @@ class CategoryData:
                         raise Exception('[qShop exception] Filter configuration error: there is no {0} in Product class!'.format(field_name))
                     field = Product._meta.get_field_by_name(field_name)[0]
                     model = field.rel.to
-                    items = model.objects.filter(product__category=self.menu).distinct()
+                    items = model.objects.filter(product__category=self.menu, product__hidden=False).distinct()
                     if items:
                         filters[filter_key] = {'name': field.verbose_name, 'values': [], 'skip_unaviable': False, 'filter_type': 'or', 'filter_aviability_check': self._check_foreignkey_filter}
                         for item in items:
@@ -251,10 +251,15 @@ class CategoryData:
 
     def get_sorting_variants(self):
         for variant in Product.SORT_VARIANTS:
+            try:
+                add = variant[3]
+            except IndexError:
+                add = None
             yield {
                 'link': self.link_for_page(sorting=variant[0], skip_page=True),
                 'name': variant[2],
-                'selected': True if variant[0] == self.sort[0] else False
+                'selected': True if variant[0] == self.sort[0] else False,
+                'add': add
             }
 
     def get_filters(self):

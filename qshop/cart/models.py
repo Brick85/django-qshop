@@ -54,8 +54,11 @@ class Item(models.Model):
     def __unicode__(self):
         return '%s - %s' % (self.quantity, self.unit_price)
 
-    def total_price(self):
-        return Currency.get_price(self.quantity * self.unit_price)
+    def total_price(self, in_default_currency=False):
+        price = self.quantity * self.unit_price
+        if in_default_currency:
+            return price
+        return Currency.get_price(price)
 
     def total_fprice(self):
         return Currency.get_fprice(self.total_price(), format_only=True)
@@ -80,6 +83,7 @@ class OrderAbstract(models.Model):
         (1, _('New')),
         (2, _('In Progress')),
         (3, _('Completed')),
+        (4, _('Canceled')),
     )
 
     date_added           = models.DateTimeField(_('date added'), auto_now_add=True)
@@ -132,7 +136,7 @@ class OrderAbstractDefault(OrderAbstract):
         return u"%s (%s)" % (self.name, self.email)
 
     def save(self, *args, **kwargs):
-        self.payed = True
+        #self.payed = True
         super(OrderAbstractDefault, self).save(*args, **kwargs)
 
     def get_comments(self):

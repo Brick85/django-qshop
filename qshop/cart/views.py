@@ -8,7 +8,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import User, UserManager
 from django.contrib.auth import logout
 
-from . import Cart, ItemAlreadyExists, ItemDoesNotExist
+from . import Cart, ItemAlreadyExists, ItemDoesNotExist, ItemTooMany
 from ..models import Product
 from .forms import OrderForm
 from .models import Order
@@ -40,13 +40,19 @@ def add_to_cart(request, product_id):
         result = False
         if not variation_quantities:
             product.select_variation(variation_id)
-            if cart.add(product, quantity):
-                result = True
+            try:
+                if cart.add(product, quantity):
+                    result = True
+            except ItemTooMany, e:
+                messages.add_message(request, messages.WARNING, _('Can\'t add product "%s" due to lack in stock. Try to decrease quantity.' % e.product))
         else:
             for k, v in variation_quantities.items():
                 product.select_variation(k)
-                if cart.add(product, v):
-                    result = True
+                try:
+                    if cart.add(product, v):
+                        result = True
+                except ItemTooMany, e:
+                    messages.add_message(request, messages.WARNING, _('Can\'t add product "%s" due to lack in stock. Try to decrease quantity.' % e.product))
 
         if result:
             messages.add_message(request, messages.INFO, _('Product added to <a href="%s">cart</a>.') % reverse('cart'))
@@ -69,12 +75,9 @@ def update_cart(request):
     for (item_id, quantity) in data['quantity'].items():
         try:
             quantity = int(quantity)
-            if quantity < 1:
-                cart.remove(item_id)
-            else:
-                cart.update(item_id, quantity)
-        except:
-            pass
+            cart.update(item_id, quantity)
+        except ItemTooMany, e:
+            messages.add_message(request, messages.WARNING, _('Quantity for product "%s" not set due to lack in stock.' % e.product))
     return HttpResponseRedirect(reverse('cart'))
 
 
@@ -87,8 +90,6 @@ def show_cart(request):
 
 def order_cart(request):
     cart = Cart(request)
-    if cart.total_products() < 1:
-        return HttpResponseRedirect(reverse('cart'))
 
     order_form = OrderForm()
 
@@ -96,10 +97,16 @@ def order_cart(request):
         order_form = OrderForm(request.POST)
 
         if order_form.is_valid():
-            order = order_form.save(cart)
-            request.session['order_pk'] = order.pk
-            cart.checkout()
-            return HttpResponseRedirect(order.get_redirect())
+            try:
+                order = order_form.save(cart)
+                request.session['order_pk'] = order.pk
+                cart.checkout()
+                return HttpResponseRedirect(order.get_redirect())
+            except ItemTooMany:
+                messages.add_message(request, messages.WARNING, _('Someone already bought product that you are trying to buy.'))
+
+    if cart.total_products() < 1:
+        return HttpResponseRedirect(reverse('cart'))
 
     return render_to_response('qshop/cart/order.html', {
         'cart': cart,
@@ -113,7 +120,10 @@ def cart_order_success(request):
         del request.session['order_pk']
     except:
         pass
-    order = get_object_or_404(Order, pk=order_pk)
+    try:
+        order = Order.objects.get(pk=order_pk)
+    except:
+        return HttpResponseRedirect('/')
     return render_to_response('qshop/cart/order_success.html', {
         'order': order,
     }, context_instance=RequestContext(request))

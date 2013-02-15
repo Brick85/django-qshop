@@ -1,5 +1,6 @@
 from django.conf import settings
 _ = lambda x: x
+from cart.overloadable_functions import count_delivery_price
 
 if not 'sitemenu' in settings.INSTALLED_APPS:
     raise Exception('Error! qShop requires django-sitemenu!')
@@ -18,6 +19,8 @@ PARAMETERS_SET_CLASS       = getattr(settings, 'QSHOP_PARAMETERS_SET_CLASS',    
 PARAMETER_CLASS            = getattr(settings, 'QSHOP_PARAMETER_CLASS',            None)
 PARAMETER_VALUE_CLASS      = getattr(settings, 'QSHOP_PARAMETER_VALUE_CLASS',      None)
 PRODUCT_TO_PARAMETER_CLASS = getattr(settings, 'QSHOP_PRODUCT_TO_PARAMETER_CLASS', None)
+
+CURRENCY_CLASS             = getattr(settings, 'QSHOP_CURRENCY_CLASS',             None)
 
 
 CART_ORDER_CLASS = getattr(settings, 'QSHOP_CART_ORDER_CLASS', None)
@@ -50,3 +53,5 @@ FILTERS_ORDER = getattr(settings, 'QSHOP_FILTERS_ORDER', [
 ])
 
 VARIATION_FILTER_NAME = getattr(settings, 'QSHOP_VARIATION_FILTER_NAME', _('Variation'))  # or add "def get_variation_name(self):" to ProductsSet or Menu
+
+FUNCTION_DELIVERY = getattr(settings, 'QSHOP_FUNCTION_DELIVERY', count_delivery_price)

@@ -6,7 +6,7 @@ from django.utils.safestring import mark_safe
 
 from sitemenu.sitemenu_settings import MENUCLASS
 from sitemenu import import_item
-from .qshop_settings import PRODUCT_CLASS, VARIATION_CLASS, VARIATION_VALUE_CLASS, PRODUCT_IMAGE_CLASS, PARAMETERS_SET_CLASS, PARAMETER_CLASS, PARAMETER_VALUE_CLASS, PRODUCT_TO_PARAMETER_CLASS
+from .qshop_settings import PRODUCT_CLASS, VARIATION_CLASS, VARIATION_VALUE_CLASS, PRODUCT_IMAGE_CLASS, PARAMETERS_SET_CLASS, PARAMETER_CLASS, PARAMETER_VALUE_CLASS, PRODUCT_TO_PARAMETER_CLASS, CURRENCY_CLASS
 
 Menu = import_item(MENUCLASS)
 
@@ -24,10 +24,15 @@ class PricingModel:
         else:
             return False
 
-    def get_price(self):
+    def get_price(self, default_currency=False):
         if self.has_discount():
-            return Currency.get_price(self._get_discount_price())
-        return Currency.get_price(self._get_price())
+            price = self._get_discount_price()
+        else:
+            price = self._get_price()
+        if default_currency:
+            return price
+        else:
+            return Currency.get_price(price)
 
     def get_price_real(self):
         return Currency.get_price(self._get_price())
@@ -67,6 +72,7 @@ class ProductAbstract(models.Model, PricingModel):
     has_variations = models.BooleanField(_('has variations'), default=False, editable=False)
     parameters_set = models.ForeignKey('ParametersSet', verbose_name=_('parameters set'))
     articul = models.SlugField(_('articul'), unique=True)
+    hidden = models.BooleanField(_('hidden'), default=False)
     name    = models.CharField(_('name'), max_length=128)
     price = models.DecimalField(_('price'), max_digits=12, decimal_places=2)
     weight = models.FloatField(_('weight'), default=0, blank=True)
@@ -87,7 +93,10 @@ class ProductAbstract(models.Model, PricingModel):
         abstract = True
 
     def __unicode__(self):
-        return "%s (articul: %s)" % (self.name, self.articul)
+        if self.hidden:
+            return "[H] %s (articul: %s)" % (self.name, self.articul)
+        else:
+            return "%s (articul: %s)" % (self.name, self.articul)
 
     def admin_price_display(self):
         if self.has_discount():
@@ -99,6 +108,12 @@ class ProductAbstract(models.Model, PricingModel):
     admin_price_display.short_description = 'Price'
 
     def get_absolute_url(self):
+        if hasattr(self, '_current_category'):
+            return self.get_absolute_url_slow()
+        else:
+            return self.get_absolute_url_fast()
+
+    def get_absolute_url_slow(self):
         try:
             return self.absolute_url
         except:
@@ -196,6 +211,9 @@ class ProductAbstract(models.Model, PricingModel):
         except:
             self._get_variations = self.productvariation_set.select_related('productvariationvalue').all()
             return self._get_variations
+
+    def can_be_purchased(self, quantity):
+        return True
 
 
 class ProductVariationValueAbstract(models.Model):
@@ -308,6 +326,58 @@ class ProductToParameterAbstract(models.Model):
     def __unicode__(self):
         return 'Product Field Nr. %d' % self.parameter_id
 
+
+class CurrencyAbstract(models.Model):
+    code = models.CharField(_('code'), max_length=3, db_index=True)
+    name = models.CharField(_('currency name'), max_length=12)
+    rate = models.FloatField(_('rate'))
+    sort = models.SmallIntegerField(_('sort'))
+    show_string = models.CharField(_('show string'), max_length=16)
+
+    current_currency = None
+
+    class Meta:
+        verbose_name = _('currency')
+        verbose_name_plural = _('currencies')
+        ordering = ('sort',)
+        abstract = True
+
+    def __unicode__(self):
+        return self.code
+
+    @staticmethod
+    def get_price(price):
+        if price != None:
+            return Currency.get_price_notoverloadable(price)
+        else:
+            return None
+
+    @staticmethod
+    def get_fprice(price, format_only=False):
+        if not format_only:
+            price = Currency.get_default_currency().get_price(price)
+        return mark_safe(unicode(Currency.get_default_currency().show_string) % price)
+
+    #TODO fix per-session independence
+
+    @staticmethod
+    def get_default_currency():
+        if not Currency.current_currency:
+            Currency.current_currency = Currency.get_default_currency_notoverloadable()
+        return Currency.current_currency
+
+    @staticmethod
+    def set_default_currency(currency):
+        Currency.current_currency = currency
+
+    @staticmethod
+    def get_default_currency_notoverloadable():
+        return Currency.objects.all()[0]
+
+    @staticmethod
+    def get_price_notoverloadable(price):
+        return float(price) / Currency.get_default_currency().rate
+
 # Create real classes
 
 
@@ -343,38 +413,5 @@ class ProductToParameter(import_item(PRODUCT_TO_PARAMETER_CLASS) if PRODUCT_TO_P
     pass
 
 
-class Currency(models.Model):
-    code = models.CharField(_('code'), max_length=3, db_index=True)
-    name = models.CharField(_('currency name'), max_length=12)
-    rate = models.FloatField(_('rate'))
-    sort = models.SmallIntegerField(_('order'))
-    show_string = models.CharField(_('show string'), max_length=16)
-
-    current_currency = None
-
-    class Meta:
-        verbose_name = _('currency')
-        verbose_name_plural = _('currencies')
-        ordering = ('sort',)
-
-    def __unicode__(self):
-        return self.code
-
-    @staticmethod
-    def get_price(price):
-        if price != None:
-            return float(price) / Currency.get_default_currency().rate
-        else:
-            return None
-
-    @staticmethod
-    def get_fprice(price, format_only=False):
-        if not format_only:
-            price = Currency.get_default_currency().get_price(price)
-        return mark_safe(unicode(Currency.get_default_currency().show_string) % price)
-
-    @staticmethod
-    def get_default_currency():
-        if not Currency.current_currency:
-            Currency.current_currency = Currency.objects.all()[0]
-        return Currency.current_currency
+class Currency(import_item(CURRENCY_CLASS) if CURRENCY_CLASS else CurrencyAbstract):
+    pass

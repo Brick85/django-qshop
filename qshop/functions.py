@@ -4,7 +4,7 @@ from .models import Product
 def get_catalogue_root(menu):
     items = menu.__class__.objects.filter(pk__in=menu.get_parents_ids_list() + [menu.pk])
     for item in items:
-        if item.page_type == 'pcat':
+        if item.page_type == 'prod':
             return item
     return menu
 
@@ -29,3 +29,4 @@ def get_products_page_data(url_add):
         show_product = False
         del url_add[0]
     return (filter_string, page_num, sort, show_product)
+
