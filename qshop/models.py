@@ -332,7 +332,7 @@ class CurrencyAbstract(models.Model):
     name = models.CharField(_('currency name'), max_length=12)
     rate = models.FloatField(_('rate'))
     sort = models.SmallIntegerField(_('sort'))
-    show_string = models.CharField(_('show string'), max_length=16)
+    show_string = models.CharField(_('show string'), max_length=64)
 
     current_currency = None
 
