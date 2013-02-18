@@ -1,6 +1,7 @@
 from django.template.loader import render_to_string
 from django.contrib.sites.models import Site
 import datetime
+from overloadable_functions import count_delivery_price
 
 from django.conf import settings
 
@@ -72,7 +73,7 @@ class Cart:
         try:
             self._delivery_price
         except:
-            self._delivery_price = qshop_settings.FUNCTION_DELIVERY(price=self.total_price(in_default_currency=True), weight=self.total_weight(), cart=self)
+            self._delivery_price = count_delivery_price(price=self.total_price(in_default_currency=True), weight=self.total_weight(), cart=self)
         if in_default_currency:
             return float(self._delivery_price)
         return Currency.get_price(self._delivery_price)
