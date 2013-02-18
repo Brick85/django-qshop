@@ -1,5 +1,4 @@
 from django.conf import settings
-from sitemenu import sitemenu_settings
 _ = lambda x: x
 from cart.overloadable_functions import count_delivery_price
 
@@ -38,15 +37,15 @@ MAIL_TYPES = getattr(settings, 'QSHOP_MAIL_TYPES', {
     },
 })
 
-PAGES = getattr(settings, 'QSHOP_PAGES', (
-    ('prod', 'Products page', 'qshop.views.render_shopspage'),
-))
+# PAGES = getattr(settings, 'QSHOP_PAGES', (
+#     ('prod', 'Products page', 'qshop.views.render_shopspage'),
+# ))
 
-sitemenu_settings.PAGES += (
-    ('', '---------', ''),
-)
+# sitemenu_settings.PAGES += (
+#     ('', '---------', ''),
+# )
 
-sitemenu_settings.PAGES += PAGES
+# sitemenu_settings.PAGES += PAGES
 
 FILTERS_ENABLED = getattr(settings, 'QSHOP_FILTERS_ENABLED', True)
 FILTERS_NEED_COUNT = getattr(settings, 'QSHOP_FILTERS_NEED_COUNT', True)
