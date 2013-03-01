@@ -15,6 +15,7 @@ from .models import Order
 
 import re
 
+
 def add_to_cart(request, product_id):
     cart = Cart(request)
 
@@ -58,6 +59,8 @@ def add_to_cart(request, product_id):
             messages.add_message(request, messages.INFO, _('Product added to <a href="%s">cart</a>.') % reverse('cart'))
 
     return_url = request.GET.get('return_url', None)
+
+    request._server_cache = {'set_cookie': True}
     if return_url:
         return HttpResponseRedirect(return_url)
     return HttpResponseRedirect(reverse('cart'))
@@ -66,6 +69,8 @@ def add_to_cart(request, product_id):
 def remove_from_cart(request, item_id):
     cart = Cart(request)
     cart.remove(item_id)
+
+    request._server_cache = {'set_cookie': True}
     return HttpResponseRedirect(reverse('cart'))
 
 
@@ -78,6 +83,8 @@ def update_cart(request):
             cart.update(item_id, quantity)
         except ItemTooMany, e:
             messages.add_message(request, messages.WARNING, _('Quantity for product "%s" not set due to lack in stock.' % e.product))
+
+    request._server_cache = {'set_cookie': True}
     return HttpResponseRedirect(reverse('cart'))
 
 
