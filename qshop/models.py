@@ -333,6 +333,7 @@ class CurrencyAbstract(models.Model):
     rate = models.FloatField(_('rate'))
     sort = models.SmallIntegerField(_('sort'))
     show_string = models.CharField(_('show string'), max_length=64)
+    is_default = models.BooleanField(_('is default'))
 
     current_currency = None
 
@@ -372,7 +373,7 @@ class CurrencyAbstract(models.Model):
 
     @staticmethod
     def get_default_currency_notoverloadable():
-        return Currency.objects.all()[0]
+        return Currency.objects.filter(is_default=True)[0]
 
     @staticmethod
     def get_price_notoverloadable(price):

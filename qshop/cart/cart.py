@@ -27,6 +27,7 @@ class ItemTooMany(Exception):
 
 class Cart:
     def __init__(self, request, cart=None):
+        self.__request = request
         if cart:
             self.cart = cart
             return
@@ -112,17 +113,23 @@ class Cart:
 
     def new(self, request):
         cart = models.Cart()
-        cart.save()
-        request.session[CART_ID] = cart.id
+        # cart.save()
+        # request.session[CART_ID] = cart.id
         return cart
 
-    def get_session_id(self, request):
-        return request.session[CART_ID]
+    def create_cart(self):
+        if not self.cart.id:
+            self.cart.save()
+            self.__request.session[CART_ID] = self.cart.id
 
-    def set_session_id(self, request, cart_id):
-        request.session[CART_ID] = cart_id
+    # def get_session_id(self, request):
+    #     return request.session[CART_ID]
+
+    # def set_session_id(self, request, cart_id):
+    #     request.session[CART_ID] = cart_id
 
     def add(self, product, quantity=1):
+        self.create_cart()
         self.clear_cache()
         if quantity <= 0:
             return False
@@ -165,6 +172,9 @@ class Cart:
             pass
         else:
             item.delete()
+        if self.total_products() == 0:
+            self.cart.delete()
+            del self.__request.session[CART_ID]
 
     def update(self, item_id, quantity):
         self.clear_cache()
