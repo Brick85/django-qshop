@@ -86,7 +86,7 @@ class CategoryData:
                         filter_id = "p{0}".format(item.parameter.id)
                         if not filter_id in filters:
                             filters_order.append(filter_id)
-                            filters[filter_id] = {'name': item.parameter.name, 'values': [], 'skip_unaviable': False, 'filter_type': 'or', 'filter_aviability_check': self._check_parameter_filter}
+                            filters[filter_id] = {'name': item.parameter.name, 'has_active': False, 'values': [], 'skip_unaviable': False, 'filter_type': 'or', 'filter_aviability_check': self._check_parameter_filter}
                         filters[filter_id]['values'].append(
                             (item.value.id, {'name': item.value.value, 'active': False, 'unaviable': False, 'count': 0, 'filter': Q(producttoparameter__value_id=item.value.id)})
                         )
@@ -105,7 +105,7 @@ class CategoryData:
                         else:
                             variation_name = _(VARIATION_FILTER_NAME)
 
-                        filters['v'] = {'name': variation_name, 'values': [], 'skip_unaviable': False, 'filter_type': 'and', 'filter_aviability_check': self._check_variation_filter}
+                        filters['v'] = {'name': variation_name, 'has_active': False, 'values': [], 'skip_unaviable': False, 'filter_type': 'and', 'filter_aviability_check': self._check_variation_filter}
                         for variation in variations:
                             filters['v']['values'].append(
                                 (variation.id, {'name': variation.get_filter_name(), 'active': False, 'unaviable': False, 'count': 0, 'filter': Q(productvariation__variation_id=variation.id)})
@@ -119,7 +119,7 @@ class CategoryData:
                     model = field.rel.to
                     items = model.objects.filter(product__category=self.menu, product__hidden=False).distinct()
                     if items:
-                        filters[filter_key] = {'name': field.verbose_name, 'values': [], 'skip_unaviable': False, 'filter_type': 'or', 'filter_aviability_check': self._check_foreignkey_filter}
+                        filters[filter_key] = {'name': field.verbose_name, 'has_active': False, 'values': [], 'skip_unaviable': False, 'filter_type': 'or', 'filter_aviability_check': self._check_foreignkey_filter}
                         for item in items:
                             q = {
                                 '{0}_id'.format(field_name): item.id
@@ -197,6 +197,7 @@ class CategoryData:
                         if value_id in selected_filters[filter_id]:
                             value_data['active'] = True
                             filter_data['skip_unaviable'] = True
+                            filter_data['has_active'] = True
 
         self.filters = filters
         self.filters_order = filters_order
