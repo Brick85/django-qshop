@@ -358,7 +358,7 @@ class CurrencyAbstract(models.Model):
 
     @staticmethod
     def get_price(price):
-        if price is None:
+        if price is not None:
             return Currency.get_price_notoverloadable(price)
         else:
             return None
