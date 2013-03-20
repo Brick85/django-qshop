@@ -9,7 +9,8 @@
 
     {{ form }}
 
-    <p>If 10 is entered, then price for all products increases by 10%. For product with price 200 new price will be 220.</p>
+    <p>If 10 is entered, then price for all selected products increases by 10%. For product with price 200 new price will be 220.</p>
+    <p>Negative numbers will reduce the price.</p>
     <p>Will be applied to:</p>
 
     <ul>{{ queryset|unordered_list }}</ul>
