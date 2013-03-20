@@ -92,6 +92,8 @@ class ProductAdmin(getParentClass('ModelAdmin', Product)):
 
     formfield_overrides = qshop_formfield_overrides
 
+    #form = ProductAdminForm
+
     def save_formset(self, request, form, formset, change):
         super(ProductAdmin, self).save_formset(request, form, formset, change)
 
@@ -104,6 +106,10 @@ class ProductAdmin(getParentClass('ModelAdmin', Product)):
                     ptp = ProductToParameter()
                     ptp.parameter = parameter
                     ptp.product = obj
+                    if 'producttoparameter_set-TOTAL_FORMS' in request.POST:
+                        for i in range(0, int(request.POST['producttoparameter_set-TOTAL_FORMS'])):
+                            if int(request.POST['producttoparameter_set-{0}-parameter'.format(i)]) == parameter.pk:
+                                ptp.value_id = int(request.POST['producttoparameter_set-{0}-value'.format(i)])
                     ptp.save()
 
         if formset.model == ProductVariation:
@@ -112,9 +118,9 @@ class ProductAdmin(getParentClass('ModelAdmin', Product)):
             price = None
             discount_price = None
             for variation in variations:
-                if not price or variation.get_price() < price:
-                    price = variation.get_price_real()
-                    discount_price = variation.get_price_discount()
+                if not price or variation.price < price or variation.discount_price < discount_price:
+                    price = variation.price
+                    discount_price = variation.discount_price
 
             obj.has_variations = bool(variations)
             if price:
@@ -122,8 +128,11 @@ class ProductAdmin(getParentClass('ModelAdmin', Product)):
                 obj.discount_price = discount_price
             obj.save()
 
+    def save_model(self, request, obj, form, change):
+        super(ProductAdmin, self).save_model(request, obj, form, change)
+
     def get_readonly_fields(self, request, obj=None):
-        if obj and obj.has_variations:
+        if ('productvariation_set-0-id' in request.POST and request.POST['productvariation_set-0-id']) or (obj and obj.has_variations):
             readonly_fields = list(self.readonly_fields) + ['price', 'discount_price']
         else:
             readonly_fields = self.readonly_fields

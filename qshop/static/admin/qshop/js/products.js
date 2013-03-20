@@ -6,7 +6,7 @@
             $(select).after('<p>' + $('option:selected', select).html() + '</p>');
         });
         $('#producttoparameter_set-group a.add-another').each(function(){
-            id = $('.field-parameter select', $(this).closest('tr')).val()
+            id = $('.field-parameter select', $(this).closest('tr')).val();
             this.href = this.href + '?parameter='+id+'&hide_parameter';
         });
     });

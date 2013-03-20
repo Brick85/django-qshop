@@ -74,7 +74,7 @@ class ProductAbstract(models.Model, PricingModel):
     articul = models.SlugField(_('articul'), unique=True)
     hidden = models.BooleanField(_('hidden'), default=False)
     name    = models.CharField(_('name'), max_length=128)
-    price = models.DecimalField(_('price'), max_digits=12, decimal_places=2)
+    price = models.DecimalField(_('price'), max_digits=12, decimal_places=2, default=0)
     weight = models.FloatField(_('weight'), default=0, blank=True)
     discount_price = models.DecimalField(_('discount price'), max_digits=12, decimal_places=2, blank=True, null=True)
     description = models.TextField(_('description'), default='', blank=True)
@@ -299,6 +299,16 @@ class ParameterAbstract(models.Model):
     def __unicode__(self):
         return self.name
 
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            process_products = True
+        else:
+            process_products = False
+        super(ParameterAbstract, self).save(*args, **kwargs)
+        if process_products:
+            for product in Product.objects.filter(parameters_set=self.parameters_set):
+                ProductToParameter.objects.create(product=product, parameter=self)
+
 
 class ParameterValueAbstract(models.Model):
     _translation_fields = ['value']
@@ -348,7 +358,7 @@ class CurrencyAbstract(models.Model):
 
     @staticmethod
     def get_price(price):
-        if price != None:
+        if price is None:
             return Currency.get_price_notoverloadable(price)
         else:
             return None
