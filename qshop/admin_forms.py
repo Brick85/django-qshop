@@ -3,6 +3,7 @@ from .models import ParameterValue, Parameter, Product
 from sitemenu.sitemenu_settings import MENUCLASS
 from sitemenu import import_item
 from django import forms
+import re
 
 Menu = import_item(MENUCLASS)
 
@@ -42,6 +43,26 @@ class PriceForm(forms.Form):
     percent = forms.IntegerField()
 
 
-# class ProductAdminForm(forms.ModelForm):
-#     class Meta:
-#         model = Product
+class ProductAdminForm(forms.ModelForm):
+    class Meta:
+        model = Product
+
+    def clean_articul(self):
+        data = self.cleaned_data['articul']
+        try:
+            data = re.match("(.*)-copy-\d+", data).groups()[0]
+        except:
+            pass
+        orig_data = data
+        i = 1
+        check = True
+        while check:
+            try:
+                if Product.objects.get(articul=data):
+                    data = "{0}-copy-{1}".format(orig_data, i)
+                    i += 1
+            except Product.DoesNotExist:
+                check = False
+
+        return data
+

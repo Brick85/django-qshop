@@ -2,7 +2,7 @@ from django.contrib import admin
 from .models import Product, ProductVariationValue, ProductVariation, ProductImage, ParametersSet, Parameter, ProductToParameter, ParameterValue
 #from django.db import models
 
-from .admin_forms import ProductToParameterFormset, CategoryForm, PriceForm
+from .admin_forms import ProductToParameterFormset, CategoryForm, PriceForm, ProductAdminForm
 
 from .admin_filters import ProductCategoryListFilter
 
@@ -92,7 +92,7 @@ class ProductAdmin(getParentClass('ModelAdmin', Product)):
 
     formfield_overrides = qshop_formfield_overrides
 
-    #form = ProductAdminForm
+    form = ProductAdminForm
 
     def save_formset(self, request, form, formset, change):
         super(ProductAdmin, self).save_formset(request, form, formset, change)
@@ -108,8 +108,11 @@ class ProductAdmin(getParentClass('ModelAdmin', Product)):
                     ptp.product = obj
                     if 'producttoparameter_set-TOTAL_FORMS' in request.POST:
                         for i in range(0, int(request.POST['producttoparameter_set-TOTAL_FORMS'])):
-                            if int(request.POST['producttoparameter_set-{0}-parameter'.format(i)]) == parameter.pk:
-                                ptp.value_id = int(request.POST['producttoparameter_set-{0}-value'.format(i)])
+                            try:
+                                if int(request.POST['producttoparameter_set-{0}-parameter'.format(i)]) == parameter.pk:
+                                    ptp.value_id = int(request.POST['producttoparameter_set-{0}-value'.format(i)])
+                            except ValueError:
+                                pass
                     ptp.save()
 
         if formset.model == ProductVariation:
@@ -128,11 +131,14 @@ class ProductAdmin(getParentClass('ModelAdmin', Product)):
                 obj.discount_price = discount_price
             obj.save()
 
+    def __init__(self, *args, **kwargs):
+        super(ProductAdmin, self).__init__(*args, **kwargs)
+
     def save_model(self, request, obj, form, change):
         super(ProductAdmin, self).save_model(request, obj, form, change)
 
     def get_readonly_fields(self, request, obj=None):
-        if ('productvariation_set-0-id' in request.POST and request.POST['productvariation_set-0-id']) or (obj and obj.has_variations):
+        if (('productvariation_set-0-variation' in request.POST and request.POST['productvariation_set-0-variation']) or (obj and obj.has_variations)):
             readonly_fields = list(self.readonly_fields) + ['price', 'discount_price']
         else:
             readonly_fields = self.readonly_fields
