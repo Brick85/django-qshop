@@ -58,11 +58,10 @@ class ProductAdminForm(forms.ModelForm):
         check = True
         while check:
             try:
-                if Product.objects.get(articul=data):
+                if Product.objects.exclude(pk=self.instance.pk).get(articul=data):
                     data = "{0}-copy-{1}".format(orig_data, i)
                     i += 1
             except Product.DoesNotExist:
                 check = False
 
         return data
-
