@@ -4,6 +4,8 @@ from django.utils.translation import ugettext_lazy as _
 from django.core.urlresolvers import reverse
 from django.utils.safestring import mark_safe
 
+from django.conf import settings
+
 from sitemenu.sitemenu_settings import MENUCLASS
 from sitemenu import import_item
 from .qshop_settings import PRODUCT_CLASS, VARIATION_CLASS, VARIATION_VALUE_CLASS, PRODUCT_IMAGE_CLASS, PARAMETERS_SET_CLASS, PARAMETER_CLASS, PARAMETER_VALUE_CLASS, PRODUCT_TO_PARAMETER_CLASS, CURRENCY_CLASS
@@ -316,7 +318,11 @@ class ParameterValueAbstract(models.Model):
     value = models.CharField(_('parameter value'), max_length=128)
 
     class Meta:
-        unique_together = (("parameter", "value"),)
+        # hack for checking unique_together with modeltranslation
+        if 'modeltranslation' in settings.INSTALLED_APPS:
+            unique_together = (("parameter", "value_{0}".format(settings.LANGUAGES[0][0])),)
+        else:
+            unique_together = (("parameter", "value"),)
         verbose_name = _('parameter value')
         verbose_name_plural = _('parameter values')
         abstract = True
