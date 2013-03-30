@@ -2,7 +2,6 @@ from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.http import HttpResponseRedirect, Http404
 from django.core.urlresolvers import reverse
-from django.utils.datastructures import DotExpandedDict
 from django.contrib import messages
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import User, UserManager
@@ -76,8 +75,14 @@ def remove_from_cart(request, item_id):
 
 def update_cart(request):
     cart = Cart(request)
-    data = DotExpandedDict(request.POST)
-    for (item_id, quantity) in data['quantity'].items():
+    for (key, quantity) in request.POST.items():
+        if not key.startswith('quantity.'):
+            continue
+        try:
+            item_id = int(key.replace('quantity.', ''))
+        except:
+            continue
+
         try:
             quantity = int(quantity)
             cart.update(item_id, quantity)
