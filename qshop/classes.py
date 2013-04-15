@@ -41,7 +41,8 @@ class CategoryData:
         if not self.sort:
             raise Http404('Invalid sorting parameter')
 
-        self.process_filters()
+        if not self.menu.page_type == 'pdis':
+            self.process_filters()
         self.process_products()
 
         if self.request.get_full_path() != self.link_for_page(skip_page=False):
@@ -49,7 +50,11 @@ class CategoryData:
             self.need_return = True
 
     def process_products(self):
-        products = Product.objects.filter(category=self.menu, hidden=False)
+
+        if not self.menu.page_type == 'pdis':
+            products = Product.objects.filter(category=self.menu, hidden=False)
+        else:
+            products = Product.objects.filter(hidden=False).exclude(discount_price=None)
 
         for filter_q in self.get_q_filters():
             products = products.filter(filter_q)

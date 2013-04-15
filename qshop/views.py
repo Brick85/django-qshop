@@ -26,7 +26,7 @@ def render_shopspage(request, menu, url_add):
     else:
         # render single product page
 
-        product = get_object_or_404(Product, articul=url_add[0], category=menu)
+        product = get_object_or_404(Product, articul=url_add[0], category=menu, hidden=False)
 
         menu._page_title = product.name
 

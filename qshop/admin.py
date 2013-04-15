@@ -121,9 +121,11 @@ class ProductAdmin(getParentClass('ModelAdmin', Product)):
             price = None
             discount_price = None
             for variation in variations:
-                if not price or variation.price < price or variation.discount_price < discount_price:
-                    price = variation.price
-                    discount_price = variation.discount_price
+                #if not price or variation.price < price or variation.discount_price < discount_price:
+                    if variation.price and (not price or variation.price < price):
+                        price = variation.price
+                    if variation.discount_price and (not discount_price or variation.discount_price < discount_price):
+                        discount_price = variation.discount_price
 
             obj.has_variations = bool(variations)
             if price:
