@@ -62,7 +62,11 @@ class CategoryData:
         if FILTERS_PRECLUDING:
             self.set_aviable_filters(products)
 
-        products = products.order_by(self.sort[1])
+        if self.sort[1] == 'price' or self.sort[1] == '-price':
+            sort = self.sort[1].replace('price', 'min_price')
+            products = products.extra(select={'min_price': "IF(`qshop_product`.`discount_price`, `qshop_product`.`discount_price`, `qshop_product`.`price`)"}).order_by(sort)
+        else:
+            products = products.order_by(self.sort[1])
 
         paginator = Paginator(products, PRODUCTS_ON_PAGE)
         try:
