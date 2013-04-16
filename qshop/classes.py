@@ -70,8 +70,9 @@ class CategoryData:
         except (PageNotAnInteger, EmptyPage):
             raise Http404('There is no such page')
 
-        for product in products_page.object_list:
-            product._current_category = self.menu
+        if not self.menu.page_type == 'pdis':
+            for product in products_page.object_list:
+                product._current_category = self.menu
 
         self.products_page = products_page
 
