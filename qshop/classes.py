@@ -3,7 +3,7 @@ from django.http import Http404
 from django.http import HttpResponseRedirect
 import re
 from django.db.models import Q
-from .qshop_settings import PRODUCTS_ON_PAGE, FILTERS_ENABLED, FILTERS_NEED_COUNT, FILTERS_PRECLUDING, FILTERS_FIELDS, FILTERS_ORDER, VARIATION_FILTER_NAME
+from .qshop_settings import PRODUCTS_ON_PAGE, FILTERS_ENABLED, FILTERS_NEED_COUNT, FILTERS_PRECLUDING, FILTERS_FIELDS, FILTERS_ORDER, VARIATION_FILTER_NAME, FILTER_BY_VARIATION_TYPE
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.db.models import Count
 from django.utils.translation import ugettext_lazy as _
@@ -101,7 +101,7 @@ class CategoryData:
                             (item.value.id, {'name': item.value.value, 'active': False, 'unaviable': False, 'count': 0, 'filter': Q(producttoparameter__value_id=item.value.id)})
                         )
                 elif filter_key == 'v':
-                    variations = ProductVariationValue.objects.filter(productvariation__product__category=self.menu, productvariation__product__hidden=False).distinct()
+                    variations = ProductVariationValue.objects.filter(productvariation__product__category=self.menu, productvariation__product__hidden=False).distinct().order_by('value')
                     if variations:
                         filters_order.append('v')
 
@@ -115,7 +115,7 @@ class CategoryData:
                         else:
                             variation_name = _(VARIATION_FILTER_NAME)
 
-                        filters['v'] = {'name': variation_name, 'has_active': False, 'values': [], 'skip_unaviable': False, 'filter_type': 'and', 'filter_aviability_check': self._check_variation_filter}
+                        filters['v'] = {'name': variation_name, 'has_active': False, 'values': [], 'skip_unaviable': False, 'filter_type': FILTER_BY_VARIATION_TYPE, 'filter_aviability_check': self._check_variation_filter}
                         for variation in variations:
                             filters['v']['values'].append(
                                 (variation.id, {'name': variation.get_filter_name(), 'active': False, 'unaviable': False, 'count': 0, 'filter': Q(productvariation__variation_id=variation.id)})
