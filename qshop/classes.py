@@ -121,7 +121,6 @@ class CategoryData:
                                 (variation.id, {'name': variation.get_filter_name(), 'active': False, 'unaviable': False, 'count': 0, 'filter': Q(productvariation__variation_id=variation.id)})
                             )
                 else:
-                    filters_order.append(filter_key)
                     field_name = FILTERS_FIELDS[filter_key]
                     if not hasattr(Product, field_name):
                         raise Exception('[qShop exception] Filter configuration error: there is no {0} in Product class!'.format(field_name))
@@ -129,6 +128,7 @@ class CategoryData:
                     model = field.rel.to
                     items = model.objects.filter(product__category=self.menu, product__hidden=False).distinct()
                     if items:
+                        filters_order.append(filter_key)
                         filters[filter_key] = {'name': field.verbose_name, 'has_active': False, 'values': [], 'skip_unaviable': False, 'filter_type': 'or', 'filter_aviability_check': self._check_foreignkey_filter}
                         for item in items:
                             q = {
