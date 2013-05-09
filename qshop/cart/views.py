@@ -44,7 +44,7 @@ def add_to_cart(request, product_id):
                 if cart.add(product, quantity):
                     result = True
             except ItemTooMany, e:
-                messages.add_message(request, messages.WARNING, _(u'Can\'t add product "%s" due to lack in stock. Try to decrease quantity.' % e.product))
+                messages.add_message(request, messages.WARNING, _(u'Can\'t add product "%s" due to lack in stock. Try to decrease quantity.') % e.product)
         else:
             for k, v in variation_quantities.items():
                 product.select_variation(k)
@@ -52,7 +52,7 @@ def add_to_cart(request, product_id):
                     if cart.add(product, v):
                         result = True
                 except ItemTooMany, e:
-                    messages.add_message(request, messages.WARNING, _(u'Can\'t add product "%s" due to lack in stock. Try to decrease quantity.' % e.product))
+                    messages.add_message(request, messages.WARNING, _(u'Can\'t add product "%s" due to lack in stock. Try to decrease quantity.') % e.product)
 
         if result:
             messages.add_message(request, messages.INFO, _(u'Product added to <a href="%s">cart</a>.') % reverse('cart'))
