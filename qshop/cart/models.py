@@ -107,7 +107,8 @@ class OrderAbstract(models.Model):
         return reverse('cart_order_success')
 
     def get_cart_text(self):
-        return mark_safe(self.cart_text)
+        return self.cart_text.replace('\n', '')
+    get_cart_text.allow_tags = True
     get_cart_text.short_description = _('cart text')
 
 
