@@ -75,7 +75,7 @@ class ProductAbstract(models.Model, PricingModel):
     parameters_set = models.ForeignKey('ParametersSet', verbose_name=_('parameters set'))
     articul = models.SlugField(_('articul'), unique=True)
     hidden = models.BooleanField(_('hidden'), default=False)
-    name    = models.CharField(_('name'), max_length=128)
+    name    = models.CharField(_('product name'), max_length=128)
     price = models.DecimalField(_('price'), max_digits=12, decimal_places=2, default=0)
     weight = models.FloatField(_('weight'), default=0, blank=True)
     discount_price = models.DecimalField(_('discount price'), max_digits=12, decimal_places=2, blank=True, null=True)
@@ -96,9 +96,9 @@ class ProductAbstract(models.Model, PricingModel):
 
     def __unicode__(self):
         if self.hidden:
-            return "[H] %s (articul: %s)" % (self.name, self.articul)
+            return _(u"[hidden] {0} (articul: {1})").format(self.name, self.articul)
         else:
-            return "%s (articul: %s)" % (self.name, self.articul)
+            return _(u"{0} (articul: {1})").format(self.name, self.articul)
 
     def admin_price_display(self):
         if self.has_discount():
@@ -107,7 +107,7 @@ class ProductAbstract(models.Model, PricingModel):
             price = self.get_fprice()
         return price
     admin_price_display.allow_tags = True
-    admin_price_display.short_description = 'Price'
+    admin_price_display.short_description = _(u'price')
 
     def get_absolute_url(self):
         if hasattr(self, '_current_category'):

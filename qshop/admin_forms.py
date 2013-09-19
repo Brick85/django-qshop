@@ -4,7 +4,7 @@ from sitemenu.sitemenu_settings import MENUCLASS
 from sitemenu import import_item
 from django import forms
 import re
-
+from django.utils.translation import ugettext_lazy as _
 Menu = import_item(MENUCLASS)
 
 
@@ -40,7 +40,7 @@ class CategoryForm(forms.Form):
 
 
 class PriceForm(forms.Form):
-    percent = forms.IntegerField()
+    percent = forms.IntegerField(label=_(u"Percents"))
 
 
 class ProductAdminForm(forms.ModelForm):

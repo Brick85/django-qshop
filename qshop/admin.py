@@ -15,6 +15,8 @@ from django.http import HttpResponseRedirect
 from sitemenu import import_item
 from sitemenu.sitemenu_settings import MENUCLASS
 from decimal import Decimal
+from django.utils.translation import ugettext_lazy as _
+
 
 Menu = import_item(MENUCLASS)
 
@@ -165,7 +167,7 @@ class ProductAdmin(getParentClass('ModelAdmin', Product)):
                 for obj in queryset:
                     obj.category.add(cat)
 
-                self.message_user(request, "Successfully linked products to '%s'." % (cat))
+                self.message_user(request, _(u"Successfully linked products to '{0}'.").format(cat))
                 return HttpResponseRedirect(request.get_full_path())
         else:
             form = CategoryForm()
@@ -175,7 +177,7 @@ class ProductAdmin(getParentClass('ModelAdmin', Product)):
             'queryset': queryset,
             'action_checkbox_name': helpers.ACTION_CHECKBOX_NAME,
         }, context_instance=RequestContext(request))
-    link_to_category.short_description = "Link to category"
+    link_to_category.short_description = _("Link to category")
 
     def unlink_from_category(self, request, queryset):
         cats = Menu.objects.filter(product__in=queryset).distinct()
@@ -188,7 +190,7 @@ class ProductAdmin(getParentClass('ModelAdmin', Product)):
                 for obj in queryset:
                     obj.category.remove(cat)
 
-                self.message_user(request, "Successfully unlinked products from '%s'." % (cat))
+                self.message_user(request, _(u"Successfully unlinked products from '{0}'.").format(cat))
                 return HttpResponseRedirect(request.get_full_path())
         else:
             form = CategoryForm(qs=cats)
@@ -198,7 +200,7 @@ class ProductAdmin(getParentClass('ModelAdmin', Product)):
             'queryset': queryset,
             'action_checkbox_name': helpers.ACTION_CHECKBOX_NAME,
         }, context_instance=RequestContext(request))
-    unlink_from_category.short_description = "Unlink from category"
+    unlink_from_category.short_description = _(u"Unlink from category")
 
     def change_price(self, request, queryset):
         if 'apply' in request.POST:
@@ -218,7 +220,7 @@ class ProductAdmin(getParentClass('ModelAdmin', Product)):
                             variation.save()
                     obj.save()
 
-                self.message_user(request, "Successfully changed prices.")
+                self.message_user(request, _(u"Successfully changed prices."))
                 return HttpResponseRedirect(request.get_full_path())
         else:
             form = PriceForm()
@@ -228,7 +230,7 @@ class ProductAdmin(getParentClass('ModelAdmin', Product)):
             'queryset': queryset,
             'action_checkbox_name': helpers.ACTION_CHECKBOX_NAME,
         }, context_instance=RequestContext(request))
-    change_price.short_description = "Change price by percent"
+    change_price.short_description = _(u"Change price by percent")
 
     def set_discount(self, request, queryset):
         if 'apply' in request.POST:
@@ -247,7 +249,7 @@ class ProductAdmin(getParentClass('ModelAdmin', Product)):
                             variation.save()
                     obj.save()
 
-                self.message_user(request, "Successfully setted discounts.")
+                self.message_user(request, _(u"Successfully set discounts."))
                 return HttpResponseRedirect(request.get_full_path())
         else:
             form = PriceForm()
@@ -257,7 +259,7 @@ class ProductAdmin(getParentClass('ModelAdmin', Product)):
             'queryset': queryset,
             'action_checkbox_name': helpers.ACTION_CHECKBOX_NAME,
         }, context_instance=RequestContext(request))
-    set_discount.short_description = "Set discount by percent"
+    set_discount.short_description = _(u"Set discount by percent")
 
 admin.site.register(Product, ProductAdmin)
 

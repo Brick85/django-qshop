@@ -1,17 +1,16 @@
 {% extends "admin/base_site.html" %}
-
+{% load i18n %}
 {% block content %}
 
-<p>Change price by:</p>
+<p>{% trans "change price by"|capfirst %}:</p>
 
 <form action="" method="post">
     {% csrf_token %}
 
     {{ form }}
 
-    <p>If 10 is entered, then price for all selected products increases by 10%. For product with price 200 new price will be 220.</p>
-    <p>Negative numbers will reduce the price.</p>
-    <p>Will be applied to:</p>
+    {% blocktrans %}<p>If 10 is entered, then price for all selected products increases by 10%. For product with price 200 new price will be 220.</p><p>Negative numbers will reduce the price.</p><p>Will be applied to:</p>{% endblocktrans %}
+
 
     <ul>{{ queryset|unordered_list }}</ul>
 
@@ -20,7 +19,7 @@
     {% endfor %}
 
     <input type="hidden" name="action" value="change_price" />
-    <input type="submit" name="apply" value="Apply" />
+    <input type="submit" name="apply" value="{% trans "apply" %}" />
 </form>
 
 {% endblock %}

@@ -132,6 +132,8 @@ class OrderAbstractDefault(OrderAbstract):
 
     class Meta:
         abstract = True
+        verbose_name = _('order')
+        verbose_name_plural = _('orders')
 
     def __unicode__(self):
         return u"%s (%s)" % (self.name, self.email)

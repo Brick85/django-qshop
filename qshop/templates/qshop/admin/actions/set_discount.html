@@ -1,17 +1,15 @@
 {% extends "admin/base_site.html" %}
-
+{% load i18n %}
 {% block content %}
 
-<p>Set discount by:</p>
+<p>{% trans "set discount by"|capfirst %}:</p>
 
 <form action="" method="post">
     {% csrf_token %}
 
     {{ form }}
 
-    <p>If 10 is entered, then discount price for all products will be 90% of price. For product with price 200 discount price will be 180.</p>
-    <p>Enter 0 to remove discount prices.</p>
-    <p>Will be applied to:</p>
+    {% blocktrans %}<p>If 10 is entered, then discount price for all products will be 90% of price. For product with price 200 discount price will be 180.</p><p>Enter 0 to remove discount prices.</p><p>Will be applied to:</p>{% endblocktrans %}
 
     <ul>{{ queryset|unordered_list }}</ul>
 
@@ -20,7 +18,7 @@
     {% endfor %}
 
     <input type="hidden" name="action" value="set_discount" />
-    <input type="submit" name="apply" value="Apply" />
+    <input type="submit" name="apply" value="{% trans "apply" %}" />
 </form>
 
 {% endblock %}

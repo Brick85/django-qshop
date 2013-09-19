@@ -2,14 +2,14 @@
 
 {% block content %}
 
-<p>Select category to unlink:</p>
+<p>{% trans "select category to unlink"|capfirst %}:</p>
 
 <form action="" method="post">
     {% csrf_token %}
 
     {{ form }}
 
-    <p>Category will be unlinked from:</p>
+    <p>{% trans "category will be unlinked from"|capfirst %}:</p>
 
     <ul>{{ queryset|unordered_list }}</ul>
 

@@ -1,15 +1,15 @@
 {% extends "admin/base_site.html" %}
-
+{% load i18n %}
 {% block content %}
 
-<p>Select category to apply:</p>
+<p>{% trans "select category to apply"|capfirst %}:</p>
 
 <form action="" method="post">
     {% csrf_token %}
 
     {{ form }}
 
-    <p>Category will be applied to:</p>
+    <p>{% trans "category will be applied to"|capfirst %}:</p>
 
     <ul>{{ queryset|unordered_list }}</ul>
 
@@ -18,7 +18,7 @@
     {% endfor %}
 
     <input type="hidden" name="action" value="link_to_category" />
-    <input type="submit" name="apply" value="Apply" />
+    <input type="submit" name="apply" value="{% trans "apply" %}" />
 </form>
 
 {% endblock %}

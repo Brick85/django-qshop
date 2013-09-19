@@ -1,2 +1,3 @@
 recursive-include qshop/static *
 recursive-include qshop/templates *
+recursive-include sitemenu/locale *
