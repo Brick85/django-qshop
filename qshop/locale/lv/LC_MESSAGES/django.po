@@ -5,368 +5,364 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: qshop\n"
+"Project-Id-Version: svmebeles\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-09-23 13:28+0300\n"
-"PO-Revision-Date: 2013-09-25 17:03+0300\n"
+"PO-Revision-Date: 2013-09-23 14:14+0300\n"
 "Last-Translator: alexey <a@trialine.lv>\n"
 "Language-Team: qt <a@trialine.lv>\n"
-"Language: Russian\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : "
+"2);\n"
 "X-Generator: Poedit 1.5.4\n"
-"X-Poedit-SourceCharset: UTF-8\n"
+"Language: Latvian\n"
 
 #: admin.py:170
 msgid "Successfully linked products to '{0}'."
-msgstr "Успешно привязали товар к '{0}'."
+msgstr "Prces veiksmīgi saistītas ar '{0}'."
 
 #: admin.py:180
 msgid "Link to category"
-msgstr "Привязать к категории"
+msgstr "Saite uz kategoriju"
 
 #: admin.py:193
 msgid "Successfully unlinked products from '{0}'."
-msgstr "Успешно отвязали товар от '{0}'."
+msgstr "Preces veiksmīgi atsaistīti no '{0}'."
 
 #: admin.py:203
 msgid "Unlink from category"
-msgstr "Отвязать от категории"
+msgstr "Atsaistīt no kategorijām"
 
 #: admin.py:223
 msgid "Successfully changed prices."
-msgstr "Цены успешно поменяны."
+msgstr "Cenas veiksmīgi nomainītas."
 
 #: admin.py:233
 msgid "Change price by percent"
-msgstr "Изменить цены в процентах"
+msgstr "Mainīt cenu procentuāli"
 
 #: admin.py:252
 msgid "Successfully set discounts."
-msgstr "Скидочные цены успешно поменяны."
+msgstr "Atlaides veiksmīgi uzstadītas."
 
 #: admin.py:262
 msgid "Set discount by percent"
-msgstr "Установить скидки в процентах"
+msgstr "Uzstādīt atlaidi procentuāli"
 
 #: admin_filters.py:11
 msgid "product category"
-msgstr "категория товара"
+msgstr "preces kategorija"
 
 #: admin_forms.py:43
 msgid "Percents"
-msgstr "Проценты"
+msgstr "Procenti"
 
 #: models.py:68
 msgid "natural"
-msgstr "по умолчанию"
+msgstr "pēc noklusējuma"
 
 #: models.py:69
 msgid "price low to high"
-msgstr "дешевые вначале"
+msgstr "lētas priekšā"
 
 #: models.py:70
 msgid "price high to low"
-msgstr "дорогие вначале"
+msgstr "dārgas priekšā"
 
 #: models.py:71
 msgid "by name"
-msgstr "по названию"
+msgstr "pēc nosaukuma"
 
 #: models.py:74
 msgid "has variations"
-msgstr "имеет вариации"
+msgstr "ir variācijas"
 
 #: models.py:75 models.py:280 models.py:290
 msgid "parameters set"
-msgstr "набор параметров"
+msgstr "parametru komplekts"
 
 #: models.py:76
 msgid "articul"
-msgstr "артикул"
+msgstr "artikuls"
 
 #: models.py:77
 msgid "hidden"
-msgstr "скрыть"
+msgstr "slēpts"
 
 #: models.py:78
 msgid "product name"
-msgstr "название товара"
+msgstr "preces nosaukums"
 
 #: models.py:79 models.py:110 models.py:241
 msgid "price"
-msgstr "цена"
+msgstr "cena"
 
 #: models.py:80
 msgid "weight"
-msgstr "вес"
+msgstr "svars"
 
 #: models.py:81 models.py:242
 msgid "discount price"
-msgstr "скидочная цена"
+msgstr "akcijas cena"
 
 #: models.py:82
 msgid "description"
-msgstr "описание"
+msgstr "apraksts"
 
 #: models.py:83 models.py:263
 msgid "image"
-msgstr "изображение"
+msgstr "attēls"
 
 #: models.py:85
 msgid "category"
-msgstr "категория"
+msgstr "kategorija"
 
 #: models.py:87 models.py:298
 msgid "parameters"
-msgstr "параметры"
+msgstr "parametri"
 
 #: models.py:89 models.py:243 models.py:350
 msgid "sort"
-msgstr "сортировка"
+msgstr "šķirošana"
 
 #: models.py:92 models.py:239 models.py:264 models.py:335
 msgid "product"
-msgstr "товар"
+msgstr "prece"
 
 #: models.py:93
 msgid "products"
-msgstr "товары"
+msgstr "preces"
 
 #: models.py:99
 msgid "[hidden] {0} (articul: {1})"
-msgstr "[скрыт] {0} (артикул: {1})"
+msgstr "[slēpts] {0} (artikuls: {1})"
 
 #: models.py:101
 msgid "{0} (articul: {1})"
-msgstr "{0} (артикул: {1})"
+msgstr "{0} (artikuls: {1})"
 
 #: models.py:223 models.py:277 models.py:291
 msgid "title"
-msgstr "заголовок"
+msgstr "virsraksts"
 
 #: models.py:226 models.py:240
 msgid "product variation value"
-msgstr "значение варианции"
+msgstr "preces variācijas vērtība"
 
 #: models.py:227
 msgid "product variation values"
-msgstr "значения варианции"
+msgstr "preces variācijas vērtības"
 
 #: models.py:246
 msgid "product variation"
-msgstr "вариация товара"
+msgstr "preces variācija"
 
 #: models.py:247
 msgid "product variations"
-msgstr "вариации товара"
+msgstr "preces variācijas"
 
 #: models.py:267
 msgid "product image"
-msgstr "изображение"
+msgstr "preces attēls"
 
 #: models.py:268
 msgid "product images"
-msgstr "изображения"
+msgstr "preces attēli"
 
 #: models.py:281
 msgid "parameters sets"
-msgstr "наборы параметров"
+msgstr "parametru komplekti"
 
 #: models.py:292
 msgid "is filter"
-msgstr "является фильтром"
+msgstr "ir filtrs"
 
 #: models.py:293 cart/models.py:135
 msgid "order"
-msgstr "сортировка"
+msgstr "šķīrošana"
 
 #: models.py:297 models.py:317 models.py:336
 msgid "parameter"
-msgstr "параметр"
+msgstr "parametrs"
 
 #: models.py:318 models.py:326
 msgid "parameter value"
-msgstr "значение параметра"
+msgstr "parametra vērtība"
 
 #: models.py:327
 msgid "parameter values"
-msgstr "значения параметра"
+msgstr "parametra vērtības"
 
 #: models.py:347
 msgid "code"
-msgstr "код"
+msgstr "kods"
 
 #: models.py:348
 msgid "currency name"
-msgstr "название валюты"
+msgstr "valūtas nosaukums"
 
 #: models.py:349
 msgid "rate"
-msgstr "курс"
+msgstr "likme"
 
 #: models.py:351
 msgid "show string"
-msgstr "показываемая строка"
+msgstr "radīšanas formāts"
 
 #: models.py:352
 msgid "is default"
-msgstr "по умолчанию"
+msgstr "pēc noklusējuma"
 
 #: models.py:357
 msgid "currency"
-msgstr "валюта"
+msgstr "valūta"
 
 #: models.py:358
 msgid "currencies"
-msgstr "валюты"
+msgstr "valūtas"
 
 #: qshop_settings.py:34
 msgid "[qShop] "
-msgstr "[QShop] "
+msgstr "[qShop] "
 
 #: qshop_settings.py:60 templates/qshop/cart/cart.html:20
 msgid "Variation"
-msgstr "Вариация"
+msgstr "Variācija"
 
 #: cart/forms.py:31
 #, python-format
 msgid "Your order %s accepted"
-msgstr "Ваш заказ %s принят"
+msgstr "Jūsu pasūtījums %s pieņemts"
 
 #: cart/models.py:14
 msgid "creation date"
-msgstr "дате создания"
+msgstr "izveides datums"
 
 #: cart/models.py:15
 msgid "modification date"
-msgstr "дата изменения"
+msgstr "modificēšanas datums"
 
 #: cart/models.py:16
 msgid "checked out"
-msgstr "сделать заказ"
+msgstr "pasūtīt"
 
 #: cart/models.py:19 cart/models.py:41 cart/models.py:92
 msgid "cart"
-msgstr "корзина"
+msgstr "grozs"
 
 #: cart/models.py:20
 msgid "carts"
-msgstr "корзины"
+msgstr "grozi"
 
 #: cart/models.py:42
 msgid "quantity"
-msgstr "количество"
+msgstr "daudzums"
 
 #: cart/models.py:43
 msgid "unit price"
-msgstr "цена за единицу"
+msgstr "vienības cena"
 
 #: cart/models.py:50
 msgid "item"
-msgstr "товар"
+msgstr "prece"
 
 #: cart/models.py:51
 msgid "items"
-msgstr "товары"
+msgstr "preces"
 
 #: cart/models.py:83
 msgid "New"
-msgstr "Новый"
+msgstr "Jauns"
 
 #: cart/models.py:84
 msgid "In Progress"
-msgstr "В процессе"
+msgstr "Progresā"
 
 #: cart/models.py:85
 msgid "Completed"
-msgstr "Завершено"
+msgstr "Pabeigts"
 
 #: cart/models.py:86
 msgid "Canceled"
-msgstr "Отменен"
+msgstr "Atcelts"
 
 #: cart/models.py:89
 msgid "date added"
-msgstr "дате добавления"
+msgstr "pievienošanas datums"
 
 #: cart/models.py:90
 msgid "status"
-msgstr "статус"
+msgstr "status"
 
 #: cart/models.py:91
 msgid "manager comments"
-msgstr "комментарии мендежера"
+msgstr "menedžēra komentāri"
 
 #: cart/models.py:93 cart/models.py:112
 msgid "cart text"
-msgstr "текст корзины"
+msgstr "groza teksts"
 
 #: cart/models.py:96
 msgid "client order"
-msgstr "заказ клиента"
+msgstr "klienta pasūtījums"
 
 #: cart/models.py:97
 msgid "client orders"
-msgstr "заказы клиента"
+msgstr "klienta pasūtījumi"
 
 #: cart/models.py:127
 msgid "name"
-msgstr "название"
+msgstr "nosaukums"
 
 #: cart/models.py:128
 msgid "phone"
-msgstr "телефон"
+msgstr "telefons"
 
 #: cart/models.py:129
 msgid "email"
-msgstr "эл. почта"
+msgstr "e-pasts"
 
 #: cart/models.py:130
 msgid "address"
-msgstr "адрес"
+msgstr "adrese"
 
 #: cart/models.py:131 cart/models.py:147
 msgid "comments"
-msgstr "комментарии"
+msgstr "komentāri"
 
 #: cart/models.py:136
 msgid "orders"
-msgstr "заказы"
+msgstr "pasūtījumi"
 
 #: cart/views.py:38
 msgid "Wrong product."
-msgstr "Неправильный товар"
+msgstr "Nepareiza prece."
 
 #: cart/views.py:47 cart/views.py:55
 #, python-format
 msgid ""
 "Can't add product \"%s\" due to lack in stock. Try to decrease quantity."
-msgstr ""
-"Невозможно добавить товар \"%s\" в связи с отсутствием на складе. Попробуйте "
-"уменьшить количество."
+msgstr "Nevar ielikt \"%s\", jo trūkst krājumā. Centieties samazināt daudzumu."
 
 #: cart/views.py:58
 #, python-format
 msgid "Product added to <a href=\"%s\">cart</a>."
-msgstr "Товар добавлен в <a href=\"%s\">корзинy</a>."
+msgstr "Prece pievienota <a href=\"%s\">grozām</ a>."
 
 #: cart/views.py:90
 #, python-format
 msgid "Quantity for product \"%s\" not set due to lack in stock."
-msgstr ""
-"Количество товара \"%s\" не установлено в связи с отсутствием на складе."
+msgstr "Preces daudzums \"%s\" nav iespējams, jo nav noliktavā."
 
 #: cart/views.py:118
 msgid "Someone already bought product that you are trying to buy."
-msgstr "Кто-то уже купил товар, который вы пытаетесь купить."
+msgstr "Kāds jau ir nopircis produktu, kuru jūs gribat iegādāties."
 
 #: templates/qshop/admin/actions/change_price.html:5
 msgid "change price by"
-msgstr "изменить цены в процентах"
+msgstr "mainīt cenu par"
 
 #: templates/qshop/admin/actions/change_price.html:12
 #, python-format
@@ -375,27 +371,27 @@ msgid ""
 "For product with price 200 new price will be 220.</p><p>Negative numbers "
 "will reduce the price.</p><p>Will be applied to:</p>"
 msgstr ""
-"<p>Если введено 10, тогда цена для выбранных продуктов увеличится на 10%%. "
-"Для продукта с ценой 200, новая цена будет 220.</p><p>Негативные числа "
-"уменьшают цену.</p><p>Будет применено:</p>"
+"p Ja 10 ir ievadīta, tad cena par visiem izvēlētajiem produktiem pieaug par "
+"10 %% . . Par produktu ar cenu 200 jaunā cena būs 220 </ p> Negatīvi skaitļi "
+"samazinās cenu </ p> tiks piemēroti. </ P>"
 
 #: templates/qshop/admin/actions/change_price.html:22
 #: templates/qshop/admin/actions/link_to_category.html:21
 #: templates/qshop/admin/actions/set_discount.html:21
 msgid "apply"
-msgstr "применить"
+msgstr "saglabāt"
 
 #: templates/qshop/admin/actions/link_to_category.html:5
 msgid "select category to apply"
-msgstr "выберите категорию к которой привязать"
+msgstr "izvēlieties kategoriju, kam piemērot"
 
 #: templates/qshop/admin/actions/link_to_category.html:12
 msgid "category will be applied to"
-msgstr "следующие товары будут привязаны к категории"
+msgstr "kategorija tiks piemērota"
 
 #: templates/qshop/admin/actions/set_discount.html:5
 msgid "set discount by"
-msgstr "Установить скидки в процентах"
+msgstr "atlaide procentos"
 
 #: templates/qshop/admin/actions/set_discount.html:12
 #, python-format
@@ -404,101 +400,92 @@ msgid ""
 "price. For product with price 200 discount price will be 180.</p><p>Enter 0 "
 "to remove discount prices.</p><p>Will be applied to:</p>"
 msgstr ""
-"<p>Если введено 10, тогда скидочная цена будет составлять 90%% от цены. Для "
-"продукта с ценой 200, скидочная цена будет 180.</p><p>Введите 0 для удаления "
-"скидочной цены.</p><p>Будет применено к:</p>"
+"p Ja 10 ir ievadīta, tad atlaide cenu visiem produktiem būs 90 %% no "
+"cenas. .. Par produktu ar cenu 200 atlaidi cena būs 180 </ p> Ievadiet 0, "
+"lai novērstu atlaidēm </ p> Tiks piemērota: </ p>"
 
 #: templates/qshop/admin/actions/unlink_from_category.html:5
 msgid "select category to unlink"
-msgstr "выберите категорию к которой отвязать"
+msgstr "izvēlieties kategoriju, lai atsaistītu"
 
 #: templates/qshop/admin/actions/unlink_from_category.html:12
 msgid "category will be unlinked from"
-msgstr "категория будет отвязана от"
+msgstr "kategorija tiks izņemta no"
 
 #: templates/qshop/cart/_cart_as_table.html:5
 msgid "Product"
-msgstr "Товар"
+msgstr "Produkts"
 
 #: templates/qshop/cart/_cart_as_table.html:6
 #: templates/qshop/cart/_cart_as_table.html:28
 #: templates/qshop/cart/cart.html:23
 msgid "Price"
-msgstr "Цена"
+msgstr "Cena"
 
 #: templates/qshop/cart/_cart_as_table.html:7
 #: templates/qshop/cart/cart.html:21
 msgid "Qty"
-msgstr "Кол-во"
+msgstr "Daudz"
 
 #: templates/qshop/cart/_cart_as_table.html:8
 #: templates/qshop/cart/cart.html:24
 msgid "Sum"
-msgstr "Сумма"
+msgstr "Summa"
 
 #: templates/qshop/cart/_cart_as_table.html:32
 msgid "Delivery"
-msgstr "Доставка"
+msgstr "Piegāde"
 
 #: templates/qshop/cart/_cart_as_table.html:36
 #: templates/qshop/cart/cart.html:59
 msgid "Total price"
-msgstr "Общая стоимость"
+msgstr "Kopējā summa"
 
 #: templates/qshop/cart/cart.html:11
 msgid "Cart is empty"
-msgstr "Ваша корзина пуста"
+msgstr "Grozs ir tukšs"
 
 #: templates/qshop/cart/cart.html:18
 msgid "Product name"
-msgstr "Название товара"
+msgstr "Produkta nosaukums"
 
 #: templates/qshop/cart/cart.html:19
 msgid "SKU"
-msgstr "Код"
+msgstr "SKU"
 
 #: templates/qshop/cart/cart.html:22
 msgid "Discount"
-msgstr "Скидка"
+msgstr "Atlaide"
 
 #: templates/qshop/cart/cart.html:41
 msgid "remove"
-msgstr "удалить"
+msgstr "dzēst"
 
 #: templates/qshop/cart/cart.html:65
 msgid "Make Order"
-msgstr "Сделать заказ"
+msgstr "Veikt pasūtījumu"
 
 #: templates/qshop/cart/order.html:19
 msgid "Process order"
-msgstr "Завершить заказ"
+msgstr "Pabeigt pasūtījumu"
 
 #: templates/qshop/cart/order_cancelled.html:6
 msgid "You cancelled payment!"
-msgstr "Вы отменили оплату!"
+msgstr "Jūs atcelat maksājumu!"
 
 #: templates/qshop/cart/order_error.html:6
 msgid "Error while paying!"
-msgstr "Ошибка при оплате!"
+msgstr "Maksāšanas kļūda!"
 
 #: templates/qshop/cart/order_error.html:7
 msgid "You didn't buy products"
-msgstr "Вы не купили товар"
+msgstr "Jūs neiegadajāties preces"
 
 #: templates/qshop/cart/order_success.html:6
 msgid "Thank You for Your purchase!"
-msgstr "Благодарим Вас за покупку!"
+msgstr "Paldies par Jūsu pirkumu!"
 
 #: templates/qshop/cart/order_success.html:7
 #, python-format
 msgid "Your order Nr. %(num)s confirmed!"
-msgstr "Ваш заказ Nr. %(num)s подтвержден!"
-
-#~ msgid ""
-#~ "If 10 is entered, then price for all selected products increases by 10%%. "
-#~ "For product with price 200 new price will be 220. Negative numbers will "
-#~ "reduce the price. Will be applied to:"
-#~ msgstr ""
-#~ "Если введено 10, тогда цена для выбранных продуктов увеличится на 10%%. "
-#~ "Для продукта с ценой 200, новая цена будет 220.Негативные числа уменьшают "
-#~ "цену.Будет применено:"
+msgstr "Jūsu pasūtījums Nr. %(num)s apstiprināts!"
