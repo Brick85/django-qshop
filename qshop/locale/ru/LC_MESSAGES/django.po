@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: qshop\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2013-09-23 13:28+0300\n"
-"PO-Revision-Date: 2013-09-25 17:28+0300\n"
+"PO-Revision-Date: 2013-09-25 17:38+0300\n"
 "Last-Translator: alexey <a@trialine.lv>\n"
 "Language-Team: qt <a@trialine.lv>\n"
 "Language: Russian\n"
@@ -90,7 +90,7 @@ msgstr "артикул"
 
 #: models.py:77
 msgid "hidden"
-msgstr "скрыть"
+msgstr "скрытый"
 
 #: models.py:78
 msgid "product name"
