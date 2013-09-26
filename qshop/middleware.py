@@ -1,6 +1,6 @@
 from .models import Currency
 from django.http import HttpResponseRedirect
-
+from django.conf import settings
 
 class CurrencyMiddleware(object):
 
@@ -11,6 +11,9 @@ class CurrencyMiddleware(object):
             try:
                 current_currency = Currency.objects.get(code=get_currency)
                 request.session['currency'] = get_currency
+                if settings.SERVER_CACHE_DIR:
+                    request._server_cache = {'set_cookie': True}
+
                 return HttpResponseRedirect(request.path)
             except:
                 pass
@@ -20,4 +23,5 @@ class CurrencyMiddleware(object):
             except:
                 current_currency = Currency.get_default_currency()
                 request.session['currency'] = current_currency.code
+
         Currency.current_currency = current_currency
