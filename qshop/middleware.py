@@ -1,6 +1,6 @@
 from .models import Currency
 from django.http import HttpResponseRedirect
-from django.conf import settings
+from sitemenu.sitemenu_settings import SERVER_CACHE_DIR
 
 class CurrencyMiddleware(object):
 
@@ -11,7 +11,8 @@ class CurrencyMiddleware(object):
             try:
                 current_currency = Currency.objects.get(code=get_currency)
                 request.session['currency'] = get_currency
-                if settings.SERVER_CACHE_DIR:
+                Currency.set_default_currency(current_currency)
+                if SERVER_CACHE_DIR:
                     request._server_cache = {'set_cookie': True}
 
                 return HttpResponseRedirect(request.path)
