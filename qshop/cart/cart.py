@@ -1,7 +1,7 @@
 from django.template.loader import render_to_string
 from django.contrib.sites.models import Site
 import datetime
-from overloadable_functions import count_delivery_price
+#from overloadable_functions import count_delivery_price
 
 from django.conf import settings
 
@@ -9,6 +9,8 @@ import models
 from ..models import Currency
 from qshop import qshop_settings
 
+from sitemenu import import_item
+count_delivery_price = import_item(qshop_settings.CART_DELIVERY_FUNCTION)
 
 CART_ID = '%s-cart' % settings.ROOT_URLCONF
 

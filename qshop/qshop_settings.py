@@ -60,3 +60,5 @@ FILTERS_ORDER = getattr(settings, 'QSHOP_FILTERS_ORDER', [
 VARIATION_FILTER_NAME = getattr(settings, 'QSHOP_VARIATION_FILTER_NAME', _('Variation'))  # or add "def get_variation_name(self):" to ProductsSet or Menu
 
 FILTER_BY_VARIATION_TYPE = getattr(settings, 'QSHOP_FILTER_BY_VARIATION_TYPE', 'and')
+
+CART_DELIVERY_FUNCTION = getattr(settings, 'QSHOP_CART_DELIVERY_FUNCTION', 'qshop.cart.overloadable_functions.count_delivery_price')
