@@ -55,10 +55,13 @@ class Item(models.Model):
         return '%s - %s' % (self.quantity, self.unit_price)
 
     def total_price(self, in_default_currency=False):
-        price = self.quantity * self.unit_price
         if in_default_currency:
-            return price
-        return Currency.get_price(price)
+            single_price = self.unit_price
+        else:
+            single_price = Currency.get_price(self.unit_price)
+
+        price = self.quantity * single_price
+        return price
 
     def total_fprice(self):
         return Currency.get_fprice(self.total_price(), format_only=True)

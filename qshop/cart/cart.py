@@ -57,11 +57,8 @@ class Cart:
     def total_price(self, in_default_currency=False):
         total_price = 0
         for item in self.get_products():
-            total_price += item.total_price(in_default_currency=True)
-        if in_default_currency:
-            return float(total_price)
-        else:
-            return Currency.get_price(total_price)
+            total_price += item.total_price(in_default_currency=in_default_currency)
+        return float(total_price)
 
     def total_fprice(self):
         return Currency.get_fprice(self.total_price(), format_only=True)
