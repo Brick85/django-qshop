@@ -7,17 +7,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: svmebeles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-09-23 13:28+0300\n"
+"POT-Creation-Date: 2013-09-26 16:47+0300\n"
 "PO-Revision-Date: 2013-09-25 17:28+0300\n"
 "Last-Translator: alexey <a@trialine.lv>\n"
 "Language-Team: qt <a@trialine.lv>\n"
+"Language: Latvian\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : "
 "2);\n"
 "X-Generator: Poedit 1.5.4\n"
-"Language: Latvian\n"
 
 #: admin.py:170
 msgid "Successfully linked products to '{0}'."
@@ -123,7 +123,7 @@ msgstr "kategorija"
 msgid "parameters"
 msgstr "parametri"
 
-#: models.py:89 models.py:243 models.py:350
+#: models.py:89 models.py:243 models.py:293 models.py:350
 msgid "sort"
 msgstr "šķirošana"
 
@@ -178,10 +178,6 @@ msgstr "parametru komplekti"
 #: models.py:292
 msgid "is filter"
 msgstr "ir filtrs"
-
-#: models.py:293 cart/models.py:135
-msgid "order"
-msgstr "šķīrošana"
 
 #: models.py:297 models.py:317 models.py:336
 msgid "parameter"
@@ -331,6 +327,10 @@ msgstr "adrese"
 #: cart/models.py:131 cart/models.py:147
 msgid "comments"
 msgstr "komentāri"
+
+#: cart/models.py:135
+msgid "order"
+msgstr "šķīrošana"
 
 #: cart/models.py:136
 msgid "orders"

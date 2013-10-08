@@ -28,7 +28,7 @@ else:
                          variables={
                             'order': order,
                          },
-                         subject=_('Your order %s accepted') % order.get_id(),
+                         subject=_("Your order %s accepted") % order.get_id(),
                          mails=[order.email]
                 )
 

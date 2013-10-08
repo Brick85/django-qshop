@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: qshop\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-09-23 13:28+0300\n"
+"POT-Creation-Date: 2013-09-26 16:47+0300\n"
 "PO-Revision-Date: 2013-09-25 17:38+0300\n"
 "Last-Translator: alexey <a@trialine.lv>\n"
 "Language-Team: qt <a@trialine.lv>\n"
@@ -124,7 +124,7 @@ msgstr "категория"
 msgid "parameters"
 msgstr "параметры"
 
-#: models.py:89 models.py:243 models.py:350
+#: models.py:89 models.py:243 models.py:293 models.py:350
 msgid "sort"
 msgstr "сортировка"
 
@@ -179,10 +179,6 @@ msgstr "наборы параметров"
 #: models.py:292
 msgid "is filter"
 msgstr "является фильтром"
-
-#: models.py:293 cart/models.py:135
-msgid "order"
-msgstr "сортировка"
 
 #: models.py:297 models.py:317 models.py:336
 msgid "parameter"
@@ -332,6 +328,10 @@ msgstr "адрес"
 #: cart/models.py:131 cart/models.py:147
 msgid "comments"
 msgstr "комментарии"
+
+#: cart/models.py:135
+msgid "order"
+msgstr "сортировка"
 
 #: cart/models.py:136
 msgid "orders"
