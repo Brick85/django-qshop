@@ -9,7 +9,7 @@
         {% endfor %}
     </ul>
     {% endif %}
-    <div class="cart_icon"><a href="{% url cart %}">Cart ({% qshop_items_in_cart_with_qty %})</a></div>
+    <div class="cart_icon"><a href="{% url 'cart' %}">Cart ({% qshop_items_in_cart_with_qty %})</a></div>
     <div class="left_column">
         {% set_catalogue_root %}
         {% render_sitemenu '_menu' catalogue_root %}
