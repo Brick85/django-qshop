@@ -12,7 +12,13 @@ from ..models import Product
 from .forms import OrderForm
 from .models import Order
 
+from qshop.qshop_settings import CART_ORDER_VIEW
+
 import re
+
+if CART_ORDER_VIEW:
+    from sitemenu import import_item
+    qshop_order_view = import_item(CART_ORDER_VIEW)
 
 
 def add_to_cart(request, product_id):
@@ -101,6 +107,9 @@ def show_cart(request):
 
 
 def order_cart(request):
+    if CART_ORDER_VIEW:
+        return qshop_order_view(request)
+
     cart = Cart(request)
 
     order_form = OrderForm()

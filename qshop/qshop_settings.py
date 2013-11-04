@@ -26,6 +26,7 @@ CART_ORDER_CLASS = getattr(settings, 'QSHOP_CART_ORDER_CLASS', None)
 CART_ORDER_FORM = getattr(settings, 'QSHOP_CART_ORDER_FORM', None)
 
 CART_ORDER_CUSTOM_ADMIN = getattr(settings, 'QSHOP_CART_ORDER_CUSTOM_ADMIN', False)
+CART_ORDER_VIEW = getattr(settings, 'QSHOP_CART_ORDER_VIEW', False)
 
 CART_TABLE_LINK_ADD = getattr(settings, 'QSHOP_CART_TABLE_LINK_ADD', None)
 CART_TABLE_IMAGE_ADD = getattr(settings, 'QSHOP_CART_TABLE_IMAGE_ADD', None)
