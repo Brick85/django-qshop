@@ -90,7 +90,7 @@ class CategoryData:
                     filters_qs = ProductToParameter.objects.select_related('parameter', 'value')\
                         .filter(product__category=self.menu, product__hidden=False, parameter__is_filter=True).exclude(value=None)\
                         .order_by('parameter__parameters_set', 'parameter__order', 'value__value')
-                    filters_qs.query.group_by = ['value']
+                    filters_qs.query.group_by = ['qshop_parametervalue.value']
 
                     for item in filters_qs:
                         filter_id = "p{0}".format(item.parameter.id)
