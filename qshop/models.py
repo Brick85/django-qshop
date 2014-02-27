@@ -8,7 +8,7 @@ from django.conf import settings
 
 from sitemenu.sitemenu_settings import MENUCLASS
 from sitemenu import import_item
-from .qshop_settings import PRODUCT_CLASS, VARIATION_CLASS, VARIATION_VALUE_CLASS, PRODUCT_IMAGE_CLASS, PARAMETERS_SET_CLASS, PARAMETER_CLASS, PARAMETER_VALUE_CLASS, PRODUCT_TO_PARAMETER_CLASS, CURRENCY_CLASS
+from .qshop_settings import PRODUCT_CLASS, VARIATION_CLASS, VARIATION_VALUE_CLASS, PRODUCT_IMAGE_CLASS, PARAMETERS_SET_CLASS, PARAMETER_CLASS, PARAMETER_VALUE_CLASS, PRODUCT_TO_PARAMETER_CLASS, CURRENCY_CLASS, LOAD_ADDITIONAL_MODELS
 
 Menu = import_item(MENUCLASS)
 
@@ -432,3 +432,7 @@ class ProductToParameter(import_item(PRODUCT_TO_PARAMETER_CLASS) if PRODUCT_TO_P
 
 class Currency(import_item(CURRENCY_CLASS) if CURRENCY_CLASS else CurrencyAbstract):
     pass
+
+if LOAD_ADDITIONAL_MODELS:
+    for add_model in LOAD_ADDITIONAL_MODELS:
+        import_item(add_model)

@@ -21,6 +21,8 @@ PRODUCT_TO_PARAMETER_CLASS = getattr(settings, 'QSHOP_PRODUCT_TO_PARAMETER_CLASS
 
 CURRENCY_CLASS             = getattr(settings, 'QSHOP_CURRENCY_CLASS',             None)
 
+LOAD_ADDITIONAL_MODELS     = getattr(settings, 'QSHOP_LOAD_ADDITIONAL_MODELS',     None)
+
 
 CART_ORDER_CLASS = getattr(settings, 'QSHOP_CART_ORDER_CLASS', None)
 CART_ORDER_FORM = getattr(settings, 'QSHOP_CART_ORDER_FORM', None)
