@@ -86,6 +86,9 @@ class ProductAbstract(models.Model, PricingModel):
 
     parameters = models.ManyToManyField('Parameter', through='ProductToParameter', verbose_name=_('parameters'))
 
+    date_added = models.DateTimeField(_('date added'), auto_now_add=True)
+    date_modified = models.DateTimeField(_('date modified'), auto_now=True)
+
     sort = models.IntegerField(_('sort'), default=0)
 
     class Meta:
