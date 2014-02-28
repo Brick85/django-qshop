@@ -273,6 +273,9 @@ class CategoryData:
                 'add': add
             }
 
+    def get_sorting_variants_as_list(self):
+        return list(self.get_sorting_variants())
+
     def get_filters(self):
         for item in self.filters_order:
             yield (item, self.filters[item])
