@@ -192,7 +192,7 @@ class ProductAbstract(models.Model, PricingModel):
         try:
             return self._parameters_for_product
         except:
-            self._parameters_for_product = ProductToParameter.objects.select_related('parameter', 'value').filter(product=self).exclude(value=None)
+            self._parameters_for_product = ProductToParameter.objects.select_related('parameter', 'value').order_by('parameter__order').filter(product=self).exclude(value=None)
             return self._parameters_for_product
 
     def get_additional_images(self):
@@ -283,6 +283,28 @@ class ParametersSetAbstract(models.Model):
 
     def __unicode__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        super(ParametersSetAbstract, self).save(*args, **kwargs)
+        parameters = set(Parameter.objects.filter(parameters_set=self).values_list('id', flat=True))
+        for product_id in Product.objects.filter(parameters_set=self).values_list('id', flat=True):
+            product_parameters = set(Parameter.objects.filter(producttoparameter__product_id=product_id).values_list('id', flat=True))
+
+            add_parameters = parameters.difference(product_parameters)
+            del_parameters = product_parameters.difference(parameters)
+
+            if add_parameters:
+                add_parameters_objects = []
+                for parameter_id in add_parameters:
+                    add_parameters_objects.append(ProductToParameter(
+                        product_id=product_id,
+                        parameter_id=parameter_id,
+                        value_id=None
+                    ))
+                ProductToParameter.objects.bulk_create(add_parameters_objects)
+
+            if del_parameters:
+                ProductToParameter.objects.filter(parameter_id__in=del_parameters, product_id=product_id).delete()
 
 
 class ParameterAbstract(models.Model):
