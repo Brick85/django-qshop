@@ -54,11 +54,20 @@ class Cart:
             self._products = self.cart.item_set.all()
             return self._products
 
-    def total_price(self, in_default_currency=False):
+    def total_price_wo_discount(self, in_default_currency=False):
         total_price = 0
         for item in self.get_products():
             total_price += item.total_price(in_default_currency=in_default_currency)
         return float(total_price)
+
+    def total_fprice_wo_discount(self):
+        return Currency.get_fprice(self.total_price_wo_discount(), format_only=True)
+
+    def total_price(self, in_default_currency=False):
+        total_price = self.total_price_wo_discount(in_default_currency)
+        if self.has_discount():
+            total_price = (100.0 - self.get_discount()) * total_price / 100.0
+        return total_price
 
     def total_fprice(self):
         return Currency.get_fprice(self.total_price(), format_only=True)
@@ -80,6 +89,19 @@ class Cart:
 
     def delivery_fprice(self):
         return Currency.get_fprice(self.delivery_price(), format_only=True)
+
+    def has_discount(self):
+        if self.get_discount() > 0:
+            return True
+        return False
+
+    def get_discount(self):
+        return self.cart.discount
+
+    def set_discount(self, discount):
+        self.cart.discount = discount
+        self.clear_cache()
+        self.cart.save()
 
     def total_weight(self):
         try:

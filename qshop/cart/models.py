@@ -14,6 +14,7 @@ class Cart(models.Model):
     date_added = models.DateTimeField(_('creation date'), auto_now_add=True)
     date_modified = models.DateTimeField(_('modification date'), auto_now=True)
     checked_out = models.BooleanField(default=False, verbose_name=_('checked out'))
+    discount = models.PositiveSmallIntegerField(_('discount'), default=0)
 
     class Meta:
         verbose_name = _('cart')

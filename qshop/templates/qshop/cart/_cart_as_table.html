@@ -24,10 +24,25 @@
         {% endfor %}
     </tbody>
     <tfoot>
-        <tr>
-            <td colspan="3">{% trans "Price" %}:</td>
-            <td><b>{{ cart.total_fprice }}</b></td>
-        </tr>
+        {% if cart.has_discount %}
+            <tr>
+                <td colspan="3">{% trans "Original Price" %}:</td>
+                <td><b>{{ cart.total_fprice_wo_discount }}</b></td>
+            </tr>
+            <tr>
+                <td colspan="3">{% trans "Discount" %}:</td>
+                <td><b>{{ cart.get_discount }}%</b></td>
+            </tr>
+            <tr>
+                <td colspan="3">{% trans "Discounted Price" %}:</td>
+                <td><b>{{ cart.total_fprice }}</b></td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="3">{% trans "Price" %}:</td>
+                <td><b>{{ cart.total_fprice }}</b></td>
+            </tr>
+        {% endif %}
         <tr>
             <td colspan="3">{% trans "Delivery" %}:</td>
             <td><b>{{ cart.delivery_fprice }}</b></td>
