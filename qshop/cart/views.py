@@ -122,6 +122,7 @@ def order_cart(request):
                 order = order_form.save(cart)
                 request.session['order_pk'] = order.pk
                 cart.checkout()
+                order.finish_order(request)
                 return HttpResponseRedirect(order.get_redirect())
             except ItemTooMany:
                 messages.add_message(request, messages.WARNING, _('Someone already bought product that you are trying to buy.'))

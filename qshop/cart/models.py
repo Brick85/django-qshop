@@ -107,8 +107,14 @@ class OrderAbstract(models.Model):
     def get_id(self):
         return "QS%d" % self.pk
 
+    def get_description(self):
+        return _(u"Order Nr. %s") % self.get_id()
+
     def get_redirect(self):
         return reverse('cart_order_success')
+
+    def finish_order(self, request):
+        pass
 
     def get_cart_text(self):
         return self.cart_text.replace('\n', '')
