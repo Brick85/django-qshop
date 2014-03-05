@@ -1,5 +1,4 @@
 from django.template.loader import render_to_string
-from django.contrib.sites.models import Site
 import datetime
 #from overloadable_functions import count_delivery_price
 
@@ -236,11 +235,13 @@ class Cart:
             item.delete()
 
     def as_table(self, standalone=False):
+        if not hasattr(settings, 'SITE_URL'):
+            raise Exception('No SITE_URL defined in settings! (SITE_URL="http://example.com")')
         link_add = ''
         image_add = ''
         if standalone:
-            link_add = 'http://{0}'.format(Site.objects.get_current().domain if qshop_settings.CART_TABLE_LINK_ADD != None else qshop_settings.CART_TABLE_LINK_ADD)
-            image_add = 'http://{0}'.format(Site.objects.get_current().domain if qshop_settings.CART_TABLE_IMAGE_ADD != None else qshop_settings.CART_TABLE_IMAGE_ADD)
+            link_add = '{0}'.format(qshop_settings.CART_TABLE_LINK_ADD if qshop_settings.CART_TABLE_LINK_ADD else settings.SITE_URL)
+            image_add = '{0}'.format(qshop_settings.CART_TABLE_IMAGE_ADD if qshop_settings.CART_TABLE_IMAGE_ADD else settings.SITE_URL)
         return render_to_string('qshop/cart/_cart_as_table.html', {
             'LINK_ADD': link_add,
             'IMAGE_ADD': image_add,
