@@ -2,12 +2,18 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.core.urlresolvers import reverse
 from django.utils.safestring import mark_safe
+import datetime
 
 from sitemenu import import_item
 from ..models import Currency
 from ..models import Product, ProductVariation
 
-from ..qshop_settings import CART_ORDER_CLASS
+from qshop import qshop_settings
+
+PAYMENT_CLASSES = {}
+for item in qshop_settings.PAYMENT_METHODS_ENABLED:
+    PAYMENT_CLASSES[item] = import_item(qshop_settings.PAYMENT_METHODS_CLASSES_PATHS[item])
+#Menu = import_item(MENUCLASS)
 
 
 class Cart(models.Model):
@@ -96,6 +102,12 @@ class OrderAbstract(models.Model):
     cart                 = models.ForeignKey(Cart, verbose_name=_('cart'), editable=False)
     cart_text            = models.TextField(_('cart text'), editable=False)
 
+    if qshop_settings.ENABLE_PAYMENTS:
+        payed                = models.BooleanField(_('payed'), default=False)
+        payed_log            = models.TextField(_('payed log'), blank=True, null=True)
+        payment_method       = models.CharField(_('payment method'), max_length=16, choices=[(item, item) for item in qshop_settings.PAYMENT_METHODS_ENABLED], default=qshop_settings.PAYMENT_METHODS_ENABLED[0])
+        payment_id           = models.CharField(_('payment id'), max_length=256, null=True)
+
     class Meta:
         verbose_name = _('client order')
         verbose_name_plural = _('client orders')
@@ -110,9 +122,6 @@ class OrderAbstract(models.Model):
     def get_description(self):
         return _(u"Order Nr. %s") % self.get_id()
 
-    def get_redirect(self):
-        return reverse('cart_order_success')
-
     def finish_order(self, request):
         pass
 
@@ -121,19 +130,25 @@ class OrderAbstract(models.Model):
     get_cart_text.allow_tags = True
     get_cart_text.short_description = _('cart text')
 
+    if not qshop_settings.ENABLE_PAYMENTS:
+        def get_redirect(self):
+            return reverse('cart_order_success')
+    else:
+        def get_redirect(self):
+            payment = PAYMENT_CLASSES[self.payment_method]()
+            return payment.get_redirect(self)
+
+        def add_log_message(self, msg):
+            if self.payed_log is None:
+                self.payed_log = u""
+            self.payed_log += "[%s] %s\n" % (datetime.datetime.strftime(datetime.datetime.now(), "%D %T"), msg)
+
+        def user_payed(self):
+            self.status = 2
+            self.payed = True
+
 
 class OrderAbstractDefault(OrderAbstract):
-    # PAYMENT_METHODS = (
-    #     ('paypal', 'paypal'),
-    #     #('webmoney', 'webmoney'),
-    #     #('yandex', 'yandex'),
-    #     ('roboxchange', 'roboxchange'),
-    #     ('delayed', 'delayed'),
-    # )
-    # PAYMENT_METHODS_KEYS = [x[0] for x in PAYMENT_METHODS]
-    # payed                = models.BooleanField(_('payed'), default=False)
-    # payed_log            = models.TextField(_('payed log'), blank=True, null=True)
-
     name = models.CharField(_('name'), max_length=128)
     phone = models.CharField(_('phone'), max_length=32, blank=True, null=True)
     email = models.EmailField(_('email'))
@@ -149,19 +164,12 @@ class OrderAbstractDefault(OrderAbstract):
         return u"%s (%s)" % (self.name, self.email)
 
     def save(self, *args, **kwargs):
-        #self.payed = True
         super(OrderAbstractDefault, self).save(*args, **kwargs)
 
     def get_comments(self):
         return mark_safe("<br />".join(self.comments.split("\n")))
     get_comments.short_description = _('comments')
 
-    # def user_payed(self, payed_log=None):
-    #     self.payed = True
-    #     if payed_log:
-    #         self.payed_log = payed_log
-    #     self.save()
 
-
-class Order(import_item(CART_ORDER_CLASS) if CART_ORDER_CLASS else OrderAbstractDefault):
+class Order(import_item(qshop_settings.CART_ORDER_CLASS) if qshop_settings.CART_ORDER_CLASS else OrderAbstractDefault):
     pass

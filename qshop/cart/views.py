@@ -151,7 +151,12 @@ def cart_order_success(request):
     }, context_instance=RequestContext(request))
 
 
-def cart_order_cancelled(request):
+def cart_order_cancelled(request, order_id=None):
+    if order_id:
+        order = get_object_or_404(Order, pk=order_id, payed=False)
+        order.status = 4
+        order.add_log_message('Order canceled!')
+        order.save()
     return render_to_response('qshop/cart/order_cancelled.html', {
     }, context_instance=RequestContext(request))
 

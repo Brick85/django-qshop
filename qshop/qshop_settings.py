@@ -67,3 +67,17 @@ VARIATION_FILTER_NAME = getattr(settings, 'QSHOP_VARIATION_FILTER_NAME', _('Vari
 FILTER_BY_VARIATION_TYPE = getattr(settings, 'QSHOP_FILTER_BY_VARIATION_TYPE', 'and')
 
 CART_DELIVERY_FUNCTION = getattr(settings, 'QSHOP_CART_DELIVERY_FUNCTION', 'qshop.cart.overloadable_functions.count_delivery_price')
+
+
+##### payments
+PAYMENT_DEBUG = getattr(settings, 'QSHOP_PAYMENT_DEBUG', False)
+ENABLE_PAYMENTS = getattr(settings, 'QSHOP_ENABLE_PAYMENTS', False)
+PAYMENT_METHODS_CLASSES_PATHS = {
+    'banktransfer': 'qshop.payment_vendors.BanktransferPayment',
+    'paypal': 'qshop.payment_vendors.PaypalPayment',
+    'webmoney': 'webmoney',
+    #('yandex', 'yandex'),
+    #('roboxchange', 'roboxchange'),
+    #('delayed', 'delayed'),
+}
+PAYMENT_METHODS_ENABLED = ['banktransfer', 'paypal']

@@ -14,6 +14,10 @@ count_delivery_price = import_item(qshop_settings.CART_DELIVERY_FUNCTION)
 CART_ID = '%s-cart' % settings.ROOT_URLCONF
 
 
+if not hasattr(settings, 'SITE_URL'):
+    raise Exception('No SITE_URL defined in settings! (SITE_URL="http://example.com")')
+
+
 class ItemAlreadyExists(Exception):
     pass
 
@@ -235,8 +239,6 @@ class Cart:
             item.delete()
 
     def as_table(self, standalone=False):
-        if not hasattr(settings, 'SITE_URL'):
-            raise Exception('No SITE_URL defined in settings! (SITE_URL="http://example.com")')
         link_add = ''
         image_add = ''
         if standalone:
