@@ -11,9 +11,9 @@ if qshop_settings.ENABLE_PAYMENTS:
 
 
     def test_payment(request):
-        order = Order.objects.get(pk=27)
-        payment = PaypalPayment()
-        payment.get_redirect(order)
+        # order = Order.objects.get(pk=27)
+        # payment = PaypalPayment()
+        # payment.get_redirect(order)
         return HttpResponse('ok')
 
     if 'banktransfer' in qshop_settings.PAYMENT_METHODS_ENABLED:

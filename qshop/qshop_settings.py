@@ -70,7 +70,6 @@ CART_DELIVERY_FUNCTION = getattr(settings, 'QSHOP_CART_DELIVERY_FUNCTION', 'qsho
 
 
 ##### payments
-PAYMENT_DEBUG = getattr(settings, 'QSHOP_PAYMENT_DEBUG', False)
 ENABLE_PAYMENTS = getattr(settings, 'QSHOP_ENABLE_PAYMENTS', False)
 PAYMENT_METHODS_CLASSES_PATHS = {
     'banktransfer': 'qshop.payment_vendors.BanktransferPayment',
