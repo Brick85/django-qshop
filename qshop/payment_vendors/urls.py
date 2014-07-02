@@ -9,9 +9,10 @@ if qshop_settings.ENABLE_PAYMENTS:
     )
 
     if 'banktransfer' in qshop_settings.PAYMENT_METHODS_ENABLED:
-        urlpatterns += patterns('',
-            url(r'^banktransfer/ok/(?P<order_id>\d+)/$', 'qshop.payment_vendors.views.vendors_payment_banktransfer_ok', name='vendors_payment_banktransfer_ok'),
-        )
+        pass
+        # urlpatterns += patterns('',
+        #     url(r'^banktransfer/ok/(?P<order_id>\d+)/$', 'qshop.payment_vendors.views.vendors_payment_banktransfer_ok', name='vendors_payment_banktransfer_ok'),
+        # )
     if 'paypal' in qshop_settings.PAYMENT_METHODS_ENABLED:
         urlpatterns += patterns('',
             url(r'^paypal/ok/(?P<order_id>\d+)/$', 'qshop.payment_vendors.views.vendors_payment_paypal_ok', name='vendors_payment_paypal_ok'),
