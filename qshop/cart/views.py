@@ -6,6 +6,7 @@ from django.contrib import messages
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth.models import User, UserManager
 from django.contrib.auth import logout
+from django.views.decorators.csrf import csrf_exempt
 
 from . import Cart, ItemAlreadyExists, ItemDoesNotExist, ItemTooMany
 from ..models import Product
@@ -123,7 +124,7 @@ def order_cart(request):
                 request.session['order_pk'] = order.pk
                 cart.checkout()
                 order.finish_order(request)
-                return HttpResponseRedirect(order.get_redirect())
+                return order.get_redirect_response()
             except ItemTooMany:
                 messages.add_message(request, messages.WARNING, _('Someone already bought product that you are trying to buy.'))
 
@@ -150,7 +151,7 @@ def cart_order_success(request):
         'order': order,
     }, context_instance=RequestContext(request))
 
-
+@csrf_exempt
 def cart_order_cancelled(request, order_id=None):
     if order_id:
         order = get_object_or_404(Order, pk=order_id, payed=False)

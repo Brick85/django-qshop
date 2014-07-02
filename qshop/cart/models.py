@@ -134,9 +134,9 @@ class OrderAbstract(models.Model):
         def get_redirect(self):
             return reverse('cart_order_success')
     else:
-        def get_redirect(self):
+        def get_redirect_response(self):
             payment = PAYMENT_CLASSES[self.payment_method]()
-            return payment.get_redirect(self)
+            return payment.get_redirect_response(self)
 
         def add_log_message(self, msg):
             if self.payed_log is None:

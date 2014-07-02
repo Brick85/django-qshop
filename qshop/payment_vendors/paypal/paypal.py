@@ -27,7 +27,7 @@ paypalrestsdk.configure({
 
 class PaypalPayment(BasePayment):
 
-    def get_redirect(self, order):
+    def get_redirect_response(self, order):
         cart = order.cart.get_cartobject()
         currency_code = cart.get_currency().code.upper()
         total_price = cart.total_price()
@@ -86,7 +86,7 @@ class PaypalPayment(BasePayment):
                     redirect_url = link.href
                     order.add_log_message("Redirect for approval: %s" % (redirect_url) )
                     order.save()
-                    return redirect_url + "&testarg=142"
+                    return HttpResponseRedirect(redirect_url)
 
             order.add_log_message("ERROR: No link in response")
         else:

@@ -75,9 +75,9 @@ ENABLE_PAYMENTS = getattr(settings, 'QSHOP_ENABLE_PAYMENTS', False)
 PAYMENT_METHODS_CLASSES_PATHS = {
     'banktransfer': 'qshop.payment_vendors.BanktransferPayment',
     'paypal': 'qshop.payment_vendors.PaypalPayment',
-    'webmoney': 'webmoney',
+    'webmoney': 'qshop.payment_vendors.WebmoneyPayment',
     #('yandex', 'yandex'),
     #('roboxchange', 'roboxchange'),
     #('delayed', 'delayed'),
 }
-PAYMENT_METHODS_ENABLED = ['banktransfer', 'paypal']
+PAYMENT_METHODS_ENABLED = getattr(settings, 'QSHOP_PAYMENT_METHODS_ENABLED', ['banktransfer', 'paypal', 'webmoney'])
