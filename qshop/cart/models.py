@@ -2,6 +2,7 @@ from django.db import models
 from django.utils.translation import ugettext_lazy as _
 from django.core.urlresolvers import reverse
 from django.utils.safestring import mark_safe
+from django.http import HttpResponseRedirect
 import datetime
 
 from sitemenu import import_item
@@ -131,8 +132,8 @@ class OrderAbstract(models.Model):
     get_cart_text.short_description = _('cart text')
 
     if not qshop_settings.ENABLE_PAYMENTS:
-        def get_redirect(self):
-            return reverse('cart_order_success')
+        def get_redirect_response(self):
+            return HttpResponseRedirect(reverse('cart_order_success'))
     else:
         def get_redirect_response(self):
             payment = PAYMENT_CLASSES[self.payment_method]()
