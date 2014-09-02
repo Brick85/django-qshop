@@ -12,8 +12,9 @@ from ..models import Product, ProductVariation
 from qshop import qshop_settings
 
 PAYMENT_CLASSES = {}
-for item in qshop_settings.PAYMENT_METHODS_ENABLED:
-    PAYMENT_CLASSES[item] = import_item(qshop_settings.PAYMENT_METHODS_CLASSES_PATHS[item])
+if qshop_settings.ENABLE_PAYMENTS:
+    for item in qshop_settings.PAYMENT_METHODS_ENABLED:
+        PAYMENT_CLASSES[item] = import_item(qshop_settings.PAYMENT_METHODS_CLASSES_PATHS[item])
 #Menu = import_item(MENUCLASS)
 
 
