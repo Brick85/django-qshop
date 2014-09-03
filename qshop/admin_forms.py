@@ -46,6 +46,7 @@ class PriceForm(forms.Form):
 class ProductAdminForm(forms.ModelForm):
     class Meta:
         model = Product
+        fields = '__all__'
 
     def clean_articul(self):
         data = self.cleaned_data['articul']

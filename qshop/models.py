@@ -13,7 +13,7 @@ from .qshop_settings import PRODUCT_CLASS, VARIATION_CLASS, VARIATION_VALUE_CLAS
 Menu = import_item(MENUCLASS)
 
 
-class PricingModel:
+class PricingModel(object):
     def _get_price(self):
         return self.price
 
@@ -374,7 +374,7 @@ class CurrencyAbstract(models.Model):
     rate = models.FloatField(_('rate'))
     sort = models.SmallIntegerField(_('sort'))
     show_string = models.CharField(_('show string'), max_length=64)
-    is_default = models.BooleanField(_('is default'))
+    is_default = models.BooleanField(_('is default'), default=False)
 
     current_currency = None
 
