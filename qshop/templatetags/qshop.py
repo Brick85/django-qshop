@@ -38,3 +38,19 @@ def set_currencies_list(context):
     context['current_currency'] = Currency.get_default_currency()
     context['currencies_list'] = Currency.objects.all()
     return ''
+
+@register.simple_tag(takes_context=True)
+def qshop_cart_total_price(context, as_var=None):
+    cart = Cart(context['request'])
+    if as_var:
+        context[as_var] = cart.total_price()
+        return ''
+    return cart.total_price()
+
+@register.simple_tag(takes_context=True)
+def qshop_cart_currency(context, as_var=None):
+    cart = Cart(context['request'])
+    if as_var:
+        context[as_var] = cart.get_currency()
+        return ''
+    return cart.get_currency()
