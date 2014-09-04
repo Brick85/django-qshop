@@ -1,0 +1,14 @@
+.category_ul {
+    margin-left: 140px !important;
+}
+.category_ul ul {
+    padding-left: 0px !important;
+    margin-left: 20px !important;
+}
+.category_ul li {
+    list-style: none;
+    padding: 0px;
+}
+.category_ul > li > label {
+    color: #333;
+}

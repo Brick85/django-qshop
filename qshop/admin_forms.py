@@ -1,5 +1,6 @@
 from django.forms.models import BaseInlineFormSet
 from .models import ParameterValue, Parameter, Product
+from qshop.admin_widgets import CategoryCheckboxSelectMultiple
 from sitemenu.sitemenu_settings import MENUCLASS
 from sitemenu import import_item
 from django import forms
@@ -47,6 +48,15 @@ class ProductAdminForm(forms.ModelForm):
     class Meta:
         model = Product
         fields = '__all__'
+        widgets = {
+            'category': CategoryCheckboxSelectMultiple(),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super(ProductAdminForm, self).__init__(*args, **kwargs)
+        self.fields['weight'].help_text = 'in gramms'
+        self.fields['category'].help_text = ''
+        self.fields['category'].widget.can_add_related = False
 
     def clean_articul(self):
         data = self.cleaned_data['articul']

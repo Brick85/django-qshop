@@ -90,7 +90,7 @@ class ProductAdmin(getParentClass('ModelAdmin', Product)):
     list_filter = ('parameters_set', ProductCategoryListFilter)
     actions = ['link_to_category', 'unlink_from_category', 'change_price', 'set_discount']
 
-    filter_horizontal = ('category',)
+    # filter_horizontal = ('category',)
 
     formfield_overrides = qshop_formfield_overrides
 
