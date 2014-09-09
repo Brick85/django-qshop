@@ -23,12 +23,13 @@ class CategoryData:
     page = 1
     default_sorting = True
 
-    def __init__(self, request, filter_string, menu, sort, page=1):
+    def __init__(self, request, filter_string, menu, sort, page=1, products=None):
         self.request = request
         self.filter_string = filter_string
         self.menu = menu
         self.page = page
         self.page_link = menu.get_absolute_url()
+        self.init_products = products
 
         for i, x in enumerate(Product.SORT_VARIANTS):
             if sort == x[0]:
@@ -50,8 +51,9 @@ class CategoryData:
             self.need_return = True
 
     def process_products(self):
-
-        if not self.menu.page_type == 'pdis':
+        if self.init_products is not None:
+            products = self.init_products
+        elif not self.menu.page_type == 'pdis':
             products = Product.objects.filter(category=self.menu, hidden=False)
         else:
             products = Product.objects.filter(hidden=False).exclude(discount_price=None)

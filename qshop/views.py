@@ -6,13 +6,13 @@ from .models import Product, Currency
 from django.http import HttpResponsePermanentRedirect, HttpResponseRedirect
 
 
-def render_shopspage(request, menu, url_add):
+def render_shopspage(request, menu, url_add, products=None):
     filter_string, page_num, sort, show_product = get_products_page_data(url_add)
 
     if not show_product:
         # render products page
 
-        productdata = CategoryData(request, filter_string, menu, sort, page_num)
+        productdata = CategoryData(request, filter_string, menu, sort, page_num, products)
 
         if productdata.need_return:
             return productdata.return_data
