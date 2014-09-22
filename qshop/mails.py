@@ -3,6 +3,7 @@ from django.template.loader import render_to_string
 from django.template import TemplateDoesNotExist
 from django.utils.translation import ugettext_lazy as _, ugettext as __
 from qshop.qshop_settings import MAIL_TYPES
+from django.conf import settings
 
 
 def sendMail(mail_type, variables={}, subject=None, mails=None):
@@ -23,6 +24,9 @@ admin_subject_prefix
         raise 'No such mail type in list!'
 
     mailconf = MAIL_TYPES[mail_type]
+
+    if not 'SITE_URL' in variables:
+        variables['SITE_URL'] = settings.SITE_URL
 
     body = render_to_string("qshop/mails/%s.html" % mail_type, variables)
 
