@@ -71,12 +71,12 @@ CART_DELIVERY_FUNCTION = getattr(settings, 'QSHOP_CART_DELIVERY_FUNCTION', 'qsho
 
 ##### payments
 ENABLE_PAYMENTS = getattr(settings, 'QSHOP_ENABLE_PAYMENTS', False)
-PAYMENT_METHODS_CLASSES_PATHS = {
+PAYMENT_METHODS_CLASSES_PATHS = getattr(settings, 'QSHOP_PAYMENT_METHODS_CLASSES_PATHS', {
     'banktransfer': 'qshop.payment_vendors.BanktransferPayment',
     'paypal': 'qshop.payment_vendors.PaypalPayment',
     'webmoney': 'qshop.payment_vendors.WebmoneyPayment',
     #('yandex', 'yandex'),
     #('roboxchange', 'roboxchange'),
     #('delayed', 'delayed'),
-}
+})
 PAYMENT_METHODS_ENABLED = getattr(settings, 'QSHOP_PAYMENT_METHODS_ENABLED', ['banktransfer', 'paypal', 'webmoney'])
