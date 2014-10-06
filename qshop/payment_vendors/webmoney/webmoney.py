@@ -1,5 +1,4 @@
 from qshop.payment_vendors.payment import BasePayment
-from qshop import qshop_settings
 from django.conf import settings
 from django.shortcuts import render_to_response
 from django.core.urlresolvers import reverse
@@ -15,7 +14,6 @@ class WebmoneyPayment(BasePayment):
         cart = order.cart.get_cartobject()
         currency_code = cart.get_currency().code.upper()
         total_price = cart.total_price()
-        total_price = int(total_price * 100) / 100.0
         total_price = "%.2f" % total_price
 
 
