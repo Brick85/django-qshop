@@ -107,7 +107,7 @@ class OrderAbstract(models.Model):
     if qshop_settings.ENABLE_PAYMENTS:
         payed                = models.BooleanField(_('payed'), default=False)
         payed_log            = models.TextField(_('payed log'), blank=True, null=True)
-        payment_method       = models.CharField(_('payment method'), max_length=16, choices=[(item, item) for item in qshop_settings.PAYMENT_METHODS_ENABLED], default=qshop_settings.PAYMENT_METHODS_ENABLED[0])
+        payment_method       = models.CharField(_('payment method'), max_length=16, choices=[(item, _(item)) for item in qshop_settings.PAYMENT_METHODS_ENABLED], default=qshop_settings.PAYMENT_METHODS_ENABLED[0])
         payment_id           = models.CharField(_('payment id'), max_length=256, null=True)
 
     class Meta:
