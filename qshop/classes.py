@@ -70,6 +70,8 @@ class CategoryData:
         else:
             products = products.order_by(self.sort[1])
 
+        products = products.distinct()
+
         paginator = Paginator(products, PRODUCTS_ON_PAGE)
         try:
             products_page = paginator.page(self.page)
