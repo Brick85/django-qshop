@@ -56,7 +56,7 @@ class ProductAdminForm(forms.ModelForm):
         super(ProductAdminForm, self).__init__(*args, **kwargs)
         if 'weight' in self.fields:
             self.fields['weight'].help_text = 'in gramms'
-        if 'category' in self.fields
+        if 'category' in self.fields:
             self.fields['category'].help_text = ''
             self.fields['category'].widget.can_add_related = False
 
