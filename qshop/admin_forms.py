@@ -54,9 +54,11 @@ class ProductAdminForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(ProductAdminForm, self).__init__(*args, **kwargs)
-        self.fields['weight'].help_text = 'in gramms'
-        self.fields['category'].help_text = ''
-        self.fields['category'].widget.can_add_related = False
+        if 'weight' in self.fields:
+            self.fields['weight'].help_text = 'in gramms'
+        if 'category' in self.fields
+            self.fields['category'].help_text = ''
+            self.fields['category'].widget.can_add_related = False
 
     def clean_articul(self):
         data = self.cleaned_data['articul']
