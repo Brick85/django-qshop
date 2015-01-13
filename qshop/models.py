@@ -8,6 +8,7 @@ from django.conf import settings
 
 from sitemenu.sitemenu_settings import MENUCLASS
 from sitemenu import import_item
+from sitemenu.helpers import upload_to_slugify
 from .qshop_settings import PRODUCT_CLASS, VARIATION_CLASS, VARIATION_VALUE_CLASS, PRODUCT_IMAGE_CLASS, PARAMETERS_SET_CLASS, PARAMETER_CLASS, PARAMETER_VALUE_CLASS, PRODUCT_TO_PARAMETER_CLASS, CURRENCY_CLASS, LOAD_ADDITIONAL_MODELS
 
 Menu = import_item(MENUCLASS)
@@ -80,7 +81,7 @@ class ProductAbstract(models.Model, PricingModel):
     weight = models.FloatField(_('weight'), default=0, blank=True)
     discount_price = models.DecimalField(_('discount price'), max_digits=12, decimal_places=2, blank=True, null=True)
     description = models.TextField(_('description'), default='', blank=True)
-    image = ThumbnailerImageField(_('image'), upload_to='products/main', blank=True, resize_source=dict(size=(1024, 1024)))
+    image = ThumbnailerImageField(_('image'), upload_to=upload_to_slugify('products/main'), blank=True, resize_source=dict(size=(1024, 1024)))
 
     category = models.ManyToManyField(Menu, verbose_name=_('category'))
 
@@ -263,7 +264,7 @@ class ProductVariationAbstract(models.Model, PricingModel):
 
 
 class ProductImageAbstract(models.Model):
-    image = ThumbnailerImageField(_('image'), upload_to='products/more', resize_source=dict(size=(1024, 1024)))
+    image = ThumbnailerImageField(_('image'), upload_to=upload_to_slugify('products/more'), resize_source=dict(size=(1024, 1024)))
     product = models.ForeignKey('Product', verbose_name=_('product'))
 
     class Meta:
