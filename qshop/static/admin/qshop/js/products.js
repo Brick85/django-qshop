@@ -7,7 +7,7 @@
         });
         $('#producttoparameter_set-group a.add-another').each(function(){
             id = $('.field-parameter select', $(this).closest('tr')).val();
-            this.href = this.href + '?parameter='+id+'&hide_parameter';
+            this.href += (this.href.indexOf('?')!= -1 ? '&' : '?') + 'parameter=' + id + '&hide_parameter';
         });
     });
 
