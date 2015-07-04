@@ -132,6 +132,12 @@ class OrderAbstract(models.Model):
     get_cart_text.allow_tags = True
     get_cart_text.short_description = _('cart text')
 
+    def get_cartobject(self):
+        return self.cart.get_cartobject()
+
+    def get_total_price(self):
+        return self.get_cartobject().total_price()
+
     if not qshop_settings.ENABLE_PAYMENTS:
         def get_redirect_response(self):
             return HttpResponseRedirect(reverse('cart_order_success'))
