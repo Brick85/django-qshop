@@ -200,9 +200,8 @@ class Cart:
         else:
             item.delete()
         if self.total_products() == 0:
-            if self.cart.pk:
-                self.cart.delete()
-                del self.__request.session[CART_ID]
+            self.cart.delete()
+            del self.__request.session[CART_ID]
 
     def update(self, item_id, quantity):
         self.clear_cache()
