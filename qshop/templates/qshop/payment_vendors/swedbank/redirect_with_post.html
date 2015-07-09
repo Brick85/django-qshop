@@ -1,0 +1,29 @@
+{% load i18n %}
+<!doctype html>
+<html>
+<head>
+    <title>{% trans "Redirecting to payment system" %}...</title>
+    <style>
+        h1 {
+            display: block;
+            width: 100%;
+            text-align: center;
+            font-size: 18px;
+            color: #000;
+        }
+    </style>
+</head>
+    <body>
+        <h1>{% trans "Redirecting to payment system" %}...</h1>
+        <form method="POST" name="swedbank_form" id="swedbank_form" action="{{ action }}" accept-charset="UTF-8">
+            {% for name, value in form.items %}
+                <input type="hidden" name="{{ name }}" value="{{ value }}" />
+            {% endfor %}
+            <input type="submit" value="{% trans 'Go' %}" />
+        </form>
+
+        <script type="text/javascript" language="javascript">
+            document.swedbank_form.submit();
+        </script>
+    </body>
+</html>

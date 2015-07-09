@@ -23,3 +23,7 @@ if qshop_settings.ENABLE_PAYMENTS:
             url(r'^webmoney/result/$', 'qshop.payment_vendors.views.vendors_payment_webmoney_result', name='vendors_payment_webmoney_result'),
             # url(r'^webmoney/fail/$', 'qshop.payment_vendors.views.vendors_payment_webmoney_fail', name='vendors_payment_webmoney_fail'),
         )
+    if 'swedbank' in qshop_settings.PAYMENT_METHODS_ENABLED:
+        urlpatterns += patterns('qshop.payment_vendors.swedbank.views',
+            url(r'^swedbank/return/$', 'payment_swedbank_return', name="payment_swedbank_return"),
+        )
