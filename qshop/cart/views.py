@@ -94,7 +94,7 @@ def update_cart(request):
             quantity = int(quantity)
             cart.update(item_id, quantity)
         except ItemTooMany, e:
-            messages.add_message(request, messages.WARNING, _(u'Quantity for product "%s" not set due to lack in stock.' % e.product))
+            messages.add_message(request, messages.WARNING, _(u'Can\'t add product "%s" due to lack in stock. Try to decrease quantity.') % e.product)
 
     request._server_cache = {'set_cookie': True}
     return HttpResponseRedirect(reverse('cart'))
