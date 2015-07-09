@@ -27,3 +27,7 @@ if qshop_settings.ENABLE_PAYMENTS:
         urlpatterns += patterns('qshop.payment_vendors.swedbank.views',
             url(r'^swedbank/return/$', 'payment_swedbank_return', name="payment_swedbank_return"),
         )
+    if 'firstdata' in qshop_settings.PAYMENT_METHODS_ENABLED:
+        urlpatterns += patterns('qshop.payment_vendors.firstata.views',
+            url(r'^swedbank/return/$', 'payment_firstdata_return', name="payment_firstdata_return"),
+        )

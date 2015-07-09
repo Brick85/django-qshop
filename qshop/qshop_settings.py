@@ -76,8 +76,9 @@ PAYMENT_METHODS_CLASSES_PATHS = getattr(settings, 'QSHOP_PAYMENT_METHODS_CLASSES
     'paypal': 'qshop.payment_vendors.PaypalPayment',
     'webmoney': 'qshop.payment_vendors.WebmoneyPayment',
     'swedbank': 'qshop.payment_vendors.SwedbankPayment',
+    'firstdata': 'qshop.payment_vendors.FirstdataPayment',
     #('yandex', 'yandex'),
     #('roboxchange', 'roboxchange'),
     #('delayed', 'delayed'),
 })
-PAYMENT_METHODS_ENABLED = getattr(settings, 'QSHOP_PAYMENT_METHODS_ENABLED', ['banktransfer', 'paypal', 'webmoney', 'swedbank'])
+PAYMENT_METHODS_ENABLED = getattr(settings, 'QSHOP_PAYMENT_METHODS_ENABLED', ['banktransfer', 'paypal', 'webmoney', 'swedbank', 'firstdata'])
