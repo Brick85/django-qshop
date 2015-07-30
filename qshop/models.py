@@ -316,7 +316,7 @@ class ParameterAbstract(models.Model):
     parameters_set = models.ForeignKey('ParametersSet', verbose_name=_('parameters set'))
     name = models.CharField(_('title'), max_length=128)
     is_filter = models.BooleanField(_('is filter'), default=True)
-    order = models.IntegerField(_('sort'), default=0)
+    order = models.SmallIntegerField(_('sort'), default=0)
 
     class Meta:
         ordering = ['order']
