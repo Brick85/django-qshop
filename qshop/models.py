@@ -215,7 +215,8 @@ class ProductAbstract(models.Model, PricingModel):
         try:
             return self._get_variations
         except:
-            self._get_variations = self.productvariation_set.select_related('productvariationvalue').all()
+            self._get_variations = self.productvariation_set.select_related('variation').all()
+            # self._get_variations = self.productvariation_set.all()
             return self._get_variations
 
     def can_be_purchased(self, quantity):
