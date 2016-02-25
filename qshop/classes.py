@@ -88,21 +88,38 @@ class CategoryData:
         filters = {}
         filters_order = []
 
+
+        from django.db.models import Count
+
         if FILTERS_ENABLED:
             for filter_key in FILTERS_ORDER:
                 if filter_key == 'p':
-                    filters_qs = ProductToParameter.objects.select_related('parameter', 'value')\
-                        .filter(product__category=self.menu, product__hidden=False, parameter__is_filter=True).exclude(value=None)\
-                        .order_by('parameter__parameters_set', 'parameter__order', 'value__value')
-                    filters_qs.query.group_by = ['qshop_parametervalue.value']
+                    filters_qs = ProductToParameter.objects.values(
+                        'parameter__id',
+                        'parameter__name',
+                        'value__id',
+                        'value__value'
+                    ).filter(
+                        product__category=self.menu,
+                        product__hidden=False,
+                        parameter__is_filter=True
+                    ).exclude(
+                        value=None
+                    ).order_by(
+                        'parameter__parameters_set',
+                        'parameter__order',
+                        'value__value'
+                    )
+
+                    filters_qs.query.group_by = ['value__id']
 
                     for item in filters_qs:
-                        filter_id = "p{0}".format(item.parameter.id)
+                        filter_id = "p{0}".format(item['parameter__id'])
                         if not filter_id in filters:
                             filters_order.append(filter_id)
-                            filters[filter_id] = {'name': item.parameter.name, 'has_active': False, 'values': [], 'skip_unaviable': False, 'filter_type': 'or', 'filter_aviability_check': self._check_parameter_filter}
+                            filters[filter_id] = {'name': item['parameter__name'], 'has_active': False, 'values': [], 'skip_unaviable': False, 'filter_type': 'or', 'filter_aviability_check': self._check_parameter_filter}
                         filters[filter_id]['values'].append(
-                            (item.value.id, {'name': item.value.value, 'active': False, 'unaviable': False, 'count': 0, 'filter': Q(producttoparameter__value_id=item.value.id)})
+                            (item['value__id'], {'name': item['value__value'], 'active': False, 'unaviable': False, 'count': 0, 'filter': Q(producttoparameter__value_id=item['value__id'])})
                         )
                 elif filter_key == 'v':
                     variations = ProductVariationValue.objects.filter(productvariation__product__category=self.menu, productvariation__product__hidden=False).distinct().order_by('value')

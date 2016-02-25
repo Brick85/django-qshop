@@ -1,6 +1,6 @@
 from django import template
 from ..models import Currency
-from ..cart import Cart
+from ..cart.cart import Cart
 from ..functions import get_catalogue_root
 
 register = template.Library()
