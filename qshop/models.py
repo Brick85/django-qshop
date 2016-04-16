@@ -267,10 +267,12 @@ class ProductVariationAbstract(models.Model, PricingModel):
 class ProductImageAbstract(models.Model):
     image = ThumbnailerImageField(_('image'), upload_to=upload_to_slugify('products/more'), resize_source=dict(size=(1024, 1024)))
     product = models.ForeignKey('Product', verbose_name=_('product'))
+    sort = models.SmallIntegerField(_('sort'), default=0)
 
     class Meta:
         verbose_name = _('product image')
         verbose_name_plural = _('product images')
+        ordering = ('sort',)
         abstract = True
 
     def __unicode__(self):
