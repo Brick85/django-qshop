@@ -157,7 +157,7 @@ class OrderAbstract(models.Model):
 
 
 class OrderAbstractDefault(OrderAbstract):
-    name = models.CharField(_('name'), max_length=128)
+    name = models.CharField(_('client name'), max_length=128)
     phone = models.CharField(_('phone'), max_length=32, blank=True, null=True)
     email = models.EmailField(_('email'))
     address = models.CharField(_('address'), max_length=128)
