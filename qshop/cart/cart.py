@@ -1,7 +1,4 @@
 from django.template.loader import render_to_string
-import datetime
-#from overloadable_functions import count_delivery_price
-
 from django.conf import settings
 
 import models
@@ -88,7 +85,11 @@ class Cart:
         try:
             self._delivery_price
         except:
-            self._delivery_price = count_delivery_price(price=self.total_price(in_default_currency=True), weight=self.total_weight(), cart=self)
+            self._delivery_price = count_delivery_price(
+                price=self.total_price(in_default_currency=True),
+                weight=self.total_weight(),
+                cart=self
+            )
         if in_default_currency:
             return float(self._delivery_price)
         return Currency.get_price(self._delivery_price)
@@ -158,7 +159,7 @@ class Cart:
     def add(self, product, quantity=1):
         self.create_cart()
         self.clear_cache()
-        if quantity <= 0:
+        if int(quantity) <= 0:
             return False
         try:
             item = models.Item.objects.get(
