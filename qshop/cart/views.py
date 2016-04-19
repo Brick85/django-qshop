@@ -8,7 +8,7 @@ from django.contrib.auth.models import User, UserManager
 from django.contrib.auth import logout
 from django.views.decorators.csrf import csrf_exempt
 
-from . import Cart, ItemAlreadyExists, ItemDoesNotExist, ItemTooMany
+from .cart import Cart, ItemAlreadyExists, ItemDoesNotExist, ItemTooMany
 from ..models import Product
 from .forms import OrderForm
 from .models import Order
