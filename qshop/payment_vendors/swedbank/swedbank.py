@@ -110,7 +110,7 @@ class SwedbankResponse(Swedbank):
 
     # VK_SERVICE: 1101: success (GET-automatic/POST-if client pressed button back to merchant)
     # VK_SERVICE: 1901: fail
-    def is_payed(self):
+    def is_paid(self):
         if self.service == '1101':
             return True
         else:

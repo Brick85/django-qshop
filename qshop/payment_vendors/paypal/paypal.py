@@ -98,7 +98,7 @@ class PaypalPayment(BasePayment):
         payment = paypalrestsdk.Payment.find(order.payment_id)
         if payment.execute({"payer_id": payer_id}):
             order.add_log_message("Payment[%s] execute successfully"%(payment.id))
-            order.user_payed()
+            order.user_paid()
         else:
             order.add_log_message("ERROR executing payment!")
             order.add_log_message(payment.error)

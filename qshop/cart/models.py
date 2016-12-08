@@ -105,8 +105,8 @@ class OrderAbstract(models.Model):
     cart_text            = models.TextField(_('cart text'), editable=False)
 
     if qshop_settings.ENABLE_PAYMENTS:
-        payed                = models.BooleanField(_('payed'), default=False)
-        payed_log            = models.TextField(_('payed log'), blank=True, null=True)
+        paid                = models.BooleanField(_('paid'), default=False)
+        paid_log            = models.TextField(_('paid log'), blank=True, null=True)
         payment_method       = models.CharField(_('payment method'), max_length=16, choices=[(item, _(item)) for item in qshop_settings.PAYMENT_METHODS_ENABLED], default=qshop_settings.PAYMENT_METHODS_ENABLED[0])
         payment_id           = models.CharField(_('payment id'), max_length=256, null=True)
 
@@ -147,13 +147,13 @@ class OrderAbstract(models.Model):
             return payment.get_redirect_response(self)
 
         def add_log_message(self, msg):
-            if self.payed_log is None:
-                self.payed_log = u""
-            self.payed_log += "[%s] %s\n" % (datetime.datetime.strftime(datetime.datetime.now(), "%D %T"), msg)
+            if self.paid_log is None:
+                self.paid_log = u""
+            self.paid_log += "[%s] %s\n" % (datetime.datetime.strftime(datetime.datetime.now(), "%D %T"), msg)
 
-        def user_payed(self):
+        def user_paid(self):
             self.status = 2
-            self.payed = True
+            self.paid = True
 
 
 class OrderAbstractDefault(OrderAbstract):

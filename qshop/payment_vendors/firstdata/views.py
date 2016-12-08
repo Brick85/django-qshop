@@ -25,7 +25,7 @@ def payment_firstdata_return(request):
 
     if trans_data['RESULT'] == 'OK':
         order.add_log_message(u"payment ok: \n%s\n%s" % (trans_data, request.POST))
-        order.user_payed()
+        order.user_paid()
         order.save()
         redirect_url = reverse('cart_order_success')
     else:

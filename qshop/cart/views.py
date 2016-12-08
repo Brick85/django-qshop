@@ -1,4 +1,4 @@
-from django.shortcuts import render_to_response, get_object_or_404
+from django.shortcuts import render, get_object_or_404
 from django.template import RequestContext
 from django.http import HttpResponseRedirect, Http404
 from django.core.urlresolvers import reverse
@@ -102,9 +102,9 @@ def update_cart(request):
 
 def show_cart(request):
     cart = Cart(request)
-    return render_to_response('qshop/cart/cart.html', {
+    return render(request, 'qshop/cart/cart.html', {
         'cart': cart,
-    }, context_instance=RequestContext(request))
+    })
 
 
 def order_cart(request):
@@ -131,10 +131,10 @@ def order_cart(request):
     if cart.total_products() < 1:
         return HttpResponseRedirect(reverse('cart'))
 
-    return render_to_response('qshop/cart/order.html', {
+    return render(request, 'qshop/cart/order.html', {
         'cart': cart,
         'order_form': order_form,
-    }, context_instance=RequestContext(request))
+    })
 
 
 def cart_order_success(request):
@@ -147,21 +147,21 @@ def cart_order_success(request):
         order = Order.objects.get(pk=order_pk)
     except:
         return HttpResponseRedirect('/')
-    return render_to_response('qshop/cart/order_success.html', {
+    return render(request, 'qshop/cart/order_success.html', {
         'order': order,
-    }, context_instance=RequestContext(request))
+    })
 
 @csrf_exempt
 def cart_order_cancelled(request, order_id=None):
     if order_id:
-        order = get_object_or_404(Order, pk=order_id, payed=False)
+        order = get_object_or_404(Order, pk=order_id, paid=False)
         order.status = 4
         order.add_log_message('Order canceled!')
         order.save()
-    return render_to_response('qshop/cart/order_cancelled.html', {
-    }, context_instance=RequestContext(request))
+    return render(request, 'qshop/cart/order_cancelled.html', {
+    })
 
 
 def cart_order_error(request):
-    return render_to_response('qshop/cart/order_error.html', {
-    }, context_instance=RequestContext(request))
+    return render(request, 'qshop/cart/order_error.html', {
+    })

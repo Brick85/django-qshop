@@ -22,7 +22,7 @@ if qshop_settings.ENABLE_PAYMENTS:
     if 'paypal' in qshop_settings.PAYMENT_METHODS_ENABLED:
         from qshop.payment_vendors import PaypalPayment
         def vendors_payment_paypal_ok(request, order_id):
-            order = get_object_or_404(Order, pk=order_id, payed=False)
+            order = get_object_or_404(Order, pk=order_id, paid=False)
             payment = PaypalPayment()
             return payment.parse_response(request, order)
 
@@ -47,6 +47,6 @@ if qshop_settings.ENABLE_PAYMENTS:
                 if not payment.check_sign(request.POST):
                     return HttpResponse('sign')
                 else:
-                    order = get_object_or_404(Order, pk=request.POST.get('LMI_PAYMENT_NO'), payed=False)
+                    order = get_object_or_404(Order, pk=request.POST.get('LMI_PAYMENT_NO'), paid=False)
                     payment.parse_response(request, order)
                     return HttpResponse('ok')

@@ -27,9 +27,9 @@ if not CART_ORDER_CUSTOM_ADMIN:
 
         #     test = request.META['HTTP_REFERER'].split(request.META['PATH_INFO'])
         #     if test[-1] and not test[-1].startswith('?'):
-        #         if not 'payed__exact' in request.GET:
+        #         if not 'paid__exact' in request.GET:
         #             q = request.GET.copy()
-        #             q['payed__exact'] = '1'
+        #             q['paid__exact'] = '1'
         #             request.GET = q
         #             request.META['QUERY_STRING'] = request.GET.urlencode()
         #     return super(OrderAdmin, self).changelist_view(request, extra_context=extra_context)

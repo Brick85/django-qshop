@@ -137,11 +137,11 @@ msgid "cart text"
 msgstr "groza teksts"
 
 #: cart/models.py:108
-msgid "payed"
+msgid "paid"
 msgstr "apmaksāts"
 
 #: cart/models.py:109
-msgid "payed log"
+msgid "paid log"
 msgstr ""
 
 #: cart/models.py:110

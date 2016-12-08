@@ -15,9 +15,9 @@ def payment_swedbank_return(request):
     if swedbank.is_valid_response():
         order = Order.objects.get(pk=swedbank.get_order_id())
 
-        if swedbank.is_payed():
+        if swedbank.is_paid():
             order.add_log_message(u"payment ok: \n%s" % (swedbank.get_response()))
-            order.user_payed()
+            order.user_paid()
             redirect_url = reverse('cart_order_success')
         else:
             if swedbank.is_canceled():

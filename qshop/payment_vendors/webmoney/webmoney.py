@@ -60,5 +60,5 @@ class WebmoneyPayment(BasePayment):
 
     def parse_response(self, request, order):
         order.add_log_message("Payment successfull")
-        order.user_payed()
+        order.user_paid()
         order.save()

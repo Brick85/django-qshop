@@ -170,7 +170,7 @@ class FirstdataPayment(object):
             return HttpResponseRedirect(Firstdata.FIRSTDATA_ECOMM_CLIENT_URL + '?trans_id=' + urlquote(merchant_data['TRANSACTION_ID']))
         else:
             order.payment_id = None
-            order.payed_log = pprint.pformat(merchant_data)
+            order.paid_log = pprint.pformat(merchant_data)
             order.save()
             error_data = {
                 'order_id': order.pk,

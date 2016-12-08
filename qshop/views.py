@@ -1,9 +1,8 @@
-from django.shortcuts import render_to_response, get_object_or_404
-from django.template import RequestContext
+from django.shortcuts import render, get_object_or_404
 from .functions import get_products_page_data
 from .classes import CategoryData
 from .models import Product, Currency
-from django.http import HttpResponsePermanentRedirect, HttpResponseRedirect
+from django.http import HttpResponsePermanentRedirect, HttpResponseRedirect, Http404
 
 
 def render_shopspage(request, menu, url_add, products=None):
@@ -17,24 +16,27 @@ def render_shopspage(request, menu, url_add, products=None):
         if productdata.need_return:
             return productdata.return_data
 
-        return render_to_response('qshop/productspage.html', {
+        return render(request, 'qshop/productspage.html', {
                 'menu': menu,
                 'url_add': url_add,
                 'productdata': productdata,
-            }, context_instance=RequestContext(request))
+            })
 
     else:
         # render single product page
+
+        if len(url_add) != 1:
+            raise Http404('wrong url_add')
 
         product = get_object_or_404(Product, articul=url_add[0], category=menu, hidden=False)
 
         menu._page_title = product.name
 
-        return render_to_response('qshop/productpage.html', {
+        return render(request, 'qshop/productpage.html', {
                 'menu': menu,
                 'url_add': url_add,
                 'product': product,
-            }, context_instance=RequestContext(request))
+            })
 
 
 def redirect_to_product(request, product_id):
