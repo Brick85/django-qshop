@@ -4,8 +4,6 @@ import re
 gre_get_level = re.compile("^((?:- )*).*")
 
 class CategoryCheckboxSelectMultiple(CheckboxSelectMultiple):
-    option_template_name = 'django/forms/widgets/checkbox_option.html'
-
     def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
         level_dashes = gre_get_level.findall(label)[0]
         level = level_dashes.count(u"-")        
