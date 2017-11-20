@@ -152,7 +152,7 @@ class CategoryData:
                     field_name = FILTERS_FIELDS[filter_key]
                     if not hasattr(Product, field_name):
                         raise Exception('[qShop exception] Filter configuration error: there is no {0} in Product class!'.format(field_name))
-                    field = Product._meta.get_field_by_name(field_name)[0]
+                    field = Product._meta.get_field(field_name)
                     model = field.rel.to
                     items = model.objects.filter(product__category=self.menu, product__hidden=False).distinct()
                     if items:
@@ -354,7 +354,7 @@ class CategoryData:
 
     def _check_foreignkey_filter(self, filter_id, filter_data, products):
         field_name = FILTERS_FIELDS[filter_id]
-        field = Product._meta.get_field_by_name(field_name)[0]
+        field = Product._meta.get_field(field_name)
         model = field.rel.to
 
         model.objects.filter(product__category=self.menu).distinct()
