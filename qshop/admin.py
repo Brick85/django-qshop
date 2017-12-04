@@ -8,8 +8,7 @@ from .admin_filters import ProductCategoryListFilter
 
 from django.conf import settings
 
-from django.shortcuts import render_to_response
-from django.template import RequestContext
+from django.shortcuts import render
 from django.contrib.admin import helpers
 from django.http import HttpResponseRedirect
 from sitemenu import import_item
@@ -172,11 +171,11 @@ class ProductAdmin(getParentClass('ModelAdmin', Product)):
         else:
             form = CategoryForm()
 
-        return render_to_response('qshop/admin/actions/link_to_category.html', {
+        return render(request, 'qshop/admin/actions/link_to_category.html', {
             'form': form,
             'queryset': queryset,
             'action_checkbox_name': helpers.ACTION_CHECKBOX_NAME,
-        }, context_instance=RequestContext(request))
+        })
     link_to_category.short_description = _("Link to category")
 
     def unlink_from_category(self, request, queryset):
@@ -195,11 +194,11 @@ class ProductAdmin(getParentClass('ModelAdmin', Product)):
         else:
             form = CategoryForm(qs=cats)
 
-        return render_to_response('qshop/admin/actions/unlink_from_category.html', {
+        return render(request, 'qshop/admin/actions/unlink_from_category.html', {
             'form': form,
             'queryset': queryset,
             'action_checkbox_name': helpers.ACTION_CHECKBOX_NAME,
-        }, context_instance=RequestContext(request))
+        })
     unlink_from_category.short_description = _(u"Unlink from category")
 
     def change_price(self, request, queryset):
@@ -225,11 +224,11 @@ class ProductAdmin(getParentClass('ModelAdmin', Product)):
         else:
             form = PriceForm()
 
-        return render_to_response('qshop/admin/actions/change_price.html', {
+        return render(request, 'qshop/admin/actions/change_price.html', {
             'form': form,
             'queryset': queryset,
             'action_checkbox_name': helpers.ACTION_CHECKBOX_NAME,
-        }, context_instance=RequestContext(request))
+        })
     change_price.short_description = _(u"Change price by percent")
 
     def set_discount(self, request, queryset):
@@ -254,11 +253,11 @@ class ProductAdmin(getParentClass('ModelAdmin', Product)):
         else:
             form = PriceForm()
 
-        return render_to_response('qshop/admin/actions/set_discount.html', {
+        return render(request, 'qshop/admin/actions/set_discount.html', {
             'form': form,
             'queryset': queryset,
             'action_checkbox_name': helpers.ACTION_CHECKBOX_NAME,
-        }, context_instance=RequestContext(request))
+        })
     set_discount.short_description = _(u"Set discount by percent")
 
 admin.site.register(Product, ProductAdmin)
