@@ -132,7 +132,7 @@ class OrderAbstract(models.Model):
         pass
 
     def get_cart_text(self):
-        return self.cart_text.replace('\n', '')
+        return mark_safe(self.cart_text)
     get_cart_text.allow_tags = True
     get_cart_text.short_description = _('cart text')
 
