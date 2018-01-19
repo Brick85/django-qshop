@@ -163,7 +163,7 @@ class CategoryData:
                                 '{0}_id'.format(field_name): item.id
                             }
                             filters[filter_key]['values'].append(
-                                (item.id, {'name': item.__unicode__(), 'active': False, 'unaviable': False, 'count': 0, 'filter': Q(**q)})
+                                (item.id, {'name': item.__str__(), 'active': False, 'unaviable': False, 'count': 0, 'filter': Q(**q)})
                             )
 
         return filters, filters_order

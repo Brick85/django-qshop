@@ -1,7 +1,7 @@
-from django.template.loader import render_to_string
 from django.conf import settings
+from django.template.loader import render_to_string
 
-import models
+from . import models
 from ..models import Currency
 from qshop import qshop_settings
 

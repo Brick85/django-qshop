@@ -1,6 +1,7 @@
 from django.conf.urls import url, include
+
 from .views import redirect_to_product, set_currency
-import qshop_settings
+from . import qshop_settings
 
 urlpatterns = [
     url(r'^show-product/(?P<product_id>\d+)/$', redirect_to_product, name='redirect_to_product'),

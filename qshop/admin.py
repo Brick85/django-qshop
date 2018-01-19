@@ -1,13 +1,13 @@
 from django.contrib import admin
-from .models import Product, ProductVariationValue, ProductVariation, ProductImage, ParametersSet, Parameter, ProductToParameter, ParameterValue
-#from django.db import models
+from .models import (
+    Product, ProductVariationValue, ProductVariation, ProductImage, ParametersSet,
+    Parameter, ProductToParameter, ParameterValue
+)
 
 from .admin_forms import ProductToParameterFormset, CategoryForm, PriceForm, ProductAdminForm
-
 from .admin_filters import ProductCategoryListFilter
 
 from django.conf import settings
-
 from django.shortcuts import render
 from django.contrib.admin import helpers
 from django.http import HttpResponseRedirect
@@ -15,7 +15,6 @@ from sitemenu import import_item
 from sitemenu.sitemenu_settings import MENUCLASS
 from decimal import Decimal
 from django.utils.translation import ugettext_lazy as _
-
 
 Menu = import_item(MENUCLASS)
 
@@ -66,10 +65,10 @@ class ProductImageInline(getParentClass('TabularInline', ProductImage)):
 
 class ProductToParameterInline(getParentClass('TabularInline', ProductToParameter)):
     model = ProductToParameter
-    #formset = ProductToTypeFieldFormset
+    # formset = ProductToTypeFieldFormset
     extra = 0
     can_delete = False
-    #readonly_fields = ('parameter',)
+    # readonly_fields = ('parameter',)
     formset = ProductToParameterFormset
     fieldsets = (
         (None, {
@@ -82,7 +81,7 @@ class ProductToParameterInline(getParentClass('TabularInline', ProductToParamete
 
 
 class ProductAdmin(getParentClass('ModelAdmin', Product)):
-    inlines = [ProductVariationInline, ProductImageInline, ProductToParameterInline]
+    inlines = [ProductImageInline, ProductVariationInline, ProductToParameterInline]
     prepopulated_fields = {"articul": ("name",)}
     list_display = ('articul', 'name', 'has_variations', 'admin_price_display', 'sort')
     list_editable = ('sort',)
@@ -122,7 +121,7 @@ class ProductAdmin(getParentClass('ModelAdmin', Product)):
             price = None
             discount_price = None
             for variation in variations:
-                #if not price or variation.price < price or variation.discount_price < discount_price:
+                # if not price or variation.price < price or variation.discount_price < discount_price:
                     if variation.price and (not price or variation.price < price):
                         price = variation.price
                     if variation.discount_price and (not discount_price or variation.discount_price < discount_price):
@@ -141,7 +140,8 @@ class ProductAdmin(getParentClass('ModelAdmin', Product)):
         super(ProductAdmin, self).save_model(request, obj, form, change)
 
     def get_readonly_fields(self, request, obj=None):
-        if (('productvariation_set-0-variation' in request.POST and request.POST['productvariation_set-0-variation']) or (obj and obj.has_variations)):
+        if (('productvariation_set-0-variation' in request.POST and
+                request.POST['productvariation_set-0-variation']) or (obj and obj.has_variations)):
             readonly_fields = list(self.readonly_fields) + ['price', 'discount_price']
         else:
             readonly_fields = self.readonly_fields

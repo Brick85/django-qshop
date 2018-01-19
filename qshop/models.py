@@ -1,15 +1,18 @@
 from django.db import models
-from easy_thumbnails.fields import ThumbnailerImageField
-from django.utils.translation import ugettext_lazy as _
-from django.core.urlresolvers import reverse
-from django.utils.safestring import mark_safe
-
 from django.conf import settings
+from django.urls import reverse
+from django.utils.html import format_html
+from django.utils.translation import ugettext_lazy as _
+from django.utils.safestring import mark_safe
+from easy_thumbnails.fields import ThumbnailerImageField
 
 from sitemenu.sitemenu_settings import MENUCLASS
 from sitemenu import import_item
 from sitemenu.helpers import upload_to_slugify
-from .qshop_settings import PRODUCT_CLASS, VARIATION_CLASS, VARIATION_VALUE_CLASS, PRODUCT_IMAGE_CLASS, PARAMETERS_SET_CLASS, PARAMETER_CLASS, PARAMETER_VALUE_CLASS, PRODUCT_TO_PARAMETER_CLASS, CURRENCY_CLASS, LOAD_ADDITIONAL_MODELS
+from .qshop_settings import (
+    PRODUCT_CLASS, VARIATION_CLASS, VARIATION_VALUE_CLASS, PRODUCT_IMAGE_CLASS, PARAMETERS_SET_CLASS,
+    PARAMETER_CLASS, PARAMETER_VALUE_CLASS, PRODUCT_TO_PARAMETER_CLASS, CURRENCY_CLASS, LOAD_ADDITIONAL_MODELS
+)
 
 Menu = import_item(MENUCLASS)
 
@@ -73,15 +76,15 @@ class ProductAbstract(models.Model, PricingModel):
     )
 
     has_variations = models.BooleanField(_('has variations'), default=False, editable=False)
-    parameters_set = models.ForeignKey('ParametersSet', verbose_name=_('parameters set'))
+    parameters_set = models.ForeignKey('ParametersSet', verbose_name=_('parameters set'), on_delete=models.CASCADE)
     articul = models.SlugField(_('articul'), unique=True)
     hidden = models.BooleanField(_('hidden'), default=False)
-    name    = models.CharField(_('product name'), max_length=128)
+    name = models.CharField(_('product name'), max_length=128)
     price = models.DecimalField(_('price'), max_digits=12, decimal_places=2, default=0)
     weight = models.FloatField(_('weight'), default=0, blank=True)
     discount_price = models.DecimalField(_('discount price'), max_digits=12, decimal_places=2, blank=True, null=True)
     description = models.TextField(_('description'), default='', blank=True)
-    image = ThumbnailerImageField(_('image'), upload_to=upload_to_slugify('products/main'), blank=True, resize_source=dict(size=(1024, 1024)))
+    image = ThumbnailerImageField(_('image'), upload_to=upload_to_slugify('products/main'), blank=True)
 
     category = models.ManyToManyField(Menu, verbose_name=_('category'))
 
@@ -98,7 +101,7 @@ class ProductAbstract(models.Model, PricingModel):
         ordering = ['sort']
         abstract = True
 
-    def __unicode__(self):
+    def __str__(self):
         if self.hidden:
             return _(u"[hidden] {0} (articul: {1})").format(self.name, self.articul)
         else:
@@ -106,7 +109,11 @@ class ProductAbstract(models.Model, PricingModel):
 
     def admin_price_display(self):
         if self.has_discount():
-            price = u'{0} <span style="text-decoration: line-through">{1}</span>'.format(self.get_fprice(), self.get_fprice_real())
+            price = format_html(
+                '{} <span style="text-decoration: line-through">{}</span>',
+                self.get_fprice(),
+                self.get_fprice_real()
+            )
         else:
             price = self.get_fprice()
         return price
@@ -196,7 +203,9 @@ class ProductAbstract(models.Model, PricingModel):
         try:
             return self._parameters_for_product
         except:
-            self._parameters_for_product = ProductToParameter.objects.select_related('parameter', 'value').order_by('parameter__order').filter(product=self).exclude(value=None)
+            self._parameters_for_product = ProductToParameter.objects.select_related(
+                'parameter', 'value'
+            ).order_by('parameter__order').filter(product=self).exclude(value=None)
             return self._parameters_for_product
 
     def get_additional_images(self):
@@ -233,7 +242,7 @@ class ProductVariationValueAbstract(models.Model):
         ordering = ['value']
         abstract = True
 
-    def __unicode__(self):
+    def __str__(self):
         return "%s" % self.value
 
     def get_filter_name(self):
@@ -241,8 +250,8 @@ class ProductVariationValueAbstract(models.Model):
 
 
 class ProductVariationAbstract(models.Model, PricingModel):
-    product = models.ForeignKey('Product', verbose_name=_('product'))
-    variation = models.ForeignKey('ProductVariationValue', verbose_name=_('product variation value'))
+    product = models.ForeignKey('Product', verbose_name=_('product'), on_delete=models.CASCADE)
+    variation = models.ForeignKey('ProductVariationValue', verbose_name=_('product variation value'), on_delete=models.CASCADE)
     price = models.DecimalField(_('price'), max_digits=12, decimal_places=2)
     discount_price = models.DecimalField(_('discount price'), max_digits=12, decimal_places=2, blank=True, null=True)
     sort = models.IntegerField(_('sort'), default=0)
@@ -256,7 +265,7 @@ class ProductVariationAbstract(models.Model, PricingModel):
     def save(self, skip_variations=False, *args, **kwargs):
         super(ProductVariationAbstract, self).save(*args, **kwargs)
 
-    def __unicode__(self):
+    def __str__(self):
         return "%s" % self.price
 
     @property
@@ -266,7 +275,7 @@ class ProductVariationAbstract(models.Model, PricingModel):
 
 class ProductImageAbstract(models.Model):
     image = ThumbnailerImageField(_('image'), upload_to=upload_to_slugify('products/more'), resize_source=dict(size=(1024, 1024)))
-    product = models.ForeignKey('Product', verbose_name=_('product'))
+    product = models.ForeignKey('Product', verbose_name=_('product'), on_delete=models.CASCADE)
     sort = models.SmallIntegerField(_('sort'), default=0)
 
     class Meta:
@@ -275,7 +284,7 @@ class ProductImageAbstract(models.Model):
         ordering = ('sort',)
         abstract = True
 
-    def __unicode__(self):
+    def __str__(self):
         return "%s" % self.image
 
 
@@ -288,7 +297,7 @@ class ParametersSetAbstract(models.Model):
         verbose_name_plural = _('parameters sets')
         abstract = True
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     def save(self, *args, **kwargs):
@@ -316,7 +325,7 @@ class ParametersSetAbstract(models.Model):
 
 class ParameterAbstract(models.Model):
     _translation_fields = ['name']
-    parameters_set = models.ForeignKey('ParametersSet', verbose_name=_('parameters set'))
+    parameters_set = models.ForeignKey('ParametersSet', verbose_name=_('parameters set'), on_delete=models.CASCADE)
     name = models.CharField(_('title'), max_length=128)
     is_filter = models.BooleanField(_('is filter'), default=True)
     order = models.SmallIntegerField(_('sort'), default=0)
@@ -327,7 +336,7 @@ class ParameterAbstract(models.Model):
         verbose_name_plural = _('parameters')
         abstract = True
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     def save(self, *args, **kwargs):
@@ -343,7 +352,7 @@ class ParameterAbstract(models.Model):
 
 class ParameterValueAbstract(models.Model):
     _translation_fields = ['value']
-    parameter = models.ForeignKey('Parameter', verbose_name=_('parameter'))
+    parameter = models.ForeignKey('Parameter', verbose_name=_('parameter'), on_delete=models.CASCADE)
     value = models.CharField(_('parameter value'), max_length=128)
 
     class Meta:
@@ -356,19 +365,19 @@ class ParameterValueAbstract(models.Model):
         verbose_name_plural = _('parameter values')
         abstract = True
 
-    def __unicode__(self):
+    def __str__(self):
         return self.value
 
 
 class ProductToParameterAbstract(models.Model):
-    product = models.ForeignKey('Product', verbose_name=_('product'))
-    parameter = models.ForeignKey('Parameter', verbose_name=_('parameter'))
-    value = models.ForeignKey('ParameterValue', blank=True, null=True)
+    product = models.ForeignKey('Product', verbose_name=_('product'), on_delete=models.CASCADE)
+    parameter = models.ForeignKey('Parameter', verbose_name=_('parameter'), on_delete=models.CASCADE)
+    value = models.ForeignKey('ParameterValue', blank=True, null=True, on_delete=models.CASCADE)
 
     class Meta:
         abstract = True
 
-    def __unicode__(self):
+    def __str__(self):
         return 'Product Field Nr. %d' % self.parameter_id
 
 
@@ -388,7 +397,7 @@ class CurrencyAbstract(models.Model):
         ordering = ('sort',)
         abstract = True
 
-    def __unicode__(self):
+    def __str__(self):
         return self.code
 
     @staticmethod
@@ -402,10 +411,9 @@ class CurrencyAbstract(models.Model):
     def get_fprice(price, format_only=False):
         if not format_only:
             price = Currency.get_default_currency().get_price(price)
-        return mark_safe(unicode(Currency.get_default_currency().show_string) % price)
+        return mark_safe(str(Currency.get_default_currency().show_string) % price)
 
-    #TODO fix per-session independence
-
+    # TODO fix per-session independence
     @staticmethod
     def get_default_currency():
         if not Currency.current_currency:

@@ -1,21 +1,17 @@
-from django.shortcuts import render, get_object_or_404
-from django.template import RequestContext
-from django.http import HttpResponseRedirect, Http404
-from django.core.urlresolvers import reverse
+import re
 from django.contrib import messages
+from django.http import HttpResponseRedirect
+from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
-from django.contrib.auth.models import User, UserManager
-from django.contrib.auth import logout
 from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import render, get_object_or_404
 
-from .cart import Cart, ItemAlreadyExists, ItemDoesNotExist, ItemTooMany
+from .cart import Cart, ItemTooMany
 from ..models import Product
 from .forms import OrderForm
 from .models import Order
 
 from qshop.qshop_settings import CART_ORDER_VIEW
-
-import re
 
 if CART_ORDER_VIEW:
     from sitemenu import import_item
@@ -50,16 +46,20 @@ def add_to_cart(request, product_id):
             try:
                 if cart.add(product, quantity):
                     result = True
-            except ItemTooMany, e:
-                messages.add_message(request, messages.WARNING, _(u'Can\'t add product "%s" due to lack in stock. Try to decrease quantity.') % e.product)
+            except ItemTooMany as e:
+                messages.add_message(
+                    request, messages.WARNING, _(u'Can\'t add product "%s" due to lack in stock. Try to decrease quantity.') % e.product
+                )
         else:
             for k, v in variation_quantities.items():
                 product.select_variation(k)
                 try:
                     if cart.add(product, v):
                         result = True
-                except ItemTooMany, e:
-                    messages.add_message(request, messages.WARNING, _(u'Can\'t add product "%s" due to lack in stock. Try to decrease quantity.') % e.product)
+                except ItemTooMany as e:
+                    messages.add_message(
+                        request, messages.WARNING, _(u'Can\'t add product "%s" due to lack in stock. Try to decrease quantity.') % e.product
+                    )
 
         if result:
             messages.add_message(request, messages.INFO, _(u'Product added to <a href="%s">cart</a>.') % reverse('cart'))
@@ -93,8 +93,10 @@ def update_cart(request):
         try:
             quantity = int(quantity)
             cart.update(item_id, quantity)
-        except ItemTooMany, e:
-            messages.add_message(request, messages.WARNING, _(u'Can\'t add product "%s" due to lack in stock. Try to decrease quantity.') % e.product)
+        except ItemTooMany as e:
+            messages.add_message(
+                request, messages.WARNING, _(u'Can\'t add product "%s" due to lack in stock. Try to decrease quantity.') % e.product
+            )
 
     request._server_cache = {'set_cookie': True}
     return HttpResponseRedirect(reverse('cart'))
@@ -150,6 +152,7 @@ def cart_order_success(request):
     return render(request, 'qshop/cart/order_success.html', {
         'order': order,
     })
+
 
 @csrf_exempt
 def cart_order_cancelled(request, order_id=None):
