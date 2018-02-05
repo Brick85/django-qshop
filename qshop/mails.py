@@ -8,24 +8,25 @@ from django.conf import settings
 
 def sendMail(mail_type, variables={}, subject=None, mails=None):
     """
-For each type you must create "qshop/mails/{{ mail_type }}.html" template
-You can also create "qshop/mails/{{ mail_type }}_admin.html" template.
-Then if "admin_mails" specified it will be used to send modified copy of mail, variables dict will be appended with "body" variable, wich constains mail body
+    For each type you must create "qshop/mails/{{ mail_type }}.html" template
+    You can also create "qshop/mails/{{ mail_type }}_admin.html" template.
+    Then if "admin_mails" specified it will be used to send modified copy of mail,
+    variables dict will be appended with "body" variable, wich constains mail body
 
-reply_to_mail (requred)
-mails
-subject
-subject_prefix
-admin_mails
-admin_subject_prefix
+    reply_to_mail (requred)
+    mails
+    subject
+    subject_prefix
+    admin_mails
+    admin_subject_prefix
     """
 
-    if not mail_type in MAIL_TYPES:
+    if mail_type not in MAIL_TYPES:
         raise 'No such mail type in list!'
 
     mailconf = MAIL_TYPES[mail_type]
 
-    if not 'SITE_URL' in variables:
+    if 'SITE_URL' not in variables:
         variables['SITE_URL'] = settings.SITE_URL
 
     body = render_to_string("qshop/mails/%s.html" % mail_type, variables)
@@ -35,7 +36,7 @@ admin_subject_prefix
             mails = mailconf['mails']
         else:
             raise 'No mail to send to!'
-    elif isinstance(mails, basestring):
+    elif isinstance(mails, str):
         mails = (mails,)
 
     if not subject:
@@ -50,7 +51,7 @@ admin_subject_prefix
 
     if 'admin_mails' in mailconf:
         try:
-            body = render_to_string("qshop/mails/%s_admin.html" % mail_type, dict(variables.items() + {'body': body}.items()))
+            body = render_to_string("qshop/mails/%s_admin.html" % mail_type, variables.update({'body': body}))
         except TemplateDoesNotExist:
             pass
         if 'admin_subject_prefix' in mailconf:

@@ -13,7 +13,7 @@ class ProductCategoryListFilter(SimpleListFilter):
 
     def lookups(self, request, model_admin):
         for menu in Menu.objects.exclude(product__id=None):
-            yield (str(menu.pk), menu.__unicode__())
+            yield (str(menu.pk), menu.__str__())
 
     def queryset(self, request, queryset):
         if self.value():

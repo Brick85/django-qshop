@@ -1,10 +1,11 @@
 from qshop.qshop_settings import CART_ORDER_FORM
+
 if CART_ORDER_FORM:
     from sitemenu import import_item
     OrderForm = import_item(CART_ORDER_FORM)
 else:
     from django import forms
-    from models import Order
+    from .models import Order
     from ..mails import sendMail
     from django.utils.translation import ugettext as _
 
@@ -24,12 +25,13 @@ else:
             order.save()
 
             if hasattr(order, 'email'):
-                sendMail('order_sended',
-                         variables={
-                            'order': order,
-                         },
-                         subject=_("Your order %s accepted") % order.get_id(),
-                         mails=[order.email]
+                sendMail(
+                    'order_sended',
+                    variables={
+                        'order': order,
+                    },
+                    subject=_("Your order %s accepted") % order.get_id(),
+                    mails=[order.email]
                 )
 
             return order

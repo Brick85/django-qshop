@@ -1,9 +1,9 @@
+import datetime
 from django.db import models
 from django.utils.translation import ugettext_lazy as _
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.utils.safestring import mark_safe
 from django.http import HttpResponseRedirect
-import datetime
 
 from sitemenu import import_item
 from ..models import Currency
@@ -15,7 +15,7 @@ PAYMENT_CLASSES = {}
 if qshop_settings.ENABLE_PAYMENTS:
     for item in qshop_settings.PAYMENT_METHODS_ENABLED:
         PAYMENT_CLASSES[item] = import_item(qshop_settings.PAYMENT_METHODS_CLASSES_PATHS[item])
-#Menu = import_item(MENUCLASS)
+# Menu = import_item(MENUCLASS)
 
 
 class Cart(models.Model):
@@ -29,8 +29,8 @@ class Cart(models.Model):
         verbose_name_plural = _('carts')
         ordering = ('-date_modified',)
 
-    def __unicode__(self):
-        return unicode(self.date_modified)
+    def __str__(self):
+        return str(self.date_modified)
 
     def get_cartobject(self):
         from cart import Cart as CartObject
@@ -47,11 +47,11 @@ class ItemManager(models.Manager):
 
 
 class Item(models.Model):
-    cart = models.ForeignKey(Cart, verbose_name=_('cart'))
+    cart = models.ForeignKey(Cart, verbose_name=_('cart'), on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(verbose_name=_('quantity'))
     unit_price = models.DecimalField(max_digits=12, decimal_places=2, verbose_name=_('unit price'))
-    _real_product = models.ForeignKey(Product)
-    _real_product_variation = models.ForeignKey(ProductVariation, blank=True, null=True)
+    _real_product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    _real_product_variation = models.ForeignKey(ProductVariation, blank=True, null=True, on_delete=models.CASCADE)
 
     objects = ItemManager()
 
@@ -60,7 +60,7 @@ class Item(models.Model):
         verbose_name_plural = _('items')
         ordering = ('cart',)
 
-    def __unicode__(self):
+    def __str__(self):
         return '%s - %s' % (self.quantity, self.unit_price)
 
     def total_price(self, in_default_currency=False):
@@ -98,24 +98,28 @@ class OrderAbstract(models.Model):
         (4, _('Canceled')),
     )
 
-    date_added           = models.DateTimeField(_('date added'), auto_now_add=True)
-    status               = models.PositiveSmallIntegerField(_('status'), choices=STATUSES, default=1)
-    manager_comments     = models.TextField(_('manager comments'), blank=True)
-    cart                 = models.ForeignKey(Cart, verbose_name=_('cart'), editable=False)
-    cart_text            = models.TextField(_('cart text'), editable=False)
+    date_added = models.DateTimeField(_('date added'), auto_now_add=True)
+    status = models.PositiveSmallIntegerField(_('status'), choices=STATUSES, default=1)
+    manager_comments = models.TextField(_('manager comments'), blank=True)
+    cart = models.ForeignKey(Cart, verbose_name=_('cart'), editable=False, on_delete=models.CASCADE)
+    cart_text = models.TextField(_('cart text'), editable=False)
 
     if qshop_settings.ENABLE_PAYMENTS:
-        paid                = models.BooleanField(_('paid'), default=False)
-        paid_log            = models.TextField(_('paid log'), blank=True, null=True)
-        payment_method       = models.CharField(_('payment method'), max_length=16, choices=[(item, _(item)) for item in qshop_settings.PAYMENT_METHODS_ENABLED], default=qshop_settings.PAYMENT_METHODS_ENABLED[0])
-        payment_id           = models.CharField(_('payment id'), max_length=256, null=True)
+        paid = models.BooleanField(_('paid'), default=False)
+        paid_log = models.TextField(_('paid log'), blank=True, null=True)
+        payment_method = models.CharField(
+            _('payment method'),
+            max_length=16,
+            choices=[(item, _(item)) for item in qshop_settings.PAYMENT_METHODS_ENABLED], default=qshop_settings.PAYMENT_METHODS_ENABLED[0]
+        )
+        payment_id = models.CharField(_('payment id'), max_length=256, null=True)
 
     class Meta:
         verbose_name = _('client order')
         verbose_name_plural = _('client orders')
         abstract = True
 
-    def __unicode__(self):
+    def __str__(self):
         return u"%s (%s)" % (self.pk, self.date_added)
 
     def get_id(self):
@@ -128,7 +132,7 @@ class OrderAbstract(models.Model):
         pass
 
     def get_cart_text(self):
-        return self.cart_text.replace('\n', '')
+        return mark_safe(self.cart_text)
     get_cart_text.allow_tags = True
     get_cart_text.short_description = _('cart text')
 
@@ -168,7 +172,7 @@ class OrderAbstractDefault(OrderAbstract):
         verbose_name = _('order')
         verbose_name_plural = _('orders')
 
-    def __unicode__(self):
+    def __str__(self):
         return u"%s (%s)" % (self.name, self.email)
 
     def save(self, *args, **kwargs):

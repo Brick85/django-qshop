@@ -1,17 +1,15 @@
 from qshop.qshop_settings import CART_ORDER_CUSTOM_ADMIN
+
 if not CART_ORDER_CUSTOM_ADMIN:
-
     from django.contrib import admin
-    from models import Order
+    from .models import Order
     # from forms import OrderAdminForm
-
     # from psyreal.actions import export_as_csv
 
-
     class OrderAdmin(admin.ModelAdmin):
-        #form = OrderAdminForm
-        list_display = ('pk', '__unicode__', 'status', 'date_added')
-        list_display_links = ('pk', '__unicode__')
+        # form = OrderAdminForm
+        list_display = ('pk', '__str__', 'status', 'date_added')
+        list_display_links = ('pk', '__str__')
         list_filter = ('status',)
         ordering = ['-date_added']
         readonly_fields = ('name', 'phone', 'email', 'address', 'get_cart_text', 'get_comments')
@@ -34,6 +32,4 @@ if not CART_ORDER_CUSTOM_ADMIN:
         #             request.META['QUERY_STRING'] = request.GET.urlencode()
         #     return super(OrderAdmin, self).changelist_view(request, extra_context=extra_context)
 
-
     admin.site.register(Order, OrderAdmin)
-
