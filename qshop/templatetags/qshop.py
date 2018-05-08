@@ -7,6 +7,15 @@ register = template.Library()
 
 
 @register.simple_tag(takes_context=True)
+def qshop_cart_products(context, as_var=None):
+    cart = Cart(context['request'])
+    if as_var:
+        context[as_var] = cart.get_products()
+        return ''
+    return cart.get_products()
+
+
+@register.simple_tag(takes_context=True)
 def qshop_items_in_cart_with_qty(context, as_var=None):
     cart = Cart(context['request'])
     if as_var:
