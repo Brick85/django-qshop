@@ -33,6 +33,16 @@ CART_ORDER_VIEW = getattr(settings, 'QSHOP_CART_ORDER_VIEW', False)
 CART_TABLE_LINK_ADD = getattr(settings, 'QSHOP_CART_TABLE_LINK_ADD', None)
 CART_TABLE_IMAGE_ADD = getattr(settings, 'QSHOP_CART_TABLE_IMAGE_ADD', None)
 
+
+# DELIVERY OPTIONS
+ENABLE_QSHOP_DELIVERY = getattr(settings, 'QSHOP_ENABLE_QSHOP_DELIVERY', False)
+VAT_PERCENTS = getattr(settings, 'QSHOP_VAT_PERCENTS', 21)
+DELIVERY_COUNTRY_CLASS = getattr(settings, 'QSHOP_DELIVERY_COUNTRY_CLASS', None)
+DELIVERY_TYPE_CLASS = getattr(settings, 'QSHOP_DELIVERY_TYPE_CLASS', None)
+DELIVERY_TYPE_ADDRESS_CLASS = getattr(settings, 'QSHOP_DELIVERY_TYPE_ADDRESS_CLASS', None)
+DELIVERY_CALCULATION_CLASS = getattr(settings, 'QSHOP_DELIVERY_CALCULATION_CLASS', None)
+
+
 MAIL_TYPES = getattr(settings, 'QSHOP_MAIL_TYPES', {
     'order_sended': {
         'reply_to_mail': 'qshop@qwe.lv',

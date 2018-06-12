@@ -185,3 +185,114 @@ class OrderAbstractDefault(OrderAbstract):
 
 class Order(import_item(qshop_settings.CART_ORDER_CLASS) if qshop_settings.CART_ORDER_CLASS else OrderAbstractDefault):
     pass
+
+
+if qshop_settings.ENABLE_QSHOP_DELIVERY:
+
+
+    class DeliveryCountryAbstract(models.Model):
+        _translation_fields = ['title']
+        VAT_NOTHING_TO_DO = 1
+        VAT_MINUS = 2
+        VAT_MINUS_IF_JURIDICAL = 3
+
+        VAT_BEHAVIOR_CHOICES = (
+            (VAT_NOTHING_TO_DO, _('Nothing to do')),
+            (VAT_MINUS, _('Take tax off a cart price')),
+            (VAT_MINUS_IF_JURIDICAL, _('Take tax off a cart price if legal entity')),
+        )
+        title = models.CharField(_('Country name'), max_length=100)
+        vat_behavior = models.SmallIntegerField(choices=VAT_BEHAVIOR_CHOICES)
+
+        class Meta:
+            abstract = True
+            verbose_name = _('delivery country')
+            verbose_name_plural = _('delivery countries')
+
+        def __str__(self):
+            return str(self.title)
+
+
+    class DeliveryCountry(import_item(qshop_settings.DELIVERY_COUNTRY_CLASS) if qshop_settings.DELIVERY_COUNTRY_CLASS else DeliveryCountryAbstract):
+        pass
+
+
+    class DeliveryTypeAbstract(models.Model):
+        _translation_fields = ['title', 'estimated_time']
+        FLAT_QTY = 1
+        DEPENDS_ON_SUM = 2
+
+        PRICING_MODEL_CHOICES = (
+            (FLAT_QTY, _('Amount of the items quantity')),
+            (DEPENDS_ON_SUM, _('Amount of the order price')),
+
+        )
+        title = models.CharField(_('Delivery type name'), max_length=100)
+        delivery_country = models.ManyToManyField('DeliveryCountry')
+        estimated_time = models.CharField(_('Estimated time'), max_length=100)
+        delivery_calculation = models.SmallIntegerField(_('Delivery calculation'), choices=PRICING_MODEL_CHOICES, default=FLAT_QTY)
+
+        class Meta:
+            abstract = True
+            verbose_name = _('delivery type')
+            verbose_name_plural = _('delivery types')
+
+        @property
+        def calculation_html(self):
+            st = []
+            for calc in self.deliverycalculation_set.all():
+                st.append(calc.__str__())
+
+            return mark_safe('<br>'.join(st))
+
+        @property
+        def countries_html(self):
+            st = []
+            for cn in self.delivery_country.all():
+                st.append(cn.title)
+
+            return mark_safe('<br>'.join(st))
+
+        def __str__(self):
+            return str(self.title)
+
+
+    class DeliveryType(import_item(qshop_settings.DELIVERY_TYPE_CLASS) if qshop_settings.DELIVERY_TYPE_CLASS else DeliveryTypeAbstract):
+        pass
+
+
+    class DeliveryTypeAddressAbstract(models.Model):
+        _translation_fields = ['title']
+        title = models.CharField(_('Address name'), max_length=100)
+        delivery_country = models.ManyToManyField('DeliveryType')
+
+        class Meta:
+            abstract = True
+            verbose_name = _('delivery type address')
+            verbose_name_plural = _('delivery type adresses')
+
+        def __str__(self):
+            return str(self.title)
+
+    class DeliveryTypeAddress(import_item(qshop_settings.DELIVERY_TYPE_ADDRESS_CLASS) if qshop_settings.DELIVERY_TYPE_ADDRESS_CLASS else DeliveryTypeAbstract):
+        pass
+
+
+    class DeliveryCalculationAbstract(models.Model):
+        value = models.DecimalField(max_digits=12, decimal_places=2, verbose_name=_('calculation value'))
+        delivery_price = models.DecimalField(max_digits=12, decimal_places=2, verbose_name=_('price'))
+        delivery_type = models.ForeignKey('DeliveryType', on_delete=models.CASCADE)
+
+        class Meta:
+            abstract = True
+            verbose_name = _('delivery calculation')
+            verbose_name_plural = _('delivery calculations')
+            ordering = ['value']
+
+        def __str__(self):
+            return mark_safe(
+                "{} - {}".format(self.value, Currency.get_fprice(self.delivery_price, format_only=True))
+                )
+
+    class DeliveryCalculation(import_item(qshop_settings.DELIVERY_CALCULATION_CLASS) if qshop_settings.DELIVERY_CALCULATION_CLASS else DeliveryCalculationAbstract):
+        pass

@@ -1,4 +1,6 @@
-from qshop.qshop_settings import CART_ORDER_CUSTOM_ADMIN
+from qshop.qshop_settings import CART_ORDER_CUSTOM_ADMIN, ENABLE_QSHOP_DELIVERY
+from django.conf import settings
+
 
 if not CART_ORDER_CUSTOM_ADMIN:
     from django.contrib import admin
@@ -6,6 +8,7 @@ if not CART_ORDER_CUSTOM_ADMIN:
     # from forms import OrderAdminForm
     # from psyreal.actions import export_as_csv
 
+    @admin.register(Order)
     class OrderAdmin(admin.ModelAdmin):
         # form = OrderAdminForm
         list_display = ('pk', '__str__', 'status', 'date_added')
@@ -32,4 +35,35 @@ if not CART_ORDER_CUSTOM_ADMIN:
         #             request.META['QUERY_STRING'] = request.GET.urlencode()
         #     return super(OrderAdmin, self).changelist_view(request, extra_context=extra_context)
 
-    admin.site.register(Order, OrderAdmin)
+
+if 'modeltranslation' in settings.INSTALLED_APPS:
+    from modeltranslation.admin import TranslationAdmin, TranslationTabularInline, TranslationStackedInline
+    from qshop.admin import getParentClass
+
+    USE_TRANSLATION = True
+    parent_classes_translation = {
+        'ModelAdmin': TranslationAdmin,
+        'TabularInline': TranslationTabularInline,
+        'StackedInline': TranslationStackedInline,
+    }
+else:
+    USE_TRANSLATION = False
+
+
+if ENABLE_QSHOP_DELIVERY:
+    from .models import DeliveryCountry, DeliveryType, DeliveryCalculation
+
+    @admin.register(DeliveryCountry)
+    class DeliveryCountryAdmin(getParentClass('ModelAdmin', DeliveryCountry)):
+        list_display = ['title', 'vat_behavior']
+
+    class DeliveryCalculationInline(admin.TabularInline):
+        model = DeliveryCalculation
+
+    @admin.register(DeliveryType)
+    class DeliveryTypeAdmin(getParentClass('ModelAdmin', DeliveryType)):
+        list_display = ['title', 'countries_html', 'delivery_calculation',  'calculation_html']
+        filter_horizontal = ['delivery_country']
+        list_filter = ['delivery_country', 'delivery_calculation', 'delivery_country__vat_behavior']
+        inlines = [DeliveryCalculationInline]
+
