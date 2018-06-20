@@ -10,6 +10,8 @@ from ..models import Currency
 from ..models import Product, ProductVariation
 
 from qshop import qshop_settings
+from django.conf import settings
+
 
 PAYMENT_CLASSES = {}
 if qshop_settings.ENABLE_PAYMENTS:
@@ -165,6 +167,8 @@ class OrderAbstractDefault(OrderAbstract):
     phone = models.CharField(_('phone'), max_length=32, blank=True, null=True)
     email = models.EmailField(_('email'))
     address = models.CharField(_('address'), max_length=128)
+
+
     comments = models.TextField(_('comments'), blank=True, null=True)
 
     class Meta:
@@ -183,13 +187,86 @@ class OrderAbstractDefault(OrderAbstract):
     get_comments.short_description = _('comments')
 
 
+
+class OrderExtendedAbstractDefault(OrderAbstract):
+    INDIVIDUAL = 0
+    LEGAL = 1
+
+    PERSON_TYPE_CHOICES = (
+        (INDIVIDUAL, _('Individual entity')),
+        (LEGAL, _('Legal entity')),
+    )
+
+    DELIVERY_NO = 0
+    DELIVERY_YES = 1
+    DELIVERY_CHOICES = (
+        (DELIVERY_NO, _('No, take in office')),
+        (DELIVERY_YES, _('Yes')),
+    )
+
+    person_type = models.SmallIntegerField(_('Person type'), choices=PERSON_TYPE_CHOICES, default=INDIVIDUAL)
+
+    # INDIVIDUAL PERSON
+    first_name = models.CharField(_('first name'), max_length=70, blank=True)
+    last_name = models.CharField(_('last name'), max_length=70, blank=True)
+    phone = models.CharField(_('phone'), max_length=32, blank=True, null=True)
+    email = models.EmailField(_('email'))
+    address = models.CharField(_('address'), max_length=128)
+    comments = models.TextField(_('comments'), blank=True, null=True)
+
+    # LEGAL ENTITY
+    country = models.ForeignKey('DeliveryCountry', verbose_name=_('Country'), on_delete=models.PROTECT, blank=True, null=True)
+    legal_name = models.CharField(_('Legal name'), max_length=255, null=True, blank=True)
+    reg_number = models.CharField(_('Registration number'), max_length=50, null=True, blank=True)
+    vat_reg_number = models.CharField(_(u'VAT registration number'), max_length=50, null=True, blank=True)
+    juridical_address = models.CharField(_('Juridical address'), max_length=255, blank=True, null=True)
+    bank_name = models.CharField(_('Bank name'), max_length=50, blank=True, null=True)
+    iban = models.CharField('IBAN', default='', null=True, blank=True, max_length=100)
+
+    # SHIPPING
+    is_delivery = models.SmallIntegerField(_('Is delivery needed'), choices=DELIVERY_CHOICES, default=DELIVERY_NO)
+    shipping_date = models.DateField(_('Shipping date'), blank=True, null=True)
+    delivery_country = models.ForeignKey('DeliveryCountry', related_name="delivery_cntr", blank=True, null=True, on_delete=models.SET_NULL)
+    delivery_price = models.DecimalField(max_digits=12, decimal_places=2, verbose_name=_('delivery price'), blank=True, null=True)
+    cart_price = models.DecimalField(max_digits=12, decimal_places=2, verbose_name=_('cart price'), blank=True)
+
+
+    class Meta:
+        abstract = True
+        verbose_name = _('order')
+        verbose_name_plural = _('orders')
+
+    def __str__(self):
+        if self.is_legal:
+            return u"%s (%s %s)" % (self.legal_name, self.first_name, self.last_name)
+        return u"%s %s" % (self.first_name, self.last_name)
+
+    # def save(self, *args, **kwargs):
+    #     super(OrderExtendedAbstractDefault, self).save(*args, **kwargs)
+
+    @property
+    def is_legal(self):
+        return self.person_type == self.LEGAL
+
+    @property
+    def is_individual(self):
+        return self.person_type == self.INDIVIDUAL
+
+    @property
+    def is_delivery_needed(self):
+        return self.is_delivery == self.DELIVERY_YES
+
+    def get_comments(self):
+        return mark_safe("<br />".join(self.comments.split("\n")))
+    get_comments.short_description = _('comments')
+
+
+
 class Order(import_item(qshop_settings.CART_ORDER_CLASS) if qshop_settings.CART_ORDER_CLASS else OrderAbstractDefault):
     pass
 
 
 if qshop_settings.ENABLE_QSHOP_DELIVERY:
-
-
     class DeliveryCountryAbstract(models.Model):
         _translation_fields = ['title']
         VAT_NOTHING_TO_DO = 1
@@ -199,7 +276,7 @@ if qshop_settings.ENABLE_QSHOP_DELIVERY:
         VAT_BEHAVIOR_CHOICES = (
             (VAT_NOTHING_TO_DO, _('Nothing to do')),
             (VAT_MINUS, _('Take tax off a cart price')),
-            (VAT_MINUS_IF_JURIDICAL, _('Take tax off a cart price if legal entity')),
+            (VAT_MINUS_IF_JURIDICAL, _('Take tax off a cart price if legal entity with VAT')),
         )
         title = models.CharField(_('Country name'), max_length=100)
         vat_behavior = models.SmallIntegerField(choices=VAT_BEHAVIOR_CHOICES)

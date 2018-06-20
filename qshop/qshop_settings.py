@@ -7,21 +7,21 @@ if not 'sitemenu' in settings.INSTALLED_APPS:
 PRODUCTS_ON_PAGE = getattr(settings, 'QSHOP_PRODUCTS_ON_PAGE', 10)
 
 
-PRODUCT_CLASS              = getattr(settings, 'QSHOP_PRODUCT_CLASS',              None)
+PRODUCT_CLASS = getattr(settings, 'QSHOP_PRODUCT_CLASS', None)
 
-VARIATION_VALUE_CLASS      = getattr(settings, 'QSHOP_VARIATION_VALUE_CLASS',      None)
-VARIATION_CLASS            = getattr(settings, 'QSHOP_VARIATION_CLASS',            None)
+VARIATION_VALUE_CLASS = getattr(settings, 'QSHOP_VARIATION_VALUE_CLASS', None)
+VARIATION_CLASS = getattr(settings, 'QSHOP_VARIATION_CLASS', None)
 
-PRODUCT_IMAGE_CLASS        = getattr(settings, 'QSHOP_PRODUCT_IMAGE_CLASS',        None)
+PRODUCT_IMAGE_CLASS = getattr(settings, 'QSHOP_PRODUCT_IMAGE_CLASS', None)
 
-PARAMETERS_SET_CLASS       = getattr(settings, 'QSHOP_PARAMETERS_SET_CLASS',       None)
-PARAMETER_CLASS            = getattr(settings, 'QSHOP_PARAMETER_CLASS',            None)
-PARAMETER_VALUE_CLASS      = getattr(settings, 'QSHOP_PARAMETER_VALUE_CLASS',      None)
+PARAMETERS_SET_CLASS = getattr(settings, 'QSHOP_PARAMETERS_SET_CLASS', None)
+PARAMETER_CLASS = getattr(settings, 'QSHOP_PARAMETER_CLASS', None)
+PARAMETER_VALUE_CLASS = getattr(settings, 'QSHOP_PARAMETER_VALUE_CLASS', None)
 PRODUCT_TO_PARAMETER_CLASS = getattr(settings, 'QSHOP_PRODUCT_TO_PARAMETER_CLASS', None)
 
-CURRENCY_CLASS             = getattr(settings, 'QSHOP_CURRENCY_CLASS',             None)
+CURRENCY_CLASS = getattr(settings, 'QSHOP_CURRENCY_CLASS', None)
 
-LOAD_ADDITIONAL_MODELS     = getattr(settings, 'QSHOP_LOAD_ADDITIONAL_MODELS',     None)
+LOAD_ADDITIONAL_MODELS = getattr(settings, 'QSHOP_LOAD_ADDITIONAL_MODELS', None)
 
 
 CART_ORDER_CLASS = getattr(settings, 'QSHOP_CART_ORDER_CLASS', None)
@@ -41,6 +41,12 @@ DELIVERY_COUNTRY_CLASS = getattr(settings, 'QSHOP_DELIVERY_COUNTRY_CLASS', None)
 DELIVERY_TYPE_CLASS = getattr(settings, 'QSHOP_DELIVERY_TYPE_CLASS', None)
 DELIVERY_TYPE_ADDRESS_CLASS = getattr(settings, 'QSHOP_DELIVERY_TYPE_ADDRESS_CLASS', None)
 DELIVERY_CALCULATION_CLASS = getattr(settings, 'QSHOP_DELIVERY_CALCULATION_CLASS', None)
+
+# EXTEND CART OPTION
+ENABLE_QSHOP_DELIVERY = getattr(settings, 'QSHOP_ENABLE_QSHOP_DELIVERY', False)
+if ENABLE_QSHOP_DELIVERY:
+    if not CART_ORDER_CLASS:
+        CART_ORDER_CLASS = 'qshop.cart.models.OrderExtendedAbstractDefault'
 
 
 MAIL_TYPES = getattr(settings, 'QSHOP_MAIL_TYPES', {

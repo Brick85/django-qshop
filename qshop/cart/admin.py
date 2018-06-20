@@ -1,8 +1,9 @@
-from qshop.qshop_settings import CART_ORDER_CUSTOM_ADMIN, ENABLE_QSHOP_DELIVERY
 from django.conf import settings
+from django.contrib import admin
 
+from qshop.qshop_settings import CART_ORDER_CUSTOM_ADMIN, ENABLE_QSHOP_DELIVERY
 
-if not CART_ORDER_CUSTOM_ADMIN:
+if not CART_ORDER_CUSTOM_ADMIN and not ENABLE_QSHOP_DELIVERY:
     from django.contrib import admin
     from .models import Order
     # from forms import OrderAdminForm
@@ -67,3 +68,16 @@ if ENABLE_QSHOP_DELIVERY:
         list_filter = ['delivery_country', 'delivery_calculation', 'delivery_country__vat_behavior']
         inlines = [DeliveryCalculationInline]
 
+
+    if not CART_ORDER_CUSTOM_ADMIN:
+        from .models import Order
+        # from forms import OrderAdminForm
+        # from psyreal.actions import export_as_csv
+
+        @admin.register(Order)
+        class OrderAdmin(admin.ModelAdmin):
+            # form = OrderAdminForm
+            list_display = ('pk', '__str__', 'status', 'date_added')
+            list_display_links = ('pk', '__str__')
+            list_filter = ('status',)
+            ordering = ['-date_added']
