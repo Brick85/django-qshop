@@ -5,17 +5,12 @@ from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, get_object_or_404
-
+from django.views.generic import CreateView
 from .cart import Cart, ItemTooMany
 from ..models import Product
 from .forms import OrderForm
 from .models import Order
 
-from qshop.qshop_settings import CART_ORDER_VIEW
-
-if CART_ORDER_VIEW:
-    from sitemenu import import_item
-    qshop_order_view = import_item(CART_ORDER_VIEW)
 
 
 def add_to_cart(request, product_id):
@@ -107,6 +102,33 @@ def show_cart(request):
     return render(request, 'qshop/cart/cart.html', {
         'cart': cart,
     })
+
+
+class OrderDetailView(CreateView):
+    form_class = OrderForm
+    template_name = 'qshop/cart/order.html'
+
+    @property
+    def cart(self):
+        return Cart(self.request)
+
+    def get(self, request, *args, **kwargs):
+        if self.cart.total_products() < 1:
+            return HttpResponseRedirect(reverse('cart'))
+        return super().get(request, *args, **kwargs)
+
+
+    def form_valid(self, form):
+        try:
+            order = form.save(self.cart)
+            self.request.session['order_pk'] = order.pk
+            self.cart.checkout()
+            order.finish_order(self.request)
+            return order.get_redirect_response()
+        except ItemTooMany:
+            messages.add_message(self.request, messages.WARNING, _('Someone already bought product that you are trying to buy.'))
+
+        return super(OrderDetailView, self).form_valid(form)
 
 
 def order_cart(request):

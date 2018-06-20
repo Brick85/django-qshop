@@ -227,8 +227,8 @@ class OrderExtendedAbstractDefault(OrderAbstract):
     is_delivery = models.SmallIntegerField(_('Is delivery needed'), choices=DELIVERY_CHOICES, default=DELIVERY_NO)
     shipping_date = models.DateField(_('Shipping date'), blank=True, null=True)
     delivery_country = models.ForeignKey('DeliveryCountry', related_name="delivery_cntr", blank=True, null=True, on_delete=models.SET_NULL)
-    delivery_price = models.DecimalField(max_digits=12, decimal_places=2, verbose_name=_('delivery price'), blank=True, null=True)
-    cart_price = models.DecimalField(max_digits=12, decimal_places=2, verbose_name=_('cart price'), blank=True)
+    delivery_price = models.DecimalField(max_digits=12, decimal_places=2, verbose_name=_('delivery price'), null=True, blank=True)
+    cart_price = models.DecimalField(max_digits=12, decimal_places=2, verbose_name=_('cart price'), null=True)
 
 
     class Meta:
@@ -240,9 +240,6 @@ class OrderExtendedAbstractDefault(OrderAbstract):
         if self.is_legal:
             return u"%s (%s %s)" % (self.legal_name, self.first_name, self.last_name)
         return u"%s %s" % (self.first_name, self.last_name)
-
-    # def save(self, *args, **kwargs):
-    #     super(OrderExtendedAbstractDefault, self).save(*args, **kwargs)
 
     @property
     def is_legal(self):
@@ -259,8 +256,6 @@ class OrderExtendedAbstractDefault(OrderAbstract):
     def get_comments(self):
         return mark_safe("<br />".join(self.comments.split("\n")))
     get_comments.short_description = _('comments')
-
-
 
 class Order(import_item(qshop_settings.CART_ORDER_CLASS) if qshop_settings.CART_ORDER_CLASS else OrderAbstractDefault):
     pass
