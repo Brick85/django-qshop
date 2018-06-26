@@ -21,7 +21,6 @@ else:
                     'last_name',
                     'phone',
                     'email',
-                    'address',
                     'comments',
 
                     # legal fields
@@ -35,8 +34,30 @@ else:
 
                     # delivery
                     'is_delivery',
-                    'delivery_country'
+                    'delivery_country',
+                    'delivery_type',
+                    'delivery_city',
+                    'delivery_street',
+                    'delivery_house',
+                    'delivery_flat',
+                    'delivery_zip',
                 ]
+                widgets = {
+                    'person_type': forms.RadioSelect,
+                    'is_delivery': forms.RadioSelect
+                }
+
+
+            class Media:
+                css = {
+                    'all': ('qcart.css',)
+                }
+                js = ('qcart.js',)
+
+
+            def __init__(self, *args, **kwargs):
+                super().__init__(*args, **kwargs)
+
 
             def save(self, cart, *args, **kwargs):
                 kwargs['commit'] = False
@@ -59,6 +80,47 @@ else:
                     )
 
                 return order
+
+
+            def clean(self):
+                data = super(OrderForm, self).clean()
+                person_type = data.get('person_type')
+                is_delivery = data.get('is_delivery')
+                delivery_country = data.get('delivery_country')
+                delivery_type = data.get('delivery_type')
+
+                if is_delivery == self._meta.model.DELIVERY_YES:
+                    self.validate_required_field(data, 'delivery_country')
+                    self.validate_required_field(data, 'delivery_type')
+                    self.validate_required_field(data, 'delivery_city')
+                    self.validate_required_field(data, 'delivery_street')
+                    self.validate_required_field(data, 'delivery_house')
+                    self.validate_required_field(data, 'delivery_flat')
+                    self.validate_required_field(data, 'delivery_zip')
+
+                    if delivery_country and delivery_type:
+                        if not delivery_type.check_country(delivery_country.pk):
+                            self._errors['delivery_type'] = self.error_class([
+                                    _('This delivery type cannot deliver to choosed country')
+                                ])
+
+                if person_type == self._meta.model.LEGAL:
+                    self.validate_required_field(data, 'country')
+                    self.validate_required_field(data, 'legal_name')
+                    self.validate_required_field(data, 'reg_number')
+                    self.validate_required_field(data, 'juridical_address')
+                    self.validate_required_field(data, 'bank_name')
+                    self.validate_required_field(data, 'iban')
+
+                return data
+
+
+
+            def validate_required_field(self, cleaned_data, field_name, msg=None):
+                if not msg:
+                    msg = _('This field is required.')
+                if(field_name in cleaned_data and not cleaned_data[field_name]):
+                    self._errors[field_name] = self.error_class([msg])
 
     else:
         class OrderForm(forms.ModelForm):

@@ -1,0 +1,18 @@
+.block-hide {
+    display: none;
+}
+
+.form-field {
+    border-bottom: 1px solid #CCC;
+    padding: 10px 0;
+}
+
+.errorlist {
+    color: red;
+    margin: 0;
+    padding: 0;
+}
+
+.errorlist li {
+    list-style-type: none;
+}

@@ -16,7 +16,6 @@ urlpatterns = [
     url(r'^remove/(?P<item_id>\d+)/$', remove_from_cart, name='remove_from_cart'),
     url(r'^update/$', update_cart, name='update_cart'),
 
-    url(r'^order/$', OrderDetailView.as_view(), name='order_cart'),
     url(r'^order/success/$', cart_order_success, name='cart_order_success'),
     url(r'^order/cancelled/$', cart_order_cancelled, name='cart_order_cancelled'),
     url(r'^order/error/$', cart_order_error, name='cart_order_error'),

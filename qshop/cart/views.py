@@ -131,34 +131,6 @@ class OrderDetailView(CreateView):
         return super(OrderDetailView, self).form_valid(form)
 
 
-def order_cart(request):
-    if CART_ORDER_VIEW:
-        return qshop_order_view(request)
-
-    cart = Cart(request)
-
-    order_form = OrderForm()
-
-    if request.method == 'POST':
-        order_form = OrderForm(request.POST)
-
-        if order_form.is_valid():
-            try:
-                order = order_form.save(cart)
-                request.session['order_pk'] = order.pk
-                cart.checkout()
-                order.finish_order(request)
-                return order.get_redirect_response()
-            except ItemTooMany:
-                messages.add_message(request, messages.WARNING, _('Someone already bought product that you are trying to buy.'))
-
-    if cart.total_products() < 1:
-        return HttpResponseRedirect(reverse('cart'))
-
-    return render(request, 'qshop/cart/order.html', {
-        'cart': cart,
-        'order_form': order_form,
-    })
 
 
 def cart_order_success(request):

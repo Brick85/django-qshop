@@ -16,7 +16,7 @@ if not CART_ORDER_CUSTOM_ADMIN and not ENABLE_QSHOP_DELIVERY:
         list_display_links = ('pk', '__str__')
         list_filter = ('status',)
         ordering = ['-date_added']
-        readonly_fields = ('name', 'phone', 'email', 'address', 'get_cart_text', 'get_comments')
+        readonly_fields = ('name', 'phone', 'email', 'get_cart_text', 'get_comments')
         exclude = ('comments',)
 
         # class Media:

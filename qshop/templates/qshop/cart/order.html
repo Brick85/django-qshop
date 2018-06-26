@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% load i18n %}
+{% load i18n static %}
 
 
 {% block body_id %}cart_order_body{% endblock %}
@@ -23,11 +23,9 @@
             {% include 'qshop/cart/_order_field.html' with FIELD=form.last_name %}
             {% include 'qshop/cart/_order_field.html' with FIELD=form.phone %}
             {% include 'qshop/cart/_order_field.html' with FIELD=form.email %}
-            {% include 'qshop/cart/_order_field.html' with FIELD=form.address %}
-
         </div>
 
-        <div class="j_legal_fields">
+        <div class="j_legal_fields{% if form.person_type.value != "1" %} block-hide{% endif %}">
             {% include 'qshop/cart/_order_field.html' with FIELD=form.country %}
             {% include 'qshop/cart/_order_field.html' with FIELD=form.legal_name %}
             {% include 'qshop/cart/_order_field.html' with FIELD=form.reg_number %}
@@ -37,19 +35,26 @@
             {% include 'qshop/cart/_order_field.html' with FIELD=form.iban %}
         </div>
 
-        <div class="j_delivery_fields">
-            {% include 'qshop/cart/_order_field.html' with FIELD=form.is_delivery %}
+        {% include 'qshop/cart/_order_field.html' with FIELD=form.is_delivery %}
+        <div class="j_delivery_fields{% if form.is_delivery.value != "1" %} block-hide{% endif %}">
             {% include 'qshop/cart/_order_field.html' with FIELD=form.delivery_country %}
+            {% include 'qshop/cart/_order_field.html' with FIELD=form.delivery_type %}
+
+            {% include 'qshop/cart/_order_field.html' with FIELD=form.delivery_city %}
+            {% include 'qshop/cart/_order_field.html' with FIELD=form.delivery_street %}
+            {% include 'qshop/cart/_order_field.html' with FIELD=form.delivery_house %}
+            {% include 'qshop/cart/_order_field.html' with FIELD=form.delivery_flat %}
+            {% include 'qshop/cart/_order_field.html' with FIELD=form.delivery_zip %}
         </div>
 
         <div class="comments">
-            {% include 'qshop/cart/_order_field.html' with FIELD=form.is_delivery %}
-            {% include 'qshop/cart/_order_field.html' with FIELD=form.delivery_country %}
             {% include 'qshop/cart/_order_field.html' with FIELD=form.comments %}
         </div>
 
 
-        {{ view.cart.as_table }}
+        <div class="j_cart_products">
+            {{ view.cart.as_table }}
+        </div>
 
         <div class="checkout">
             <input type="submit" value="{% trans "Process order" %}" />
@@ -58,4 +63,12 @@
     </form>
     <div class="clear"></div>
 </div>
+
+
+{% block qjquery_load %}
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha256-3edrmyuQ0w65f8gfBsqowzjJe2iM6n0nKciPUp8y+7E=" crossorigin="anonymous"></script>
+{% endblock qjquery_load %}
+
+{{ form.media }}
+
 {% endblock content %}

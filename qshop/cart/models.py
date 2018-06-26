@@ -207,11 +207,10 @@ class OrderExtendedAbstractDefault(OrderAbstract):
     person_type = models.SmallIntegerField(_('Person type'), choices=PERSON_TYPE_CHOICES, default=INDIVIDUAL)
 
     # INDIVIDUAL PERSON
-    first_name = models.CharField(_('first name'), max_length=70, blank=True)
-    last_name = models.CharField(_('last name'), max_length=70, blank=True)
+    first_name = models.CharField(_('first name'), max_length=70)
+    last_name = models.CharField(_('last name'), max_length=70)
     phone = models.CharField(_('phone'), max_length=32, blank=True, null=True)
     email = models.EmailField(_('email'))
-    address = models.CharField(_('address'), max_length=128)
     comments = models.TextField(_('comments'), blank=True, null=True)
 
     # LEGAL ENTITY
@@ -226,10 +225,15 @@ class OrderExtendedAbstractDefault(OrderAbstract):
     # SHIPPING
     is_delivery = models.SmallIntegerField(_('Is delivery needed'), choices=DELIVERY_CHOICES, default=DELIVERY_NO)
     shipping_date = models.DateField(_('Shipping date'), blank=True, null=True)
-    delivery_country = models.ForeignKey('DeliveryCountry', related_name="delivery_cntr", blank=True, null=True, on_delete=models.SET_NULL)
+    delivery_type = models.ForeignKey('DeliveryType', related_name="delivery_typ", blank=True, null=True, on_delete=models.SET_NULL)
     delivery_price = models.DecimalField(max_digits=12, decimal_places=2, verbose_name=_('delivery price'), null=True, blank=True)
     cart_price = models.DecimalField(max_digits=12, decimal_places=2, verbose_name=_('cart price'), null=True)
-
+    delivery_country = models.ForeignKey('DeliveryCountry', related_name="delivery_cntr", blank=True, null=True, on_delete=models.SET_NULL)
+    delivery_city = models.CharField(_('city'), max_length=128)
+    delivery_street = models.CharField(_('street'), max_length=128)
+    delivery_house = models.CharField(_('house'), max_length=128)
+    delivery_flat = models.CharField(_('flat'), max_length=128)
+    delivery_zip = models.CharField(_('zip'), max_length=128)
 
     class Meta:
         abstract = True
@@ -324,6 +328,9 @@ if qshop_settings.ENABLE_QSHOP_DELIVERY:
                 st.append(cn.title)
 
             return mark_safe('<br>'.join(st))
+
+        def check_country(self, country_pk):
+            return True if self.delivery_country.filter(pk=country_pk) else False
 
         def __str__(self):
             return str(self.title)
