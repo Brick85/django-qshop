@@ -68,8 +68,13 @@ class Cart:
 
     def total_price(self, in_default_currency=False):
         total_price = self.total_price_wo_discount(in_default_currency)
+
         if self.has_discount():
             total_price = (100.0 - self.get_discount()) * total_price / 100.0
+
+        if self.has_vat_reduction():
+            total_price = (100.0 - self.get_vat_reduction()) * total_price / 100.0
+
         return total_price
 
     def total_fprice(self):
@@ -80,6 +85,10 @@ class Cart:
 
     def total_fprice_with_delivery(self):
         return Currency.get_fprice(self.total_price_with_delivery(), format_only=True)
+
+    def set_delivery_price(self, price):
+        self._delivery_price = price
+
 
     def delivery_price(self, in_default_currency=False):
         try:
@@ -105,10 +114,29 @@ class Cart:
     def get_discount(self):
         return self.cart.discount
 
-    def set_discount(self, discount):
+    def get_discount_reason(self):
+        return self.cart.discount_reason
+
+    def set_discount(self, discount, reason=""):
         self.cart.discount = discount
-        self.clear_cache()
+        self.cart.discount_reason = reason
+
+        # self.clear_cache()
         self.cart.save()
+
+    def set_vat_reduction(self, percents):
+        self.cart.vat_reduction = percents
+        # self.clear_cache()
+        self.cart.save()
+
+    def get_vat_reduction(self):
+        return self.cart.vat_reduction
+
+    def has_vat_reduction(self):
+        if self.get_vat_reduction() > 0:
+            return True
+        return False
+
 
     def total_weight(self):
         try:
@@ -149,12 +177,6 @@ class Cart:
         if not self.cart.id:
             self.cart.save()
             self.__request.session[CART_ID] = self.cart.id
-
-    # def get_session_id(self, request):
-    #     return request.session[CART_ID]
-
-    # def set_session_id(self, request, cart_id):
-    #     request.session[CART_ID] = cart_id
 
     def add(self, product, quantity=1):
         self.create_cart()

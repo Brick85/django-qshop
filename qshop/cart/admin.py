@@ -6,8 +6,6 @@ from qshop.qshop_settings import CART_ORDER_CUSTOM_ADMIN, ENABLE_QSHOP_DELIVERY
 if not CART_ORDER_CUSTOM_ADMIN and not ENABLE_QSHOP_DELIVERY:
     from django.contrib import admin
     from .models import Order
-    # from forms import OrderAdminForm
-    # from psyreal.actions import export_as_csv
 
     @admin.register(Order)
     class OrderAdmin(admin.ModelAdmin):
@@ -18,12 +16,6 @@ if not CART_ORDER_CUSTOM_ADMIN and not ENABLE_QSHOP_DELIVERY:
         ordering = ['-date_added']
         readonly_fields = ('name', 'phone', 'email', 'get_cart_text', 'get_comments')
         exclude = ('comments',)
-
-        # class Media:
-        #     js = (
-        #         '/static/modeltranslation/js/force_jquery.js',
-        #         '/static/admin/js/order.js',
-        #     )
 
         # def changelist_view(self, request, extra_context=None):
 
@@ -81,3 +73,4 @@ if ENABLE_QSHOP_DELIVERY:
             list_display_links = ('pk', '__str__')
             list_filter = ('status',)
             ordering = ['-date_added']
+            readonly_fields = ('get_cart_text',)

@@ -8,17 +8,22 @@ $.extend(QApp, {
       DELIVERY_FIELDS_WRAP = ".j_delivery_fields";
       HIDE_CLASS = "block-hide";
       this.initPersonTypeChoose();
-      this.initDeliveryTypeChoose();
+      this.initIsDeliveryChoose();
+      this.initDeliveryCountryChoose();
     },
 
-
+    initDeliveryCountryChoose: function() {
+      $('[name="delivery_country"]').change(function() {
+        console.log('check');
+      });
+    },
     initPersonTypeChoose: function() {
       $(':radio[name="person_type"]').change(function() {
         QApp.showHideBlock(LEGAL_FIELDS_WRAP, $(this).val(), 0);
       });
     },
 
-    initDeliveryTypeChoose: function() {
+    initIsDeliveryChoose: function() {
       $(':radio[name="is_delivery"]').change(function() {
         QApp.showHideBlock(DELIVERY_FIELDS_WRAP, $(this).val(), 0);
       });

@@ -1,17 +1,16 @@
 import datetime
+
+from django.conf import settings
 from django.db import models
-from django.utils.translation import ugettext_lazy as _
+from django.http import HttpResponseRedirect
 from django.urls import reverse
 from django.utils.safestring import mark_safe
-from django.http import HttpResponseRedirect
-
-from sitemenu import import_item
-from ..models import Currency
-from ..models import Product, ProductVariation
-
+from django.utils.translation import ugettext_lazy as _
+from qshop.mails import sendMail
 from qshop import qshop_settings
-from django.conf import settings
+from sitemenu import import_item
 
+from ..models import Currency, Product, ProductVariation
 
 PAYMENT_CLASSES = {}
 if qshop_settings.ENABLE_PAYMENTS:
@@ -25,6 +24,7 @@ class Cart(models.Model):
     date_modified = models.DateTimeField(_('modification date'), auto_now=True)
     checked_out = models.BooleanField(default=False, verbose_name=_('checked out'))
     discount = models.PositiveSmallIntegerField(_('discount'), default=0)
+    vat_reduction = models.PositiveSmallIntegerField(_('vat reduction'), default=0)
 
     class Meta:
         verbose_name = _('cart')
@@ -35,7 +35,7 @@ class Cart(models.Model):
         return str(self.date_modified)
 
     def get_cartobject(self):
-        from cart import Cart as CartObject
+        from .cart import Cart as CartObject
         return CartObject(None, self)
 
 
@@ -229,11 +229,11 @@ class OrderExtendedAbstractDefault(OrderAbstract):
     delivery_price = models.DecimalField(max_digits=12, decimal_places=2, verbose_name=_('delivery price'), null=True, blank=True)
     cart_price = models.DecimalField(max_digits=12, decimal_places=2, verbose_name=_('cart price'), null=True)
     delivery_country = models.ForeignKey('DeliveryCountry', related_name="delivery_cntr", blank=True, null=True, on_delete=models.SET_NULL)
-    delivery_city = models.CharField(_('city'), max_length=128)
-    delivery_street = models.CharField(_('street'), max_length=128)
-    delivery_house = models.CharField(_('house'), max_length=128)
-    delivery_flat = models.CharField(_('flat'), max_length=128)
-    delivery_zip = models.CharField(_('zip'), max_length=128)
+    delivery_city = models.CharField(_('city'), max_length=128, blank=True, null=True)
+    delivery_street = models.CharField(_('street'), max_length=128, blank=True, null=True)
+    delivery_house = models.CharField(_('house'), max_length=128, blank=True, null=True)
+    delivery_flat = models.CharField(_('flat'), max_length=128, blank=True, null=True)
+    delivery_zip = models.CharField(_('zip'), max_length=128, blank=True, null=True)
 
     class Meta:
         abstract = True
@@ -261,24 +261,51 @@ class OrderExtendedAbstractDefault(OrderAbstract):
         return mark_safe("<br />".join(self.comments.split("\n")))
     get_comments.short_description = _('comments')
 
+    def calculate_delivery(self, cart):
+        pass
+
+    def send_checkout_email(self):
+        if hasattr(self, 'email'):
+            return sendMail('order_sended', variables={
+                    'order': self,
+                },
+                subject=_("Your order %s accepted") % self.get_id(),
+                mails=[self.email]
+            )
+        return False
+
+
+    @staticmethod
+    def get_country_delivery_type_json():
+        # json_output = {}
+        # for country in DeliveryCountry.object.all():
+        #     cn[country.pk] = {
+        #         'pk': country.pk,
+        #         'title': country.title
+        #     }
+
+        # json_output.append(cn);
+        return "[{'ad': 'asd'}]"
+
 class Order(import_item(qshop_settings.CART_ORDER_CLASS) if qshop_settings.CART_ORDER_CLASS else OrderAbstractDefault):
     pass
 
 
 if qshop_settings.ENABLE_QSHOP_DELIVERY:
     class DeliveryCountryAbstract(models.Model):
-        _translation_fields = ['title']
+        _translation_fields = ['title', 'vat_behavior_reason']
         VAT_NOTHING_TO_DO = 1
-        VAT_MINUS = 2
-        VAT_MINUS_IF_JURIDICAL = 3
+        VAT_MINUS_LEGAL = 2
+        VAT_MINUS_LEGAL_VAT = 3
 
         VAT_BEHAVIOR_CHOICES = (
             (VAT_NOTHING_TO_DO, _('Nothing to do')),
-            (VAT_MINUS, _('Take tax off a cart price')),
-            (VAT_MINUS_IF_JURIDICAL, _('Take tax off a cart price if legal entity with VAT')),
+            (VAT_MINUS_LEGAL, _('Take tax off a cart price')),
+            (VAT_MINUS_LEGAL_VAT, _('Take tax off a cart price if legal entity with VAT')),
         )
         title = models.CharField(_('Country name'), max_length=100)
         vat_behavior = models.SmallIntegerField(choices=VAT_BEHAVIOR_CHOICES)
+        vat_behavior_reason = models.CharField(_('VAT behavior reason, if reduce'), max_length=200, blank=True, null=True)
 
         class Meta:
             abstract = True
@@ -287,6 +314,22 @@ if qshop_settings.ENABLE_QSHOP_DELIVERY:
 
         def __str__(self):
             return str(self.title)
+
+        def get_vat_reduction(self, vat_nr, person_type):
+            if person_type and int(person_type) == Order.LEGAL and \
+                (self.vat_behavior == self.VAT_MINUS_LEGAL_VAT and vat_nr or self.vat_behavior == self.VAT_MINUS_LEGAL):
+                return qshop_settings.VAT_PERCENTS
+            return 0
+
+
+        @classmethod
+        def get_vat_reduction_static(cls, country_pk=None, vat_nr="", person_type=None):
+            if country_pk:
+                country = cls.objects.filter(pk=country_pk).first()
+                if country:
+                    return country.get_vat_reduction(vat_nr, person_type)
+
+            return 0
 
 
     class DeliveryCountry(import_item(qshop_settings.DELIVERY_COUNTRY_CLASS) if qshop_settings.DELIVERY_COUNTRY_CLASS else DeliveryCountryAbstract):
@@ -329,8 +372,42 @@ if qshop_settings.ENABLE_QSHOP_DELIVERY:
 
             return mark_safe('<br>'.join(st))
 
-        def check_country(self, country_pk):
-            return True if self.delivery_country.filter(pk=country_pk) else False
+        def check_country(self, country):
+            cpk=country
+
+            if isinstance(country, DeliveryCountry):
+                cpk=country.pk
+
+            ret = self.delivery_country.filter(pk=cpk).first()
+
+            return True if ret else False
+
+
+        def get_delivery_calculation(self, cart):
+            ret = None
+            if self.delivery_calculation == self.FLAT_QTY:
+                ret = self.deliverycalculation_set.filter(value__gte=cart.total_products()).first()
+            else:
+                ret = self.deliverycalculation_set.filter(value__gte=cart.total_price_wo_discount()).first()
+
+            return ret
+
+        def get_delivery_price(self, country, cart):
+            if self.check_country(country):
+                dcalc = self.get_delivery_calculation(cart)
+                return dcalc.delivery_price
+
+            return 0
+
+
+        @classmethod
+        def get_delivery_price_static(cls, delivery_type_pk, country_pk, cart):
+            if not delivery_type_pk and not country_pk:
+                return 0
+
+            dtype = cls.objects.get(pk=delivery_type_pk)
+            return dtype.get_delivery_price(country_pk, cart)
+
 
         def __str__(self):
             return str(self.title)

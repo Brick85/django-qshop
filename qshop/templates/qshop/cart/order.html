@@ -38,6 +38,7 @@
         {% include 'qshop/cart/_order_field.html' with FIELD=form.is_delivery %}
         <div class="j_delivery_fields{% if form.is_delivery.value != "1" %} block-hide{% endif %}">
             {% include 'qshop/cart/_order_field.html' with FIELD=form.delivery_country %}
+            form instance = {{ form.instance.get_country_delivery_type_json }}
             {% include 'qshop/cart/_order_field.html' with FIELD=form.delivery_type %}
 
             {% include 'qshop/cart/_order_field.html' with FIELD=form.delivery_city %}
@@ -53,7 +54,12 @@
 
 
         <div class="j_cart_products">
+            VIEW CART:
             {{ view.cart.as_table }}
+
+            <br><br>
+            FORM CART:
+            {{ form.instance.cart_text }}
         </div>
 
         <div class="checkout">

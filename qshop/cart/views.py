@@ -5,11 +5,11 @@ from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, get_object_or_404
-from django.views.generic import CreateView
+from django.views.generic import CreateView, TemplateView, View
 from .cart import Cart, ItemTooMany
 from ..models import Product
 from .forms import OrderForm
-from .models import Order
+from .models import Order, DeliveryType, DeliveryCountry
 
 
 
@@ -97,11 +97,32 @@ def update_cart(request):
     return HttpResponseRedirect(reverse('cart'))
 
 
-def show_cart(request):
-    cart = Cart(request)
-    return render(request, 'qshop/cart/cart.html', {
-        'cart': cart,
-    })
+
+class CartDetailView(TemplateView):
+    template_name = "qshop/cart/cart.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['cart'] = Cart(self.request)
+        return context
+
+
+# from django.http import JsonResponse
+
+# class GetAvailableDeliveryTypesView(View):
+#     def get_data(self, context):
+#         cart = Cart(self.request)
+#         gresult = []
+#         for item in self.object_list:
+#             result = {}
+#             result['cart'] = cart
+
+#             gresult.append(result)
+
+#         return gresult
+
+#     def render_to_response(self, context, **response_kwargs):
+#         return JsonResponse(self.get_data(context), safe=False, **response_kwargs)
 
 
 class OrderDetailView(CreateView):
@@ -110,20 +131,28 @@ class OrderDetailView(CreateView):
 
     @property
     def cart(self):
-        return Cart(self.request)
+        cart = Cart(self.request)
+        return cart
 
     def get(self, request, *args, **kwargs):
         if self.cart.total_products() < 1:
             return HttpResponseRedirect(reverse('cart'))
         return super().get(request, *args, **kwargs)
 
+    def get_form_kwargs(self):
+        kwargs = super(OrderDetailView, self).get_form_kwargs()
+        kwargs['cart'] = self.cart
+        return kwargs
 
     def form_valid(self, form):
         try:
-            order = form.save(self.cart)
+            order = form.save()
             self.request.session['order_pk'] = order.pk
             self.cart.checkout()
+
+            order.send_checkout_email()
             order.finish_order(self.request)
+
             return order.get_redirect_response()
         except ItemTooMany:
             messages.add_message(self.request, messages.WARNING, _('Someone already bought product that you are trying to buy.'))
