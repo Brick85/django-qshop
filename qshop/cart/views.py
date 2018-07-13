@@ -147,12 +147,8 @@ class OrderDetailView(CreateView):
     def form_valid(self, form):
         try:
             order = form.save()
-            self.request.session['order_pk'] = order.pk
-            self.cart.checkout()
-
-            order.send_checkout_email()
             order.finish_order(self.request)
-
+            self.request.session['order_pk'] = order.pk
             return order.get_redirect_response()
         except ItemTooMany:
             messages.add_message(self.request, messages.WARNING, _('Someone already bought product that you are trying to buy.'))

@@ -131,7 +131,7 @@ class OrderAbstract(models.Model):
         return _(u"Order Nr. %s") % self.get_id()
 
     def finish_order(self, request):
-        pass
+        self.send_checkout_email()
 
     def get_cart_text(self):
         return mark_safe(self.cart_text)

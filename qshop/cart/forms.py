@@ -118,3 +118,8 @@ else:
                 msg = _('This field is required.')
             if(field_name in cleaned_data and not cleaned_data[field_name]):
                 self._errors[field_name] = self.error_class([msg])
+
+        def save(self, commit=True):
+            instance = super(OrderForm, self).save(commit)
+            self.cart.checkout()
+            return instance
