@@ -76,7 +76,7 @@ class ProductToParameterInline(getParentClass('TabularInline', ProductToParamete
         }),
     )
 
-    def has_add_permission(self, request):
+    def has_add_permission(self, request, obj):
         return False
 
 
