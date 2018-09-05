@@ -57,17 +57,17 @@ $.extend(QApp, {
           type: "POST",
           url: $('.j_cart_products').data('refresh-url'),
           data: $('.j_order-form').serialize(),
-          beforeSend: function() {
-              console.log( 'before send' );
-          },
+          // beforeSend: function() {
+              // console.log( 'before send' );
+          // },
 
           success: function(data, status) {
               $('.j_cart_products').html($('.j_cart_products', data).html());
 
           },
-          error: function(data){
-              console.log('hellooo - this is an error!!!');
-          }
+          // error: function(data){
+              // console.log('hellooo - this is an error!!!');
+          // }
       });
     },
 
