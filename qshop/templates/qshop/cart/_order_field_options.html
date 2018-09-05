@@ -1,0 +1,14 @@
+{% load qshop %}
+
+
+<div class="form-field">
+    {{ FIELD.errors }}
+    <div class="field field-person_type j_person_type-wrap">
+        {{ FIELD.label_tag }}
+        {% for item in FIELD  %}
+            <div class="ff-option j_toggle j_toggle{{ item.data.value }}">
+                {{ item }}
+            </div>
+        {% endfor %}
+    </div>
+</div>

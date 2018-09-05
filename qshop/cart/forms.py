@@ -1,16 +1,61 @@
-from qshop.qshop_settings import CART_ORDER_FORM
+from qshop.qshop_settings import CART_ORDER_FORM, ENABLE_QSHOP_DELIVERY
+
 
 if CART_ORDER_FORM:
     from sitemenu import import_item
     OrderForm = import_item(CART_ORDER_FORM)
+
+elif not ENABLE_QSHOP_DELIVERY:
+    from django import forms
+    from .models import Order
+    from ..mails import sendMail
+    from django.utils.translation import ugettext as _
+
+    class OrderForm(forms.ModelForm):
+
+        class Meta:
+            model = Order
+            exclude = ('date_added', 'status', 'manager_comments', 'cart', 'cart_text')
+
+        def save(self, cart, *args, **kwargs):
+            kwargs['commit'] = False
+            order = super(OrderForm, self).save(*args, **kwargs)
+
+            order.cart = cart.cart
+            order.cart_text = cart.as_table(standalone=True)
+
+            order.save()
+
+            if hasattr(order, 'email'):
+                sendMail(
+                    'order_sended',
+                    variables={
+                        'order': order,
+                    },
+                    subject=_("Your order %s accepted") % order.get_id(),
+                    mails=[order.email]
+                )
+
+            return order
 else:
     from django import forms
     from .models import Order, DeliveryType
     from ..mails import sendMail
     from django.utils.translation import ugettext as _
 
-    class OrderForm(forms.ModelForm):
 
+    class DeliveryCountrySelect(forms.Select):
+        def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
+            option = super(DeliveryCountrySelect, self).create_option(name, value, label, selected, index, subindex, attrs)
+            if option['value']:
+                delivery_type_ids = DeliveryType.objects.filter(delivery_country__id=option['value']).values_list('id', flat=True)
+                option['attrs']['data-countries-pks'] = ','.join([str(pk) for pk in delivery_type_ids])
+
+
+            return option
+
+
+    class OrderForm(forms.ModelForm):
         class Meta:
             model = Order
             fields = [
@@ -44,7 +89,11 @@ else:
             widgets = {
                 'person_type': forms.RadioSelect,
                 'is_delivery': forms.RadioSelect,
-                'delivery_type': forms.RadioSelect
+                'delivery_type': forms.RadioSelect,
+                'delivery_country': DeliveryCountrySelect(attrs={
+                    'data-toggle-scope': '.j_person_type-wrap',
+                    'data-toggle-template': '.j_toggle'
+                })
             }
 
 
@@ -61,7 +110,7 @@ else:
             self.cart.set_delivery_price(0)
             self.cart.set_vat_reduction(0)
             super().__init__(*args, **kwargs)
-
+            self.fields['delivery_type'].empty_label = None
             self.refresh_instance_data()
 
         def refresh_instance_data(self):
@@ -93,7 +142,6 @@ else:
                 self.validate_required_field(data, 'delivery_city')
                 self.validate_required_field(data, 'delivery_street')
                 self.validate_required_field(data, 'delivery_house')
-                self.validate_required_field(data, 'delivery_flat')
                 self.validate_required_field(data, 'delivery_zip')
 
                 if delivery_country and delivery_type:

@@ -6,6 +6,11 @@ from ..functions import get_catalogue_root
 register = template.Library()
 
 
+# @register.simple_tag(takes_context=True)
+# def test_field(context, field):
+#     import ipdb; ipdb.set_trace()
+#     return ''
+
 @register.simple_tag(takes_context=True)
 def qshop_cart_products(context, as_var=None):
     cart = Cart(context['request'])

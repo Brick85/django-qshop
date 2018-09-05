@@ -5,11 +5,11 @@ from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, get_object_or_404
-from django.views.generic import CreateView, TemplateView, View
+from django.views.generic import CreateView, TemplateView
 from .cart import Cart, ItemTooMany
 from ..models import Product
 from .forms import OrderForm
-from .models import Order, DeliveryType, DeliveryCountry
+from .models import Order
 
 
 
@@ -107,27 +107,10 @@ class CartDetailView(TemplateView):
         return context
 
 
-# from django.http import JsonResponse
-
-# class GetAvailableDeliveryTypesView(View):
-#     def get_data(self, context):
-#         cart = Cart(self.request)
-#         gresult = []
-#         for item in self.object_list:
-#             result = {}
-#             result['cart'] = cart
-
-#             gresult.append(result)
-
-#         return gresult
-
-#     def render_to_response(self, context, **response_kwargs):
-#         return JsonResponse(self.get_data(context), safe=False, **response_kwargs)
-
 
 class OrderDetailView(CreateView):
     form_class = OrderForm
-    template_name = 'qshop/cart/order.html'
+    template_name = 'qshop/cart/order_extended.html'
 
     @property
     def cart(self):
@@ -156,6 +139,9 @@ class OrderDetailView(CreateView):
         return super(OrderDetailView, self).form_valid(form)
 
 
+class AjaxOrderDetailView(OrderDetailView):
+    def form_valid(self, form):
+        import ipdb; ipdb.set_trace()
 
 
 def cart_order_success(request):
@@ -172,7 +158,6 @@ def cart_order_success(request):
         'order': order,
     })
 
-
 @csrf_exempt
 def cart_order_cancelled(request, order_id=None):
     if order_id:
@@ -186,4 +171,39 @@ def cart_order_cancelled(request, order_id=None):
 
 def cart_order_error(request):
     return render(request, 'qshop/cart/order_error.html', {
+    })
+
+from qshop.qshop_settings import CART_ORDER_VIEW
+
+if CART_ORDER_VIEW:
+    from sitemenu import import_item
+    qshop_order_view = import_item(CART_ORDER_VIEW)
+
+def order_cart(request):
+    if CART_ORDER_VIEW:
+        return qshop_order_view(request)
+
+    cart = Cart(request)
+
+    order_form = OrderForm()
+
+    if request.method == 'POST':
+        order_form = OrderForm(request.POST)
+
+        if order_form.is_valid():
+            try:
+                order = order_form.save(cart)
+                request.session['order_pk'] = order.pk
+                cart.checkout()
+                order.finish_order(request)
+                return order.get_redirect_response()
+            except ItemTooMany:
+                messages.add_message(request, messages.WARNING, _('Someone already bought product that you are trying to buy.'))
+
+    if cart.total_products() < 1:
+        return HttpResponseRedirect(reverse('cart'))
+
+    return render(request, 'qshop/cart/order.html', {
+        'cart': cart,
+        'order_form': order_form,
     })

@@ -417,21 +417,21 @@ if qshop_settings.ENABLE_QSHOP_DELIVERY:
         pass
 
 
-    class DeliveryTypeAddressAbstract(models.Model):
-        _translation_fields = ['title']
-        title = models.CharField(_('Address name'), max_length=100)
-        delivery_country = models.ManyToManyField('DeliveryType')
+    # class DeliveryTypeAddressAbstract(models.Model):
+    #     _translation_fields = ['title']
+    #     title = models.CharField(_('Address name'), max_length=100)
+    #     delivery_country = models.ManyToManyField('DeliveryType')
 
-        class Meta:
-            abstract = True
-            verbose_name = _('delivery type address')
-            verbose_name_plural = _('delivery type adresses')
+    #     class Meta:
+    #         abstract = True
+    #         verbose_name = _('delivery type address')
+    #         verbose_name_plural = _('delivery type adresses')
 
-        def __str__(self):
-            return str(self.title)
+    #     def __str__(self):
+    #         return str(self.title)
 
-    class DeliveryTypeAddress(import_item(qshop_settings.DELIVERY_TYPE_ADDRESS_CLASS) if qshop_settings.DELIVERY_TYPE_ADDRESS_CLASS else DeliveryTypeAbstract):
-        pass
+    # class DeliveryTypeAddress(import_item(qshop_settings.DELIVERY_TYPE_ADDRESS_CLASS) if qshop_settings.DELIVERY_TYPE_ADDRESS_CLASS else DeliveryTypeAddressAbstract):
+    #     pass
 
 
     class DeliveryCalculationAbstract(models.Model):
