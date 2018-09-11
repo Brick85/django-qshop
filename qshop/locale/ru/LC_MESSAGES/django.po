@@ -2,13 +2,13 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-# 
+#
 msgid ""
 msgstr ""
 "Project-Id-Version: qshop\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-09-12 00:54+0300\n"
-"PO-Revision-Date: 2016-04-19 18:32+0300\n"
+"POT-Creation-Date: 2018-09-12 01:25+0300\n"
+"PO-Revision-Date: 2018-09-12 01:31+0300\n"
 "Last-Translator: alexey <alexey@trialine.lv>\n"
 "Language-Team: qt <a@trialine.lv>\n"
 "Language: ru\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
-"X-Generator: Poedit 1.8.6\n"
+"X-Generator: Poedit 2.0.4\n"
 "X-Poedit-SourceCharset: UTF-8\n"
 
 #: .\admin.py:169
@@ -69,11 +69,11 @@ msgstr "Ваш заказ %s принят"
 
 #: .\cart\forms.py:158
 msgid "This delivery type cannot deliver to choosed country"
-msgstr ""
+msgstr "Этот тип доставки не может доставлять в выбранную страну"
 
 #: .\cart\forms.py:174
 msgid "This field is required."
-msgstr ""
+msgstr "Это поле обязательно."
 
 #: .\cart\models.py:23
 msgid "creation date"
@@ -93,7 +93,7 @@ msgstr "скидка"
 
 #: .\cart\models.py:27
 msgid "vat reduction"
-msgstr ""
+msgstr "уменьшение НДС"
 
 #: .\cart\models.py:30 .\cart\models.py:52 .\cart\models.py:106
 msgid "cart"
@@ -211,103 +211,95 @@ msgstr "заказы"
 
 #: .\cart\models.py:196
 msgid "Individual entity"
-msgstr ""
+msgstr "Физическое лицо"
 
 #: .\cart\models.py:197
-#, fuzzy
-#| msgid "quantity"
 msgid "Legal entity"
-msgstr "количество"
+msgstr "Юридическое лицо"
 
 #: .\cart\models.py:203
 msgid "No, take in office"
-msgstr ""
+msgstr "Нет, заберу сам"
 
 #: .\cart\models.py:204
 msgid "Yes"
-msgstr ""
+msgstr "Да"
 
 #: .\cart\models.py:207
 msgid "Person type"
-msgstr ""
+msgstr "Тип лица"
 
 #: .\cart\models.py:210
-#, fuzzy
-#| msgid "client name"
 msgid "first name"
 msgstr "имя"
 
 #: .\cart\models.py:211
-#, fuzzy
-#| msgid "client name"
 msgid "last name"
-msgstr "имя"
+msgstr "фамилия"
 
-#: .\cart\models.py:217
+#: .\cart\models.py:217 .\cart\models.py:231
 msgid "Country"
-msgstr ""
+msgstr "Страна"
 
 #: .\cart\models.py:218
 msgid "Legal name"
-msgstr ""
+msgstr "Название"
 
 #: .\cart\models.py:219
 msgid "Registration number"
-msgstr ""
+msgstr "Рег. номер"
 
 #: .\cart\models.py:220
 msgid "VAT registration number"
-msgstr ""
+msgstr "Номер НДС плательщика"
 
 #: .\cart\models.py:221
 msgid "Juridical address"
-msgstr ""
+msgstr "Юридический адрес"
 
 #: .\cart\models.py:222
-#, fuzzy
-#| msgid "by name"
 msgid "Bank name"
-msgstr "по названию"
+msgstr "Наименование банка"
 
 #: .\cart\models.py:226
 msgid "Is delivery needed"
-msgstr ""
+msgstr "нужна доставка"
 
 #: .\cart\models.py:227
 msgid "Shipping date"
 msgstr ""
 
+#: .\cart\models.py:228 .\cart\models.py:368
+msgid "delivery type"
+msgstr "тип доставки"
+
 #: .\cart\models.py:229
-#, fuzzy
-#| msgid "Delivery"
 msgid "delivery price"
-msgstr "Доставка"
+msgstr "цена доставки"
 
 #: .\cart\models.py:230
-#, fuzzy
-#| msgid "unit price"
 msgid "cart price"
-msgstr "цена за единицу"
+msgstr "сумма корзины"
 
 #: .\cart\models.py:232
 msgid "city"
-msgstr ""
+msgstr "город"
 
 #: .\cart\models.py:233
 msgid "street"
-msgstr ""
+msgstr "улица"
 
 #: .\cart\models.py:234
 msgid "house"
-msgstr ""
+msgstr "дом"
 
 #: .\cart\models.py:235
 msgid "flat"
-msgstr ""
+msgstr "квартира"
 
 #: .\cart\models.py:236
 msgid "zip"
-msgstr ""
+msgstr "почтовый индекс"
 
 #: .\cart\models.py:306
 msgid "Nothing to do"
@@ -322,10 +314,8 @@ msgid "Take tax off a cart price if legal entity with VAT"
 msgstr ""
 
 #: .\cart\models.py:310
-#, fuzzy
-#| msgid "product name"
 msgid "Country name"
-msgstr "название товара"
+msgstr "Название страны"
 
 #: .\cart\models.py:312
 msgid "VAT behavior reason, if reduce"
@@ -344,20 +334,16 @@ msgid "Country 2 symbols ISO code"
 msgstr ""
 
 #: .\cart\models.py:315
-#, fuzzy
-#| msgid "description"
 msgid "Position"
-msgstr "описание"
+msgstr "Позиция"
 
 #: .\cart\models.py:323
 msgid "delivery country"
-msgstr ""
+msgstr "страна доставки"
 
 #: .\cart\models.py:324
-#, fuzzy
-#| msgid "discount price"
 msgid "delivery countries"
-msgstr "скидочная цена"
+msgstr "страны доставки"
 
 #: .\cart\models.py:357
 msgid "Amount of the items quantity"
@@ -368,10 +354,8 @@ msgid "Amount of the order price"
 msgstr ""
 
 #: .\cart\models.py:361
-#, fuzzy
-#| msgid "client name"
 msgid "Delivery type name"
-msgstr "имя"
+msgstr "Название типа доставки"
 
 #: .\cart\models.py:363
 msgid "Estimated time"
@@ -381,17 +365,9 @@ msgstr ""
 msgid "Delivery calculation"
 msgstr ""
 
-#: .\cart\models.py:368
-#, fuzzy
-#| msgid "Delivery"
-msgid "delivery type"
-msgstr "Доставка"
-
 #: .\cart\models.py:369
-#, fuzzy
-#| msgid "Delivery"
 msgid "delivery types"
-msgstr "Доставка"
+msgstr "типы доставки"
 
 #: .\cart\models.py:450
 #, fuzzy
@@ -413,7 +389,7 @@ msgstr ""
 
 #: .\cart\views.py:36
 msgid "Wrong product."
-msgstr "Неправильный товар"
+msgstr "Неправильный товар."
 
 #: .\cart\views.py:46 .\cart\views.py:56 .\cart\views.py:93
 #, python-format
@@ -634,7 +610,7 @@ msgstr "следующие товары будут привязаны к кат�
 
 #: .\templates\qshop\admin\actions\set_discount.html:5
 msgid "set discount by"
-msgstr "Установить скидки в процентах"
+msgstr "установить скидки в процентах"
 
 #: .\templates\qshop\admin\actions\set_discount.html:12
 #, python-format

@@ -2,13 +2,13 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
-#
+# 
 msgid ""
 msgstr ""
 "Project-Id-Version: svmebeles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-09-12 00:54+0300\n"
-"PO-Revision-Date: 2018-09-12 01:02+0300\n"
+"POT-Creation-Date: 2018-09-12 01:25+0300\n"
+"PO-Revision-Date: 2018-09-12 01:25+0300\n"
 "Last-Translator: alexey <alexey@trialine.lv>\n"
 "Language-Team: qt <a@trialine.lv>\n"
 "Language: lv\n"
@@ -236,7 +236,7 @@ msgstr "vārds"
 msgid "last name"
 msgstr "uzvārds"
 
-#: .\cart\models.py:217
+#: .\cart\models.py:217 .\cart\models.py:231
 msgid "Country"
 msgstr "Valsts"
 
@@ -267,6 +267,10 @@ msgstr "Ir vajadzīga piegāde"
 #: .\cart\models.py:227
 msgid "Shipping date"
 msgstr "Piegādes datums"
+
+#: .\cart\models.py:228 .\cart\models.py:368
+msgid "delivery type"
+msgstr "piegādes tips"
 
 #: .\cart\models.py:229
 msgid "delivery price"
@@ -334,7 +338,7 @@ msgstr "Kārtas numurs"
 
 #: .\cart\models.py:323
 msgid "delivery country"
-msgstr ""
+msgstr "valsts"
 
 #: .\cart\models.py:324
 #, fuzzy
@@ -361,10 +365,6 @@ msgstr ""
 #: .\cart\models.py:364
 msgid "Delivery calculation"
 msgstr ""
-
-#: .\cart\models.py:368
-msgid "delivery type"
-msgstr "piegādes tips"
 
 #: .\cart\models.py:369
 msgid "delivery types"

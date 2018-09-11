@@ -225,10 +225,10 @@ class OrderExtendedAbstractDefault(OrderAbstract):
     # SHIPPING
     is_delivery = models.SmallIntegerField(_('Is delivery needed'), choices=DELIVERY_CHOICES, default=DELIVERY_NO)
     shipping_date = models.DateField(_('Shipping date'), blank=True, null=True)
-    delivery_type = models.ForeignKey('DeliveryType', related_name="delivery_typ", blank=True, null=True, on_delete=models.SET_NULL)
+    delivery_type = models.ForeignKey('DeliveryType', verbose_name=_('delivery type'), related_name="delivery_typ", blank=True, null=True, on_delete=models.SET_NULL)
     delivery_price = models.DecimalField(max_digits=12, decimal_places=2, verbose_name=_('delivery price'), null=True, blank=True)
     cart_price = models.DecimalField(max_digits=12, decimal_places=2, verbose_name=_('cart price'), null=True)
-    delivery_country = models.ForeignKey('DeliveryCountry', related_name="delivery_cntr", blank=True, null=True, on_delete=models.SET_NULL)
+    delivery_country = models.ForeignKey('DeliveryCountry', verbose_name=_('Country'), related_name="delivery_cntr", blank=True, null=True, on_delete=models.SET_NULL)
     delivery_city = models.CharField(_('city'), max_length=128, blank=True, null=True)
     delivery_street = models.CharField(_('street'), max_length=128, blank=True, null=True)
     delivery_house = models.CharField(_('house'), max_length=128, blank=True, null=True)
