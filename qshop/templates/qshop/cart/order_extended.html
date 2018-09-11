@@ -35,9 +35,12 @@
             {% include 'qshop/cart/_order_field.html' with FIELD=form.iban %}
         </div>
 
-        {% include 'qshop/cart/_order_field.html' with FIELD=form.is_delivery %}
+        {% if form.is_delivery %}
+            {% include 'qshop/cart/_order_field.html' with FIELD=form.is_delivery %}
+        {% endif %}
 
-        <div class="j_delivery_fields{% if form.is_delivery.value != "1" %} block-hide{% endif %}">
+
+        <div class="j_delivery_fields{% if form.is_delivery.value != "1" and form.is_delivery %} block-hide{% endif %}">
             {% include 'qshop/cart/_order_field.html' with FIELD=form.delivery_country %}
             {% include 'qshop/cart/_order_field_options.html' with FIELD=form.delivery_type %}
 

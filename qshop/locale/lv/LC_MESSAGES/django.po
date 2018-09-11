@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: svmebeles\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-04-19 18:30+0300\n"
-"PO-Revision-Date: 2016-04-19 18:31+0300\n"
+"POT-Creation-Date: 2018-09-12 00:54+0300\n"
+"PO-Revision-Date: 2018-09-12 01:02+0300\n"
 "Last-Translator: alexey <alexey@trialine.lv>\n"
 "Language-Team: qt <a@trialine.lv>\n"
 "Language: lv\n"
@@ -17,378 +17,572 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : "
 "2);\n"
-"X-Generator: Poedit 1.8.6\n"
+"X-Generator: Poedit 2.0.4\n"
 
-#: admin.py:170
+#: .\admin.py:169
+#, python-brace-format
 msgid "Successfully linked products to '{0}'."
 msgstr "Prces veiksmīgi saistītas ar '{0}'."
 
-#: admin.py:180
+#: .\admin.py:179
 msgid "Link to category"
 msgstr "Saite uz kategoriju"
 
-#: admin.py:193
+#: .\admin.py:192
+#, python-brace-format
 msgid "Successfully unlinked products from '{0}'."
 msgstr "Preces veiksmīgi atsaistīti no '{0}'."
 
-#: admin.py:203
+#: .\admin.py:202
 msgid "Unlink from category"
 msgstr "Atsaistīt no kategorijām"
 
-#: admin.py:223
+#: .\admin.py:222
 msgid "Successfully changed prices."
 msgstr "Cenas veiksmīgi nomainītas."
 
-#: admin.py:233
+#: .\admin.py:232
 msgid "Change price by percent"
 msgstr "Mainīt cenu procentuāli"
 
-#: admin.py:252
+#: .\admin.py:251
 msgid "Successfully set discounts."
 msgstr "Atlaides veiksmīgi uzstadītas."
 
-#: admin.py:262
+#: .\admin.py:261
 msgid "Set discount by percent"
 msgstr "Uzstādīt atlaidi procentuāli"
 
-#: admin_filters.py:11
+#: .\admin_filters.py:11
 msgid "product category"
 msgstr "preces kategorija"
 
-#: admin_forms.py:44
+#: .\admin_forms.py:44
 msgid "Percents"
 msgstr "Procenti"
 
-#: cart/forms.py:31
+#: .\cart\forms.py:35 .\cart\models.py:272
 #, python-format
 msgid "Your order %s accepted"
 msgstr "Jūsu pasūtījums %s pieņemts"
 
-#: cart/models.py:22
+#: .\cart\forms.py:158
+msgid "This delivery type cannot deliver to choosed country"
+msgstr "Jūsu izvēlētā valstī nevar nodrošināt šo piegādes veidu"
+
+#: .\cart\forms.py:174
+msgid "This field is required."
+msgstr "Šīs laukums ir obligāts."
+
+#: .\cart\models.py:23
 msgid "creation date"
 msgstr "izveides datums"
 
-#: cart/models.py:23
+#: .\cart\models.py:24
 msgid "modification date"
 msgstr "modificēšanas datums"
 
-#: cart/models.py:24
+#: .\cart\models.py:25
 msgid "checked out"
 msgstr "pasūtīt"
 
-#: cart/models.py:25
+#: .\cart\models.py:26
 msgid "discount"
 msgstr "atlaide"
 
-#: cart/models.py:28 cart/models.py:50 cart/models.py:104
+#: .\cart\models.py:27
+msgid "vat reduction"
+msgstr "PVN samazinājums"
+
+#: .\cart\models.py:30 .\cart\models.py:52 .\cart\models.py:106
 msgid "cart"
 msgstr "grozs"
 
-#: cart/models.py:29
+#: .\cart\models.py:31
 msgid "carts"
 msgstr "grozi"
 
-#: cart/models.py:51
+#: .\cart\models.py:53
 msgid "quantity"
 msgstr "daudzums"
 
-#: cart/models.py:52
+#: .\cart\models.py:54
 msgid "unit price"
 msgstr "vienības cena"
 
-#: cart/models.py:59
+#: .\cart\models.py:61
 msgid "item"
 msgstr "prece"
 
-#: cart/models.py:60
+#: .\cart\models.py:62
 msgid "items"
 msgstr "preces"
 
-#: cart/models.py:95
+#: .\cart\models.py:97
 msgid "New"
 msgstr "Jauns"
 
-#: cart/models.py:96
+#: .\cart\models.py:98
 msgid "In Progress"
 msgstr "Progresā"
 
-#: cart/models.py:97
+#: .\cart\models.py:99
 msgid "Completed"
 msgstr "Pabeigts"
 
-#: cart/models.py:98
+#: .\cart\models.py:100
 msgid "Canceled"
 msgstr "Atcelts"
 
-#: cart/models.py:101 models.py:90
+#: .\cart\models.py:103 .\models.py:93
 msgid "date added"
 msgstr "pievienošanas datums"
 
-#: cart/models.py:102
+#: .\cart\models.py:104
 msgid "status"
 msgstr "status"
 
-#: cart/models.py:103
+#: .\cart\models.py:105
 msgid "manager comments"
 msgstr "menedžēra komentāri"
 
-#: cart/models.py:105 cart/models.py:133
+#: .\cart\models.py:107 .\cart\models.py:139
 msgid "cart text"
 msgstr "groza teksts"
 
-#: cart/models.py:108
+#: .\cart\models.py:110
 msgid "paid"
 msgstr "apmaksāts"
 
-#: cart/models.py:109
+#: .\cart\models.py:111
 msgid "paid log"
 msgstr ""
 
-#: cart/models.py:110
+#: .\cart\models.py:113
 msgid "payment method"
 msgstr "apmaksas veids"
 
-#: cart/models.py:111
+#: .\cart\models.py:117
 msgid "payment id"
 msgstr ""
 
-#: cart/models.py:114
+#: .\cart\models.py:120
 msgid "client order"
 msgstr "klienta pasūtījums"
 
-#: cart/models.py:115
+#: .\cart\models.py:121
 msgid "client orders"
 msgstr "klienta pasūtījumi"
 
-#: cart/models.py:125
+#: .\cart\models.py:131
 #, python-format
 msgid "Order Nr. %s"
 msgstr "Pasūtījuma Nr. %s"
 
-#: cart/models.py:160
+#: .\cart\models.py:166
 msgid "client name"
 msgstr "vārds"
 
-#: cart/models.py:161
+#: .\cart\models.py:167 .\cart\models.py:212
 msgid "phone"
 msgstr "telefons"
 
-#: cart/models.py:162
+#: .\cart\models.py:168 .\cart\models.py:213
 msgid "email"
 msgstr "e-pasts"
 
-#: cart/models.py:163
+#: .\cart\models.py:169
 msgid "address"
 msgstr "adrese"
 
-#: cart/models.py:164 cart/models.py:179
+#: .\cart\models.py:172 .\cart\models.py:187 .\cart\models.py:214
+#: .\cart\models.py:262
 msgid "comments"
 msgstr "komentāri"
 
-#: cart/models.py:168
+#: .\cart\models.py:176 .\cart\models.py:240
 msgid "order"
 msgstr "šķīrošana"
 
-#: cart/models.py:169
+#: .\cart\models.py:177 .\cart\models.py:241
 msgid "orders"
 msgstr "pasūtījumi"
 
-#: cart/views.py:45
+#: .\cart\models.py:196
+msgid "Individual entity"
+msgstr "Fiziska persona"
+
+#: .\cart\models.py:197
+msgid "Legal entity"
+msgstr "Juridiska persona"
+
+#: .\cart\models.py:203
+msgid "No, take in office"
+msgstr "Nē, paņemšu uz vietas"
+
+#: .\cart\models.py:204
+msgid "Yes"
+msgstr "Jā"
+
+#: .\cart\models.py:207
+msgid "Person type"
+msgstr "Personas tips"
+
+#: .\cart\models.py:210
+msgid "first name"
+msgstr "vārds"
+
+#: .\cart\models.py:211
+msgid "last name"
+msgstr "uzvārds"
+
+#: .\cart\models.py:217
+msgid "Country"
+msgstr "Valsts"
+
+#: .\cart\models.py:218
+msgid "Legal name"
+msgstr "Nosaukums"
+
+#: .\cart\models.py:219
+msgid "Registration number"
+msgstr "Reģistrācijas numurs"
+
+#: .\cart\models.py:220
+msgid "VAT registration number"
+msgstr "PVN reģistrācijas numurs"
+
+#: .\cart\models.py:221
+msgid "Juridical address"
+msgstr "Juridiskā adrese"
+
+#: .\cart\models.py:222
+msgid "Bank name"
+msgstr "Bankas nosaukums"
+
+#: .\cart\models.py:226
+msgid "Is delivery needed"
+msgstr "Ir vajadzīga piegāde"
+
+#: .\cart\models.py:227
+msgid "Shipping date"
+msgstr "Piegādes datums"
+
+#: .\cart\models.py:229
+msgid "delivery price"
+msgstr "piegādes cena"
+
+#: .\cart\models.py:230
+msgid "cart price"
+msgstr "groza summa"
+
+#: .\cart\models.py:232
+msgid "city"
+msgstr "pilsēta"
+
+#: .\cart\models.py:233
+msgid "street"
+msgstr "iela"
+
+#: .\cart\models.py:234
+msgid "house"
+msgstr "māja"
+
+#: .\cart\models.py:235
+msgid "flat"
+msgstr "dzīvoklis"
+
+#: .\cart\models.py:236
+msgid "zip"
+msgstr "pasta indekss"
+
+#: .\cart\models.py:306
+msgid "Nothing to do"
+msgstr ""
+
+#: .\cart\models.py:307
+msgid "Take tax off a cart price"
+msgstr ""
+
+#: .\cart\models.py:308
+msgid "Take tax off a cart price if legal entity with VAT"
+msgstr ""
+
+#: .\cart\models.py:310
+msgid "Country name"
+msgstr "Valsts nosaukums"
+
+#: .\cart\models.py:312
+msgid "VAT behavior reason, if reduce"
+msgstr ""
+
+#: .\cart\models.py:313
+msgid "Can draw up an invoice?"
+msgstr ""
+
+#: .\cart\models.py:313
+msgid "If legal entity"
+msgstr ""
+
+#: .\cart\models.py:314
+msgid "Country 2 symbols ISO code"
+msgstr ""
+
+#: .\cart\models.py:315
+msgid "Position"
+msgstr "Kārtas numurs"
+
+#: .\cart\models.py:323
+msgid "delivery country"
+msgstr ""
+
+#: .\cart\models.py:324
+#, fuzzy
+#| msgid "discount price"
+msgid "delivery countries"
+msgstr "akcijas cena"
+
+#: .\cart\models.py:357
+msgid "Amount of the items quantity"
+msgstr ""
+
+#: .\cart\models.py:358
+msgid "Amount of the order price"
+msgstr ""
+
+#: .\cart\models.py:361
+msgid "Delivery type name"
+msgstr "Piegādes tipa nosaukums"
+
+#: .\cart\models.py:363
+msgid "Estimated time"
+msgstr ""
+
+#: .\cart\models.py:364
+msgid "Delivery calculation"
+msgstr ""
+
+#: .\cart\models.py:368
+msgid "delivery type"
+msgstr "piegādes tips"
+
+#: .\cart\models.py:369
+msgid "delivery types"
+msgstr "piegādes tipi"
+
+#: .\cart\models.py:450
+#, fuzzy
+#| msgid "product variation value"
+msgid "calculation value"
+msgstr "preces variācijas vērtība"
+
+#: .\cart\models.py:451 .\models.py:83 .\models.py:121 .\models.py:255
+msgid "price"
+msgstr "cena"
+
+#: .\cart\models.py:456
+msgid "delivery calculation"
+msgstr ""
+
+#: .\cart\models.py:457
+msgid "delivery calculations"
+msgstr ""
+
+#: .\cart\views.py:36
 msgid "Wrong product."
 msgstr "Nepareiza prece."
 
-#: cart/views.py:54 cart/views.py:62 cart/views.py:97
+#: .\cart\views.py:46 .\cart\views.py:56 .\cart\views.py:93
 #, python-format
 msgid ""
 "Can't add product \"%s\" due to lack in stock. Try to decrease quantity."
 msgstr "Nevar ielikt \"%s\", jo trūkst krājumā. Centieties samazināt daudzumu."
 
-#: cart/views.py:65
+#: .\cart\views.py:60
 #, python-format
 msgid "Product added to <a href=\"%s\">cart</a>."
 msgstr "Prece pievienota <a href=\"%s\">grozām</ a>."
 
-#: cart/views.py:129
+#: .\cart\views.py:137 .\cart\views.py:201
 msgid "Someone already bought product that you are trying to buy."
 msgstr "Kāds jau ir nopircis produktu, kuru jūs gribat iegādāties."
 
-#: models.py:69
+#: .\models.py:72
 msgid "natural"
 msgstr "pēc noklusējuma"
 
-#: models.py:70
+#: .\models.py:73
 msgid "price low to high"
 msgstr "lētas priekšā"
 
-#: models.py:71
+#: .\models.py:74
 msgid "price high to low"
 msgstr "dārgas priekšā"
 
-#: models.py:72
+#: .\models.py:75
 msgid "by name"
 msgstr "pēc nosaukuma"
 
-#: models.py:75
+#: .\models.py:78
 msgid "has variations"
 msgstr "ir variācijas"
 
-#: models.py:76 models.py:287 models.py:319
+#: .\models.py:79 .\models.py:296 .\models.py:328
 msgid "parameters set"
 msgstr "parametru komplekts"
 
-#: models.py:77
+#: .\models.py:80
 msgid "articul"
 msgstr "artikuls"
 
-#: models.py:78
+#: .\models.py:81
 msgid "hidden"
 msgstr "slēpts"
 
-#: models.py:79
+#: .\models.py:82
 msgid "product name"
 msgstr "preces nosaukums"
 
-#: models.py:80 models.py:114 models.py:246
-msgid "price"
-msgstr "cena"
-
-#: models.py:81
+#: .\models.py:84
 msgid "weight"
 msgstr "svars"
 
-#: models.py:82 models.py:247
+#: .\models.py:85 .\models.py:256
 msgid "discount price"
 msgstr "akcijas cena"
 
-#: models.py:83
+#: .\models.py:86
 msgid "description"
 msgstr "apraksts"
 
-#: models.py:84 models.py:268
+#: .\models.py:87 .\models.py:277
 msgid "image"
 msgstr "attēls"
 
-#: models.py:86
+#: .\models.py:89
 msgid "category"
 msgstr "kategorija"
 
-#: models.py:88 models.py:327
+#: .\models.py:91 .\models.py:336
 msgid "parameters"
 msgstr "parametri"
 
-#: models.py:91
+#: .\models.py:94
 msgid "date modified"
 msgstr "rediģēšanas datums"
 
-#: models.py:93 models.py:248 models.py:270 models.py:322 models.py:379
+#: .\models.py:96 .\models.py:257 .\models.py:279 .\models.py:331
+#: .\models.py:388
 msgid "sort"
 msgstr "šķirošana"
 
-#: models.py:96 models.py:244 models.py:269 models.py:364
+#: .\models.py:99 .\models.py:253 .\models.py:278 .\models.py:373
 msgid "product"
 msgstr "prece"
 
-#: models.py:97
+#: .\models.py:100
 msgid "products"
 msgstr "preces"
 
-#: models.py:103
+#: .\models.py:106
+#, python-brace-format
 msgid "[hidden] {0} (articul: {1})"
 msgstr "[slēpts] {0} (artikuls: {1})"
 
-#: models.py:105
+#: .\models.py:108
+#, python-brace-format
 msgid "{0} (articul: {1})"
 msgstr "{0} (artikuls: {1})"
 
-#: models.py:228 models.py:284 models.py:320
+#: .\models.py:237 .\models.py:293 .\models.py:329
 msgid "title"
 msgstr "virsraksts"
 
-#: models.py:231 models.py:245
+#: .\models.py:240 .\models.py:254
 msgid "product variation value"
 msgstr "preces variācijas vērtība"
 
-#: models.py:232
+#: .\models.py:241
 msgid "product variation values"
 msgstr "preces variācijas vērtības"
 
-#: models.py:251
+#: .\models.py:260
 msgid "product variation"
 msgstr "preces variācija"
 
-#: models.py:252
+#: .\models.py:261
 msgid "product variations"
 msgstr "preces variācijas"
 
-#: models.py:273
+#: .\models.py:282
 msgid "product image"
 msgstr "preces attēls"
 
-#: models.py:274
+#: .\models.py:283
 msgid "product images"
 msgstr "preces attēli"
 
-#: models.py:288
+#: .\models.py:297
 msgid "parameters sets"
 msgstr "parametru komplekti"
 
-#: models.py:321
+#: .\models.py:330
 msgid "is filter"
 msgstr "ir filtrs"
 
-#: models.py:326 models.py:346 models.py:365
+#: .\models.py:335 .\models.py:355 .\models.py:374
 msgid "parameter"
 msgstr "parametrs"
 
-#: models.py:347 models.py:355
+#: .\models.py:356 .\models.py:364
 msgid "parameter value"
 msgstr "parametra vērtība"
 
-#: models.py:356
+#: .\models.py:365
 msgid "parameter values"
 msgstr "parametra vērtības"
 
-#: models.py:376
+#: .\models.py:385
 msgid "code"
 msgstr "kods"
 
-#: models.py:377
+#: .\models.py:386
 msgid "currency name"
 msgstr "valūtas nosaukums"
 
-#: models.py:378
+#: .\models.py:387
 msgid "rate"
 msgstr "likme"
 
-#: models.py:380
+#: .\models.py:389
 msgid "show string"
 msgstr "radīšanas formāts"
 
-#: models.py:381
+#: .\models.py:390
 msgid "is default"
 msgstr "pēc noklusējuma"
 
-#: models.py:386
+#: .\models.py:395
 msgid "currency"
 msgstr "valūta"
 
-#: models.py:387
+#: .\models.py:396
 msgid "currencies"
 msgstr "valūtas"
 
-#: qshop_settings.py:39
+#: .\qshop_settings.py:56
 msgid "[qShop] "
 msgstr "[qShop] "
 
-#: qshop_settings.py:65 templates/qshop/cart/cart.html.py:19
+#: .\qshop_settings.py:82 .\templates\qshop\cart\cart.html:19
 msgid "Variation"
 msgstr "Variācija"
 
-#: templates/qshop/admin/actions/change_price.html:5
+#: .\templates\qshop\admin\actions\change_price.html:5
 msgid "change price by"
 msgstr "mainīt cenu par"
 
-#: templates/qshop/admin/actions/change_price.html:12
+#: .\templates\qshop\admin\actions\change_price.html:12
 #, python-format
 msgid ""
 "<p>If 10 is entered, then price for all selected products increases by 10%%. "
@@ -399,25 +593,25 @@ msgstr ""
 "10 %% . . Par produktu ar cenu 200 jaunā cena būs 220 </ p> Negatīvi skaitļi "
 "samazinās cenu </ p> tiks piemēroti. </ P>"
 
-#: templates/qshop/admin/actions/change_price.html:22
-#: templates/qshop/admin/actions/link_to_category.html:21
-#: templates/qshop/admin/actions/set_discount.html:21
+#: .\templates\qshop\admin\actions\change_price.html:22
+#: .\templates\qshop\admin\actions\link_to_category.html:21
+#: .\templates\qshop\admin\actions\set_discount.html:21
 msgid "apply"
 msgstr "saglabāt"
 
-#: templates/qshop/admin/actions/link_to_category.html:5
+#: .\templates\qshop\admin\actions\link_to_category.html:5
 msgid "select category to apply"
 msgstr "izvēlieties kategoriju, kam piemērot"
 
-#: templates/qshop/admin/actions/link_to_category.html:12
+#: .\templates\qshop\admin\actions\link_to_category.html:12
 msgid "category will be applied to"
 msgstr "kategorija tiks piemērota"
 
-#: templates/qshop/admin/actions/set_discount.html:5
+#: .\templates\qshop\admin\actions\set_discount.html:5
 msgid "set discount by"
 msgstr "atlaide procentos"
 
-#: templates/qshop/admin/actions/set_discount.html:12
+#: .\templates\qshop\admin\actions\set_discount.html:12
 #, python-format
 msgid ""
 "<p>If 10 is entered, then discount price for all products will be 90%% of "
@@ -428,107 +622,113 @@ msgstr ""
 "cenas. .. Par produktu ar cenu 200 atlaidi cena būs 180 </ p> Ievadiet 0, "
 "lai novērstu atlaidēm </ p> Tiks piemērota: </ p>"
 
-#: templates/qshop/admin/actions/unlink_from_category.html:5
+#: .\templates\qshop\admin\actions\unlink_from_category.html:5
 msgid "select category to unlink"
 msgstr "izvēlieties kategoriju, lai atsaistītu"
 
-#: templates/qshop/admin/actions/unlink_from_category.html:12
+#: .\templates\qshop\admin\actions\unlink_from_category.html:12
 msgid "category will be unlinked from"
 msgstr "kategorija tiks izņemta no"
 
-#: templates/qshop/cart/_cart_as_table.html:5
+#: .\templates\qshop\cart\_cart_as_table.html:5
 msgid "Product"
 msgstr "Produkts"
 
-#: templates/qshop/cart/_cart_as_table.html:6
-#: templates/qshop/cart/_cart_as_table.html:42
-#: templates/qshop/cart/cart.html:22
+#: .\templates\qshop\cart\_cart_as_table.html:6
+#: .\templates\qshop\cart\_cart_as_table.html:52
+#: .\templates\qshop\cart\cart.html:22
 msgid "Price"
 msgstr "Cena"
 
-#: templates/qshop/cart/_cart_as_table.html:7 templates/qshop/cart/cart.html:20
+#: .\templates\qshop\cart\_cart_as_table.html:7
+#: .\templates\qshop\cart\cart.html:20
 msgid "Qty"
 msgstr "Daudz"
 
-#: templates/qshop/cart/_cart_as_table.html:8 templates/qshop/cart/cart.html:23
+#: .\templates\qshop\cart\_cart_as_table.html:8
+#: .\templates\qshop\cart\cart.html:23
 msgid "Sum"
 msgstr "Summa"
 
-#: templates/qshop/cart/_cart_as_table.html:29
+#: .\templates\qshop\cart\_cart_as_table.html:29
 msgid "Original Price"
 msgstr "Parasta cena"
 
-#: templates/qshop/cart/_cart_as_table.html:33
-#: templates/qshop/cart/cart.html:21
+#: .\templates\qshop\cart\_cart_as_table.html:36
+#: .\templates\qshop\cart\cart.html:21
 msgid "Discount"
 msgstr "Atlaide"
 
-#: templates/qshop/cart/_cart_as_table.html:37
-msgid "Discounted Price"
-msgstr "Akcijas cena"
+#: .\templates\qshop\cart\_cart_as_table.html:44
+msgid "VAT reduction"
+msgstr ""
 
-#: templates/qshop/cart/_cart_as_table.html:47
+#: .\templates\qshop\cart\_cart_as_table.html:61
 msgid "Delivery"
 msgstr "Piegāde"
 
-#: templates/qshop/cart/_cart_as_table.html:51
-#: templates/qshop/cart/cart.html:58
+#: .\templates\qshop\cart\_cart_as_table.html:67
+#: .\templates\qshop\cart\cart.html:58
 msgid "Total price"
 msgstr "Kopējā summa"
 
-#: templates/qshop/cart/cart.html:10
+#: .\templates\qshop\cart\cart.html:10
 msgid "Cart is empty"
 msgstr "Grozs ir tukšs"
 
-#: templates/qshop/cart/cart.html:17
+#: .\templates\qshop\cart\cart.html:17
 msgid "Product name"
 msgstr "Produkta nosaukums"
 
-#: templates/qshop/cart/cart.html:18
+#: .\templates\qshop\cart\cart.html:18
 msgid "SKU"
 msgstr "SKU"
 
-#: templates/qshop/cart/cart.html:40
+#: .\templates\qshop\cart\cart.html:40
 msgid "remove"
 msgstr "dzēst"
 
-#: templates/qshop/cart/cart.html:64
+#: .\templates\qshop\cart\cart.html:64
 msgid "Make Order"
 msgstr "Veikt pasūtījumu"
 
-#: templates/qshop/cart/order.html:19
+#: .\templates\qshop\cart\order.html:19
+#: .\templates\qshop\cart\order_extended.html:65
 msgid "Process order"
 msgstr "Pabeigt pasūtījumu"
 
-#: templates/qshop/cart/order_cancelled.html:6
+#: .\templates\qshop\cart\order_cancelled.html:6
 msgid "You cancelled payment!"
 msgstr "Jūs atcelat maksājumu!"
 
-#: templates/qshop/cart/order_error.html:6
+#: .\templates\qshop\cart\order_error.html:6
 msgid "Error while paying!"
 msgstr "Maksāšanas kļūda!"
 
-#: templates/qshop/cart/order_error.html:7
+#: .\templates\qshop\cart\order_error.html:7
 msgid "You didn't buy products"
 msgstr "Jūs neiegadajāties preces"
 
-#: templates/qshop/cart/order_success.html:6
+#: .\templates\qshop\cart\order_success.html:6
 msgid "Thank You for Your purchase!"
 msgstr "Paldies par Jūsu pirkumu!"
 
-#: templates/qshop/cart/order_success.html:7
+#: .\templates\qshop\cart\order_success.html:7
 #, python-format
 msgid "Your order Nr. %(num)s confirmed!"
 msgstr "Jūsu pasūtījums Nr. %(num)s apstiprināts!"
 
-#: templates/qshop/payment_vendors/swedbank/redirect_with_post.html:5
-#: templates/qshop/payment_vendors/swedbank/redirect_with_post.html:17
+#: .\templates\qshop\payment_vendors\swedbank\redirect_with_post.html:5
+#: .\templates\qshop\payment_vendors\swedbank\redirect_with_post.html:17
 msgid "Redirecting to payment system"
-msgstr ""
+msgstr "Pāradresācija uz maksājuma sistēmu"
 
-#: templates/qshop/payment_vendors/swedbank/redirect_with_post.html:22
+#: .\templates\qshop\payment_vendors\swedbank\redirect_with_post.html:22
 msgid "Go"
 msgstr "Uz priekšu"
+
+#~ msgid "Discounted Price"
+#~ msgstr "Akcijas cena"
 
 #~ msgid "name"
 #~ msgstr "nosaukums"

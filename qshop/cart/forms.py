@@ -1,4 +1,4 @@
-from qshop.qshop_settings import CART_ORDER_FORM, ENABLE_QSHOP_DELIVERY
+from qshop.qshop_settings import CART_ORDER_FORM, ENABLE_QSHOP_DELIVERY, DELIVERY_REQUIRED
 
 
 if CART_ORDER_FORM:
@@ -77,7 +77,6 @@ else:
                 'iban',
 
                 # delivery
-                'is_delivery',
                 'delivery_country',
                 'delivery_type',
                 'delivery_city',
@@ -86,6 +85,10 @@ else:
                 'delivery_flat',
                 'delivery_zip',
             ]
+
+            if not DELIVERY_REQUIRED:
+                fields.append('is_delivery')
+
             widgets = {
                 'person_type': forms.RadioSelect,
                 'is_delivery': forms.RadioSelect,
@@ -140,7 +143,8 @@ else:
 
             self.refresh_instance_data()
 
-            if is_delivery == self._meta.model.DELIVERY_YES:
+
+            if is_delivery == self._meta.model.DELIVERY_YES or is_delivery is None:
                 self.validate_required_field(data, 'delivery_country')
                 self.validate_required_field(data, 'delivery_type')
                 self.validate_required_field(data, 'delivery_city')
