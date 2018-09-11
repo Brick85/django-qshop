@@ -48,7 +48,7 @@ if ENABLE_QSHOP_DELIVERY:
 
     @admin.register(DeliveryCountry)
     class DeliveryCountryAdmin(getParentClass('ModelAdmin', DeliveryCountry)):
-        list_display = ['title', 'vat_behavior']
+        list_display = ['title', 'vat_behavior', 'can_draw_up_an_invoice']
 
     class DeliveryCalculationInline(admin.TabularInline):
         model = DeliveryCalculation

@@ -292,6 +292,10 @@ class Order(import_item(qshop_settings.CART_ORDER_CLASS) if qshop_settings.CART_
 
 
 if qshop_settings.ENABLE_QSHOP_DELIVERY:
+    class InvoiceManager(models.Manager):
+        def get_queryset(self):
+            return super().get_queryset().filter(can_draw_up_an_invoice=True)
+
     class DeliveryCountryAbstract(models.Model):
         _translation_fields = ['title', 'vat_behavior_reason']
         VAT_NOTHING_TO_DO = 1
@@ -306,6 +310,10 @@ if qshop_settings.ENABLE_QSHOP_DELIVERY:
         title = models.CharField(_('Country name'), max_length=100)
         vat_behavior = models.SmallIntegerField(choices=VAT_BEHAVIOR_CHOICES)
         vat_behavior_reason = models.CharField(_('VAT behavior reason, if reduce'), max_length=200, blank=True, null=True)
+        can_draw_up_an_invoice = models.BooleanField(_('Can draw up an invoice?'), default=True, help_text=_('If legal entity'))
+
+        objects = models.Manager() # The default manager.
+        can_invoicing = InvoiceManager() # The Dahl-specific manager.
 
         class Meta:
             abstract = True

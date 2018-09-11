@@ -39,7 +39,7 @@ elif not ENABLE_QSHOP_DELIVERY:
             return order
 else:
     from django import forms
-    from .models import Order, DeliveryType
+    from .models import Order, DeliveryType, DeliveryCountry
     from ..mails import sendMail
     from django.utils.translation import ugettext as _
 
@@ -112,6 +112,10 @@ else:
             super().__init__(*args, **kwargs)
             self.fields['delivery_type'].empty_label = None
             self.refresh_instance_data()
+            # if any delivery type dont exist in this delivery_country
+            self.fields['delivery_country'].queryset = DeliveryCountry.objects.exclude(deliverytype=None)
+
+            self.fields['country'].queryset = DeliveryCountry.can_invoicing.all()
 
         def refresh_instance_data(self):
             self.instance.cart = self.cart.cart
