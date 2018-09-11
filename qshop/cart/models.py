@@ -312,6 +312,8 @@ if qshop_settings.ENABLE_QSHOP_DELIVERY:
         vat_behavior_reason = models.CharField(_('VAT behavior reason, if reduce'), max_length=200, blank=True, null=True)
         can_draw_up_an_invoice = models.BooleanField(_('Can draw up an invoice?'), default=True, help_text=_('If legal entity'))
         iso2_code = models.CharField(_('Country 2 symbols ISO code'), max_length=2)
+        sort_order = models.SmallIntegerField(_('Position'), default=0)
+
 
         objects = models.Manager() # The default manager.
         can_invoicing = InvoiceManager() # The Dahl-specific manager.
@@ -320,6 +322,7 @@ if qshop_settings.ENABLE_QSHOP_DELIVERY:
             abstract = True
             verbose_name = _('delivery country')
             verbose_name_plural = _('delivery countries')
+            ordering = ["sort_order", "title"]
 
         def __str__(self):
             return str(self.title)

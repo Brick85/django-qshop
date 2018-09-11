@@ -48,7 +48,8 @@ if ENABLE_QSHOP_DELIVERY:
 
     @admin.register(DeliveryCountry)
     class DeliveryCountryAdmin(getParentClass('ModelAdmin', DeliveryCountry)):
-        list_display = ['title', 'iso2_code',  'vat_behavior', 'can_draw_up_an_invoice']
+        list_display = ['title', 'iso2_code',  'vat_behavior', 'can_draw_up_an_invoice', 'sort_order']
+        list_editable = ['sort_order']
 
     class DeliveryCalculationInline(admin.TabularInline):
         model = DeliveryCalculation
