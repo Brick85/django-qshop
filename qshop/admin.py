@@ -41,6 +41,18 @@ if 'tinymce' in settings.INSTALLED_APPS:
     qshop_formfield_overrides = {
         models.TextField: {'widget': AdminTinyMCE},
     }
+elif 'ckeditor_uploader' in settings.INSTALLED_APPS:
+    from django.db import models
+    from ckeditor_uploader.widgets import CKEditorUploadingWidget
+    qshop_formfield_overrides = {
+        models.TextField: {'widget': CKEditorUploadingWidget},
+    }
+elif 'ckeditor' in settings.INSTALLED_APPS:
+    from django.db import models
+    from ckeditor.widgets import CKEditorWidget
+    qshop_formfield_overrides = {
+        models.TextField: {'widget': CKEditorWidget},
+    }
 else:
     qshop_formfield_overrides = {}
 
