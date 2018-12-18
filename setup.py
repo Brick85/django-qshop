@@ -2,7 +2,7 @@
 from setuptools import setup
 
 setup(name='django-qshop',
-      version='0.2.0',
+      version='0.3.0',
       description='E-commerce for django. Requires django-sitemenu. Beta version.',
       long_description='E-commerce for django. Requires django-sitemenu. Beta version.',
       author='Vital Belikov',
@@ -19,6 +19,6 @@ setup(name='django-qshop',
                    'License :: OSI Approved :: BSD License',
                    'Natural Language :: English',
                    'Operating System :: Unix',
-                   'Programming Language :: Python :: 2.7',
+                   'Programming Language :: Python :: 3.6',
                    'Topic :: Utilities'],
       license='New BSD')
