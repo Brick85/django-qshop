@@ -2,7 +2,7 @@ from django.shortcuts import render, get_object_or_404
 from .functions import get_products_page_data
 from .classes import CategoryData
 from .models import Product, Currency
-from django.http import HttpResponsePermanentRedirect, HttpResponseRedirect, Http404
+from django.http import HttpResponseRedirect, Http404
 
 
 def render_shopspage(request, menu, url_add, products=None):
@@ -41,7 +41,7 @@ def render_shopspage(request, menu, url_add, products=None):
 
 def redirect_to_product(request, product_id):
     product = get_object_or_404(Product, pk=product_id)
-    return HttpResponsePermanentRedirect(product.get_absolute_url_slow())
+    return HttpResponseRedirect(product.get_absolute_url_slow())
 
 
 def set_currency(request, currency_code=None):
