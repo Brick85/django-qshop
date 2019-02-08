@@ -4,7 +4,7 @@ from .models import (
     Parameter, ProductToParameter, ParameterValue
 )
 
-from .admin_forms import ProductToParameterFormset, CategoryForm, PriceForm, ProductAdminForm
+from .admin_forms import ProductToParameterFormset, CategoryForm, PriceForm, ProductAdminForm, ProductToParameterForm
 from .admin_filters import ProductCategoryListFilter
 
 from django.conf import settings
@@ -77,14 +77,14 @@ class ProductImageInline(getParentClass('TabularInline', ProductImage)):
 
 class ProductToParameterInline(getParentClass('TabularInline', ProductToParameter)):
     model = ProductToParameter
-    # formset = ProductToTypeFieldFormset
     extra = 0
     can_delete = False
-    readonly_fields = ('parameter',)
+    form = ProductToParameterForm
     formset = ProductToParameterFormset
+    readonly_fields = ('get_parameter_name',)
     fieldsets = (
         (None, {
-            'fields': ('parameter', 'value'),
+            'fields': ('get_parameter_name', 'parameter', 'value'),
         }),
     )
 
@@ -93,6 +93,11 @@ class ProductToParameterInline(getParentClass('TabularInline', ProductToParamete
 
     def get_queryset(self, request):
         return super(ProductToParameterInline).get_queryset(request).select_related('parameter')
+
+    def get_parameter_name(self, obj=None):
+        if obj:
+            return obj.parameter
+    get_parameter_name.short_description = 'Parameter'
 
 
 class ProductAdmin(getParentClass('ModelAdmin', Product)):
