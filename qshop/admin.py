@@ -92,7 +92,8 @@ class ProductToParameterInline(getParentClass('TabularInline', ProductToParamete
         return False
 
     def get_queryset(self, request):
-        return super(ProductToParameterInline).get_queryset(request).select_related('parameter')
+        # TODO: move to Python 3.x syntax super()
+        return super(ProductToParameterInline, self).get_queryset(request).select_related('parameter')
 
     def get_parameter_name(self, obj=None):
         if obj:
