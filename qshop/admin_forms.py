@@ -33,7 +33,7 @@ class ProductToParameterFormset(BaseInlineFormSet):
 class ProductToParameterForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(ProductToParameterForm, self).__init__(*args, **kwargs)
-        self.fields['parameter'].widget = forms.HiddenInput()
+        self.fields['parameter'].widget = forms.HiddenInput(attrs={'class': 'j_parameter_id'})
 
 
 class CategoryForm(forms.Form):
