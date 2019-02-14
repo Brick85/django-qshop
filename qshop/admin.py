@@ -15,6 +15,7 @@ from sitemenu import import_item
 from sitemenu.sitemenu_settings import MENUCLASS
 from decimal import Decimal
 from django.utils.translation import ugettext_lazy as _
+from django.utils.datastructures import MultiValueDictKeyError
 
 Menu = import_item(MENUCLASS)
 
@@ -132,7 +133,7 @@ class ProductAdmin(getParentClass('ModelAdmin', Product)):
                             try:
                                 if int(request.POST['producttoparameter_set-{0}-parameter'.format(i)]) == parameter.pk:
                                     ptp.value_id = int(request.POST['producttoparameter_set-{0}-value'.format(i)])
-                            except ValueError:
+                            except (KeyError, MultiValueDictKeyError):
                                 pass
                     ptp.save()
 
