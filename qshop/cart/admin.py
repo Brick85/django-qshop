@@ -31,7 +31,6 @@ if not CART_ORDER_CUSTOM_ADMIN and not ENABLE_QSHOP_DELIVERY:
 
 if 'modeltranslation' in settings.INSTALLED_APPS:
     from modeltranslation.admin import TranslationAdmin, TranslationTabularInline, TranslationStackedInline
-    from qshop.admin import getParentClass
 
     USE_TRANSLATION = True
     parent_classes_translation = {
@@ -45,6 +44,7 @@ else:
 
 if ENABLE_QSHOP_DELIVERY:
     from .models import DeliveryCountry, DeliveryType, DeliveryCalculation
+    from qshop.admin import getParentClass
 
     @admin.register(DeliveryCountry)
     class DeliveryCountryAdmin(getParentClass('ModelAdmin', DeliveryCountry)):

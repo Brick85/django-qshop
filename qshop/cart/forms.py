@@ -69,6 +69,7 @@ else:
 
                 # legal fields
                 'country',
+                'company_name',
                 'legal_name',
                 'reg_number',
                 'vat_reg_number',
@@ -160,6 +161,7 @@ else:
 
             if person_type == self._meta.model.LEGAL:
                 self.validate_required_field(data, 'country')
+                self.validate_required_field(data, 'company_name')
                 self.validate_required_field(data, 'legal_name')
                 self.validate_required_field(data, 'reg_number')
                 self.validate_required_field(data, 'juridical_address')

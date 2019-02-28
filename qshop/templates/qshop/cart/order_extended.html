@@ -27,6 +27,7 @@
 
         <div class="j_legal_fields{% if form.person_type.value != "1" %} block-hide{% endif %}">
             {% include 'qshop/cart/_order_field.html' with FIELD=form.country %}
+            {% include 'qshop/cart/_order_field.html' with FIELD=form.company_name %}
             {% include 'qshop/cart/_order_field.html' with FIELD=form.legal_name %}
             {% include 'qshop/cart/_order_field.html' with FIELD=form.reg_number %}
             {% include 'qshop/cart/_order_field.html' with FIELD=form.vat_reg_number %}

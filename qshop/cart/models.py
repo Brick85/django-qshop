@@ -215,6 +215,7 @@ class OrderExtendedAbstractDefault(OrderAbstract):
 
     # LEGAL ENTITY
     country = models.ForeignKey('DeliveryCountry', verbose_name=_('Country'), on_delete=models.PROTECT, blank=True, null=True)
+    company_name = models.CharField(_('Company name'), max_length=50, null=True, blank=True)
     legal_name = models.CharField(_('Legal name'), max_length=255, null=True, blank=True)
     reg_number = models.CharField(_('Registration number'), max_length=50, null=True, blank=True)
     vat_reg_number = models.CharField(_(u'VAT registration number'), max_length=50, null=True, blank=True)
