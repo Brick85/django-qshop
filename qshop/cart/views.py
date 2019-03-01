@@ -107,7 +107,6 @@ class CartDetailView(TemplateView):
         return context
 
 
-
 class OrderDetailView(CreateView):
     form_class = OrderForm
     template_name = 'qshop/cart/order_extended.html'
@@ -141,22 +140,23 @@ class OrderDetailView(CreateView):
 
 class AjaxOrderDetailView(OrderDetailView):
     def form_valid(self, form):
-        import ipdb; ipdb.set_trace()
+        pass
 
 
 def cart_order_success(request):
     order_pk = request.session.get('order_pk', None)
     try:
         del request.session['order_pk']
-    except:
+    except Exception:
         pass
     try:
         order = Order.objects.get(pk=order_pk)
-    except:
+    except Exception:
         return HttpResponseRedirect('/')
     return render(request, 'qshop/cart/order_success.html', {
         'order': order,
     })
+
 
 @csrf_exempt
 def cart_order_cancelled(request, order_id=None):

@@ -36,6 +36,10 @@
             {% include 'qshop/cart/_order_field.html' with FIELD=form.iban %}
         </div>
 
+        {% if form.payment_method %}
+            <div>{% include 'qshop/cart/_order_field.html' with FIELD=form.payment_method %}</div>
+        {% endif %}
+
         {% if form.is_delivery %}
             {% include 'qshop/cart/_order_field.html' with FIELD=form.is_delivery %}
         {% endif %}

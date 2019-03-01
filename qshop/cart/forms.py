@@ -1,4 +1,4 @@
-from qshop.qshop_settings import CART_ORDER_FORM, ENABLE_QSHOP_DELIVERY, DELIVERY_REQUIRED
+from qshop.qshop_settings import CART_ORDER_FORM, ENABLE_QSHOP_DELIVERY, DELIVERY_REQUIRED, ENABLE_PAYMENTS
 
 
 if CART_ORDER_FORM:
@@ -12,7 +12,6 @@ elif not ENABLE_QSHOP_DELIVERY:
     from django.utils.translation import ugettext as _
 
     class OrderForm(forms.ModelForm):
-
         class Meta:
             model = Order
             exclude = ('date_added', 'status', 'manager_comments', 'cart', 'cart_text')
@@ -42,7 +41,6 @@ else:
     from .models import Order, DeliveryType, DeliveryCountry
     from ..mails import sendMail
     from django.utils.translation import ugettext as _
-
 
     class DeliveryCountrySelect(forms.Select):
         def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
@@ -87,6 +85,9 @@ else:
                 'delivery_zip',
             ]
 
+            if ENABLE_PAYMENTS:
+                fields.append('payment_method')
+
             if not DELIVERY_REQUIRED:
                 fields.append('is_delivery')
 
@@ -100,13 +101,11 @@ else:
                 })
             }
 
-
         class Media:
             css = {
                 'all': ('qcart.css',)
             }
             js = ('qcart.js',)
-
 
         def __init__(self, *args, **kwargs):
             self.cart = kwargs.pop('cart')
@@ -144,7 +143,6 @@ else:
 
             self.refresh_instance_data()
 
-
             if is_delivery == self._meta.model.DELIVERY_YES or is_delivery is None:
                 self.validate_required_field(data, 'delivery_country')
                 self.validate_required_field(data, 'delivery_type')
@@ -167,7 +165,6 @@ else:
                 self.validate_required_field(data, 'juridical_address')
                 self.validate_required_field(data, 'bank_name')
                 self.validate_required_field(data, 'iban')
-
 
             return data
 

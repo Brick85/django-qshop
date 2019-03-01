@@ -92,7 +92,6 @@ class Item(models.Model):
 
 
 class OrderAbstract(models.Model):
-
     STATUSES = (
         (1, _('New')),
         (2, _('In Progress')),
@@ -112,7 +111,8 @@ class OrderAbstract(models.Model):
         payment_method = models.CharField(
             _('payment method'),
             max_length=16,
-            choices=[(item, _(item)) for item in qshop_settings.PAYMENT_METHODS_ENABLED], default=qshop_settings.PAYMENT_METHODS_ENABLED[0]
+            choices=[(item, _(item)) for item in qshop_settings.PAYMENT_METHODS_ENABLED],
+            default=qshop_settings.PAYMENT_METHODS_ENABLED[0]
         )
         payment_id = models.CharField(_('payment id'), max_length=256, null=True)
 
@@ -167,8 +167,6 @@ class OrderAbstractDefault(OrderAbstract):
     phone = models.CharField(_('phone'), max_length=32, blank=True, null=True)
     email = models.EmailField(_('email'))
     address = models.CharField(_('address'), max_length=128)
-
-
     comments = models.TextField(_('comments'), blank=True, null=True)
 
     class Meta:
@@ -185,7 +183,6 @@ class OrderAbstractDefault(OrderAbstract):
     def get_comments(self):
         return mark_safe("<br />".join(self.comments.split("\n")))
     get_comments.short_description = _('comments')
-
 
 
 class OrderExtendedAbstractDefault(OrderAbstract):
@@ -275,7 +272,6 @@ class OrderExtendedAbstractDefault(OrderAbstract):
             )
         return False
 
-
     @staticmethod
     def get_country_delivery_type_json():
         # json_output = {}
@@ -287,6 +283,7 @@ class OrderExtendedAbstractDefault(OrderAbstract):
 
         # json_output.append(cn);
         return "[{'ad': 'asd'}]"
+
 
 class Order(import_item(qshop_settings.CART_ORDER_CLASS) if qshop_settings.CART_ORDER_CLASS else OrderAbstractDefault):
     pass
@@ -315,8 +312,7 @@ if qshop_settings.ENABLE_QSHOP_DELIVERY:
         iso2_code = models.CharField(_('Country 2 symbols ISO code'), max_length=2)
         sort_order = models.SmallIntegerField(_('Position'), default=0)
 
-
-        objects = models.Manager() # The default manager.
+        objects = models.Manager()  # The default manager.
         can_invoicing = InvoiceManager() # The Dahl-specific manager.
 
         class Meta:
@@ -362,7 +358,11 @@ if qshop_settings.ENABLE_QSHOP_DELIVERY:
         title = models.CharField(_('Delivery type name'), max_length=100)
         delivery_country = models.ManyToManyField('DeliveryCountry')
         estimated_time = models.CharField(_('Estimated time'), max_length=100)
-        delivery_calculation = models.SmallIntegerField(_('Delivery calculation'), choices=PRICING_MODEL_CHOICES, default=FLAT_QTY)
+        delivery_calculation = models.SmallIntegerField(
+            _('Delivery calculation'),
+            choices=PRICING_MODEL_CHOICES,
+            default=FLAT_QTY
+        )
 
         class Meta:
             abstract = True
@@ -386,15 +386,14 @@ if qshop_settings.ENABLE_QSHOP_DELIVERY:
             return mark_safe('<br>'.join(st))
 
         def check_country(self, country):
-            cpk=country
+            cpk = country
 
             if isinstance(country, DeliveryCountry):
-                cpk=country.pk
+                cpk = country.pk
 
             ret = self.delivery_country.filter(pk=cpk).first()
 
             return True if ret else False
-
 
         def get_delivery_calculation(self, cart):
             ret = None
@@ -412,7 +411,6 @@ if qshop_settings.ENABLE_QSHOP_DELIVERY:
 
             return 0
 
-
         @classmethod
         def get_delivery_price_static(cls, delivery_type_pk, country_pk, cart):
             if not delivery_type_pk and not country_pk:
@@ -421,14 +419,12 @@ if qshop_settings.ENABLE_QSHOP_DELIVERY:
             dtype = cls.objects.get(pk=delivery_type_pk)
             return dtype.get_delivery_price(country_pk, cart)
 
-
         def __str__(self):
             return str(self.title)
 
 
     class DeliveryType(import_item(qshop_settings.DELIVERY_TYPE_CLASS) if qshop_settings.DELIVERY_TYPE_CLASS else DeliveryTypeAbstract):
         pass
-
 
     # class DeliveryTypeAddressAbstract(models.Model):
     #     _translation_fields = ['title']
