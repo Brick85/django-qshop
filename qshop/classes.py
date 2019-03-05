@@ -68,7 +68,10 @@ class CategoryData:
             sort = self.sort[1].replace('price', 'min_price')
             products = products.extra(select={'min_price': "IF(`qshop_product`.`discount_price`, `qshop_product`.`discount_price`, `qshop_product`.`price`)"}).order_by(sort)
         else:
-            products = products.order_by(*self.sort[1])
+            sort = self.sort[1]
+            if isinstance(sort, str):
+                sort = (sort,)
+            products = products.order_by(*sort)
 
         products = products.distinct()
 
