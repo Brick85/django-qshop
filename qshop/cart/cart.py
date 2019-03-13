@@ -236,8 +236,9 @@ class Cart:
             del self._count_with_qty
 
     def clear(self):
-        for item in self.cart.item_set:
+        for item in self.cart.item_set.all():
             item.delete()
+        self.clear_cache()
 
     def as_table(self, standalone=False):
         link_add = ''
