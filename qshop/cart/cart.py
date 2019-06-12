@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.conf import settings
 from django.template.loader import render_to_string
 
@@ -42,6 +44,8 @@ class Cart:
         else:
             cart = self.new(request)
         self.cart = cart
+        if qshop_settings.ENABLE_PROMO_CODES and not self.cart.checked_out:
+            self.activate_promo_code()
 
     def __iter__(self):
         for item in self.get_products():
@@ -68,10 +72,11 @@ class Cart:
 
     def total_price(self, in_default_currency=False):
         total_price = self.total_price_wo_discount(in_default_currency)
-
         if self.has_discount():
-            total_price = (100.0 - self.get_discount()) * total_price / 100.0
-
+            if qshop_settings.ENABLE_PROMO_CODES:
+                total_price = Decimal(total_price) - self.get_discount()
+            else:
+                total_price = (100.0 - self.get_discount()) * total_price / 100.0
         if self.has_vat_reduction():
             total_price = (100.0 - self.get_vat_reduction()) * total_price / 100.0
 
@@ -113,6 +118,9 @@ class Cart:
 
     def get_discount(self):
         return self.cart.discount
+
+    def get_fdiscount(self):
+        return Currency.get_fprice(self.get_discount(), format_only=True)
 
     def get_discount_reason(self):
         return self.cart.discount_reason
@@ -277,3 +285,13 @@ class Cart:
     def checkout(self):
         self.cart.checked_out = True
         self.cart.save()
+
+
+    def set_promo_code(self, promo_code):
+        self.cart.promo_code = promo_code
+        self.cart.save()
+
+    def activate_promo_code(self):
+        if self.cart.promo_code:
+            discount = self.cart.promo_code.get_discount(self)
+            self.set_discount(discount, self.cart.promo_code.code)

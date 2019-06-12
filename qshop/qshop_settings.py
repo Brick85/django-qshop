@@ -49,6 +49,9 @@ if ENABLE_QSHOP_DELIVERY:
     if not CART_ORDER_CLASS:
         CART_ORDER_CLASS = 'qshop.cart.models.OrderExtendedAbstractDefault'
 
+# PROMOCODE OPTIONS
+ENABLE_PROMO_CODES = getattr(settings, 'QSHOP_ENABLE_PROMO_CODES', False)
+PROMO_CODE_CLASS = getattr(settings, 'QSHOP_PROMO_CODE_CLASS', False)
 
 MAIL_TYPES = getattr(settings, 'QSHOP_MAIL_TYPES', {
     'order_sended': {

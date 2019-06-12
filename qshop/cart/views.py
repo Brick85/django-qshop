@@ -5,12 +5,12 @@ from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, get_object_or_404
-from django.views.generic import CreateView, TemplateView
+from django.views.generic import CreateView, TemplateView, FormView
+from qshop import qshop_settings
 from .cart import Cart, ItemTooMany
-from ..models import Product
 from .forms import OrderForm
+from ..models import Product
 from .models import Order
-
 
 
 def add_to_cart(request, product_id):
@@ -104,6 +104,7 @@ class CartDetailView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['cart'] = Cart(self.request)
+        context['apply_promo_form'] = ApplyPromoForm()
         return context
 
 
@@ -179,6 +180,7 @@ if CART_ORDER_VIEW:
     from sitemenu import import_item
     qshop_order_view = import_item(CART_ORDER_VIEW)
 
+
 def order_cart(request):
     if CART_ORDER_VIEW:
         return qshop_order_view(request)
@@ -207,3 +209,30 @@ def order_cart(request):
         'cart': cart,
         'order_form': order_form,
     })
+
+
+if qshop_settings.ENABLE_PROMO_CODES:
+    from .forms import ApplyPromoForm
+
+    class ApplyPromoView(FormView):
+        form_class = ApplyPromoForm
+        template_name = 'qshop/cart/cart.html'
+
+        def get_success_url(self):
+            messages.add_message(self.request, messages.INFO, _(u'Promo code applied successfully.'))
+            return reverse('cart')
+
+        def get_context_data(self, **kwargs):
+            kwargs = super(ApplyPromoView, self).get_context_data(**kwargs)
+            kwargs['cart'] = Cart(self.request)
+            kwargs['apply_promo_form'] = kwargs['form']
+            return kwargs
+
+        def get_form_kwargs(self):
+            kwargs = super(ApplyPromoView, self).get_form_kwargs()
+            kwargs['cart'] = Cart(self.request)
+            return kwargs
+
+        def form_valid(self, form):
+            form.cart.set_promo_code(form.promo_code)
+            return super(ApplyPromoView, self).form_valid(form)

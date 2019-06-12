@@ -18,13 +18,18 @@ if qshop_settings.ENABLE_PAYMENTS:
         PAYMENT_CLASSES[item] = import_item(qshop_settings.PAYMENT_METHODS_CLASSES_PATHS[item])
 # Menu = import_item(MENUCLASS)
 
+if qshop_settings.ENABLE_PROMO_CODES:
+    from qshop.models import PromoCode
+
 
 class Cart(models.Model):
     date_added = models.DateTimeField(_('creation date'), auto_now_add=True)
     date_modified = models.DateTimeField(_('modification date'), auto_now=True)
     checked_out = models.BooleanField(default=False, verbose_name=_('checked out'))
-    discount = models.PositiveSmallIntegerField(_('discount'), default=0)
+    discount = models.DecimalField(_('discount'), max_digits=9, decimal_places=2, default=0)
     vat_reduction = models.PositiveSmallIntegerField(_('vat reduction'), default=0)
+    if qshop_settings.ENABLE_PROMO_CODES:
+        promo_code = models.ForeignKey(PromoCode, on_delete=models.SET_NULL, null=True, blank=True, related_name="promocode")
 
     class Meta:
         verbose_name = _('cart')

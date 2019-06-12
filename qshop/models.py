@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.db import models
 from django.conf import settings
 from django.urls import reverse
@@ -11,7 +13,7 @@ from sitemenu import import_item
 from sitemenu.helpers import upload_to_slugify
 from .qshop_settings import (
     PRODUCT_CLASS, VARIATION_CLASS, VARIATION_VALUE_CLASS, PRODUCT_IMAGE_CLASS, PARAMETERS_SET_CLASS,
-    PARAMETER_CLASS, PARAMETER_VALUE_CLASS, PRODUCT_TO_PARAMETER_CLASS, CURRENCY_CLASS, LOAD_ADDITIONAL_MODELS
+    PARAMETER_CLASS, PARAMETER_VALUE_CLASS, PRODUCT_TO_PARAMETER_CLASS, CURRENCY_CLASS, LOAD_ADDITIONAL_MODELS, PROMO_CODE_CLASS
 )
 
 Menu = import_item(MENUCLASS)
@@ -432,6 +434,60 @@ class CurrencyAbstract(models.Model):
     def get_price_notoverloadable(price):
         return float(price) / Currency.get_default_currency().rate
 
+
+class PromoCodeAbstract(models.Model):
+    PERCENT = 0
+    FIXED = 1
+    DISCOUNT_TYPE_CHOICES = (
+        (PERCENT, _('percent')),
+        (FIXED, _('fixed'))
+    )
+
+    is_active = models.BooleanField(_('is active'), default=True)
+    code = models.CharField(_('code'), max_length=50, unique=True)
+    discount = models.DecimalField(_('discount'), max_digits=9, decimal_places=2, default=0)
+    discount_type = models.PositiveSmallIntegerField(_('discount type'), choices=DISCOUNT_TYPE_CHOICES, default=PERCENT)
+    max_discount = models.DecimalField(_('max discount'), max_digits=9, decimal_places=2, default=0)
+    min_sum = models.DecimalField(
+        _('min sum'), max_digits=9, decimal_places=2, default=0, help_text=_('min cart sum to apply discount')
+    )
+
+
+    class Meta:
+        verbose_name = 'Promo Code'
+        verbose_name_plural = 'Promo Codes'
+        abstract = True
+
+    def __str__(self):
+        return self.code
+
+    @property
+    def is_percent_discount(self):
+        return self.discount_type == self.PERCENT
+
+    @property
+    def is_fixed_discount(self):
+        return self.discount_type == self.FIXED
+
+    @staticmethod
+    def find_by_code(code):
+        try:
+            return PromoCode.objects.get(code=code, is_active=True)
+        except PromoCode.DoesNotExist:
+            return None
+
+    def get_discount(self, cart):
+        discount = 0
+        if cart.total_price_wo_discount() > self.min_sum and self.is_active:
+            if self.is_percent_discount:
+                discount = Decimal(cart.total_price_wo_discount()) * self.discount / 100
+            else:
+                discount = self.discount
+            if self.max_discount:
+                if discount > self.max_discount:
+                    discount = self.max_discount
+        return discount
+
 # Create real classes
 
 
@@ -469,6 +525,11 @@ class ProductToParameter(import_item(PRODUCT_TO_PARAMETER_CLASS) if PRODUCT_TO_P
 
 class Currency(import_item(CURRENCY_CLASS) if CURRENCY_CLASS else CurrencyAbstract):
     pass
+
+
+class PromoCode(import_item(PROMO_CODE_CLASS) if PROMO_CODE_CLASS else PromoCodeAbstract):
+    pass
+
 
 if LOAD_ADDITIONAL_MODELS:
     for add_model in LOAD_ADDITIONAL_MODELS:
