@@ -295,3 +295,5 @@ class Cart:
         if self.cart.promo_code:
             discount = self.cart.promo_code.get_discount(self)
             self.set_discount(discount, self.cart.promo_code.code)
+        else:
+            self.set_discount(0)
