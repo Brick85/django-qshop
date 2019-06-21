@@ -104,7 +104,8 @@ class CartDetailView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['cart'] = Cart(self.request)
-        context['apply_promo_form'] = ApplyPromoForm()
+        if qshop_settings.ENABLE_PROMO_CODES:
+            context['apply_promo_form'] = ApplyPromoForm()
         return context
 
 

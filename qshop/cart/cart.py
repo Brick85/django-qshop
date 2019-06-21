@@ -39,13 +39,13 @@ class Cart:
         if cart_id:
             try:
                 cart = models.Cart.objects.get(id=cart_id, checked_out=False)
+                if qshop_settings.ENABLE_PROMO_CODES and not cart.checked_out:
+                    cart.activate_promo_code()
             except models.Cart.DoesNotExist:
                 cart = self.new(request)
         else:
             cart = self.new(request)
         self.cart = cart
-        if qshop_settings.ENABLE_PROMO_CODES and not self.cart.checked_out:
-            self.activate_promo_code()
 
     def __iter__(self):
         for item in self.get_products():
@@ -76,9 +76,9 @@ class Cart:
             if qshop_settings.ENABLE_PROMO_CODES:
                 total_price = Decimal(total_price) - self.get_discount()
             else:
-                total_price = (100.0 - self.get_discount()) * total_price / 100.0
+                total_price = (100 - self.get_discount()) * Decimal(total_price / 100.0)
         if self.has_vat_reduction():
-            total_price = (100.0 - self.get_vat_reduction()) * total_price / 100.0
+            total_price = (100 - self.get_vat_reduction()) * Decimal(total_price / 100.0)
 
         return total_price
 
@@ -290,10 +290,3 @@ class Cart:
     def set_promo_code(self, promo_code):
         self.cart.promo_code = promo_code
         self.cart.save()
-
-    def activate_promo_code(self):
-        if self.cart.promo_code:
-            discount = self.cart.promo_code.get_discount(self)
-            self.set_discount(discount, self.cart.promo_code.code)
-        else:
-            self.set_discount(0)

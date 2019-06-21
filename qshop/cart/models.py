@@ -43,6 +43,13 @@ class Cart(models.Model):
         from .cart import Cart as CartObject
         return CartObject(None, self)
 
+    def activate_promo_code(self):
+        if self.promo_code:
+            self.discount = self.promo_code.get_discount(self.get_cartobject())
+        else:
+            self.discount = 0
+        self.save()
+
 
 class ItemManager(models.Manager):
     def get(self, *args, **kwargs):

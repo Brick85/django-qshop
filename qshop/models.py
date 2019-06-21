@@ -447,7 +447,6 @@ class PromoCodeAbstract(models.Model):
     code = models.CharField(_('code'), max_length=50, unique=True)
     discount = models.DecimalField(_('discount'), max_digits=9, decimal_places=2, default=0)
     discount_type = models.PositiveSmallIntegerField(_('discount type'), choices=DISCOUNT_TYPE_CHOICES, default=PERCENT)
-    max_discount = models.DecimalField(_('max discount'), max_digits=9, decimal_places=2, default=0)
     min_sum = models.DecimalField(
         _('min sum'), max_digits=9, decimal_places=2, default=0, help_text=_('min cart sum to apply discount')
     )
@@ -483,9 +482,6 @@ class PromoCodeAbstract(models.Model):
                 discount = Decimal(cart.total_price_wo_discount()) * self.discount / 100
             else:
                 discount = self.discount
-            if self.max_discount:
-                if discount > self.max_discount:
-                    discount = self.max_discount
         return discount
 
 # Create real classes
