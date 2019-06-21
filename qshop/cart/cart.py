@@ -86,7 +86,7 @@ class Cart:
         return Currency.get_fprice(self.total_price(), format_only=True)
 
     def total_price_with_delivery(self):
-        return self.total_price() + self.delivery_price()
+        return self.total_price() + Decimal(self.delivery_price())
 
     def total_fprice_with_delivery(self):
         return Currency.get_fprice(self.total_price_with_delivery(), format_only=True)
