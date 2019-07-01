@@ -80,7 +80,7 @@ class Cart:
         if self.has_vat_reduction():
             total_price = (100 - self.get_vat_reduction()) * Decimal(total_price / 100.0)
 
-        return total_price
+        return Decimal(total_price)
 
     def total_fprice(self):
         return Currency.get_fprice(self.total_price(), format_only=True)
@@ -93,7 +93,6 @@ class Cart:
 
     def set_delivery_price(self, price):
         self._delivery_price = price
-
 
     def delivery_price(self, in_default_currency=False):
         try:
