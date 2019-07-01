@@ -50,6 +50,19 @@ class Cart(models.Model):
             self.discount = 0
         self.save()
 
+    @property
+    def order(self):
+        order = self.order_set.first()
+        if order:
+            return order
+        return None
+
+    def get_order_html(self):
+        if self.order:
+            return mark_safe('<a href="{}">{}</a>'.format(reverse('admin:cart_order_change', args=[self.order.id]), self.order.get_id()))
+        return "-"
+    get_order_html.short_description = "Order ID"
+
 
 class ItemManager(models.Manager):
     def get(self, *args, **kwargs):
