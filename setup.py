@@ -19,6 +19,6 @@ setup(name='django-qshop',
                    'License :: OSI Approved :: BSD License',
                    'Natural Language :: English',
                    'Operating System :: Unix',
-                   'Programming Language :: Python :: 2.7',
+                   'Programming Language :: Python :: 3.6',
                    'Topic :: Utilities'],
       license='New BSD')
