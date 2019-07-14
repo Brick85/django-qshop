@@ -175,7 +175,10 @@ else:
             if(field_name in cleaned_data and not cleaned_data[field_name]):
                 self._errors[field_name] = self.error_class([msg])
 
+
         def save(self, commit=True):
+            if DELIVERY_REQUIRED:
+                self.instance.is_delivery = Order.DELIVERY_YES
             instance = super(OrderForm, self).save(commit)
             self.cart.checkout()
             return instance
