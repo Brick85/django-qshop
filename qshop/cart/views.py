@@ -141,8 +141,9 @@ class OrderDetailView(CreateView):
 
 
 class AjaxOrderDetailView(OrderDetailView):
+    # need to return cart html always even if form_valid, because we need to show refreshed cart items before checkout
     def form_valid(self, form):
-        pass
+        return self.form_invalid(form)
 
 
 def cart_order_success(request):
