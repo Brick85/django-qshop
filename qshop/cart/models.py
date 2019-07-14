@@ -236,27 +236,30 @@ class OrderExtendedAbstractDefault(OrderAbstract):
     comments = models.TextField(_('comments'), blank=True, null=True)
 
     # LEGAL ENTITY
-    country = models.ForeignKey('DeliveryCountry', verbose_name=_('Country'), on_delete=models.PROTECT, blank=True, null=True)
-    company_name = models.CharField(_('Company name'), max_length=50, null=True, blank=True)
     legal_name = models.CharField(_('Legal name'), max_length=255, null=True, blank=True)
     reg_number = models.CharField(_('Registration number'), max_length=50, null=True, blank=True)
     vat_reg_number = models.CharField(_(u'VAT registration number'), max_length=50, null=True, blank=True)
-    juridical_address = models.CharField(_('Juridical address'), max_length=255, blank=True, null=True)
     bank_name = models.CharField(_('Bank name'), max_length=50, blank=True, null=True)
     iban = models.CharField('IBAN', default='', null=True, blank=True, max_length=100)
+    bank_account = models.CharField('Account', default='', null=True, blank=True, max_length=100)
 
-    # SHIPPING
+    country = models.ForeignKey('DeliveryCountry', verbose_name=_('Country'), on_delete=models.PROTECT, blank=True, null=True)
+    city = models.CharField(_('city'), max_length=128, blank=True, null=True)
+    address = models.CharField(_('address'), max_length=255, blank=True, null=True)
+    zip_code = models.CharField(_('zip'), max_length=128, blank=True, null=True)
+
     is_delivery = models.SmallIntegerField(_('Is delivery needed'), choices=DELIVERY_CHOICES, default=DELIVERY_NO)
     shipping_date = models.DateField(_('Shipping date'), blank=True, null=True)
     delivery_type = models.ForeignKey('DeliveryType', verbose_name=_('delivery type'), related_name="delivery_typ", blank=True, null=True, on_delete=models.SET_NULL)
     delivery_price = models.DecimalField(max_digits=12, decimal_places=2, verbose_name=_('delivery price'), null=True, blank=True)
     cart_price = models.DecimalField(max_digits=12, decimal_places=2, verbose_name=_('cart price'), null=True)
+    cart_vat_amount = models.DecimalField(max_digits=12, decimal_places=2, verbose_name=_('vat amount'), null=True)
+
+    # SHIPPING
     delivery_country = models.ForeignKey('DeliveryCountry', verbose_name=_('Country'), related_name="delivery_cntr", blank=True, null=True, on_delete=models.SET_NULL)
     delivery_city = models.CharField(_('city'), max_length=128, blank=True, null=True)
-    delivery_street = models.CharField(_('street'), max_length=128, blank=True, null=True)
-    delivery_house = models.CharField(_('house'), max_length=128, blank=True, null=True)
-    delivery_flat = models.CharField(_('flat'), max_length=128, blank=True, null=True)
-    delivery_zip = models.CharField(_('zip'), max_length=128, blank=True, null=True)
+    delivery_address = models.CharField(_('address'), max_length=128, blank=True, null=True)
+    delivery_zip_code = models.CharField(_('zip'), max_length=128, blank=True, null=True)
 
     class Meta:
         abstract = True
@@ -267,6 +270,26 @@ class OrderExtendedAbstractDefault(OrderAbstract):
         if self.is_legal:
             return u"%s (%s %s)" % (self.legal_name, self.first_name, self.last_name)
         return u"%s %s" % (self.first_name, self.last_name)
+
+    @property
+    def billing_address(self):
+        return self.address if self.is_legal else self.delivery_address
+
+    @property
+    def billing_country(self):
+        return self.country.title if self.is_legal else self.delivery_country.title
+
+    @property
+    def billing_country_iso2_code(self):
+        return self.country.iso2_code if self.is_legal else self.delivery_country.iso2_code
+
+    @property
+    def billing_city(self):
+        return self.city if self.is_legal else self.delivery_city
+
+    @property
+    def billing_zip_code(self):
+        return self.zip_code if self.is_legal else self.delivery_zip_code
 
     @property
     def is_legal(self):
@@ -297,21 +320,11 @@ class OrderExtendedAbstractDefault(OrderAbstract):
             )
         return False
 
-    @staticmethod
-    def get_country_delivery_type_json():
-        # json_output = {}
-        # for country in DeliveryCountry.object.all():
-        #     cn[country.pk] = {
-        #         'pk': country.pk,
-        #         'title': country.title
-        #     }
+    def get_delivery_address(self):
+        if self.is_delivery_needed:
+            return f"{self.delivery_address}, {self.delivery_city}, {self.delivery_zip_code}, {self.delivery_country}"
 
-        # json_output.append(cn);
-        return "[{'ad': 'asd'}]"
-
-
-class Order(import_item(qshop_settings.CART_ORDER_CLASS) if qshop_settings.CART_ORDER_CLASS else OrderAbstractDefault):
-    pass
+        return ""
 
 
 if qshop_settings.ENABLE_QSHOP_DELIVERY:
@@ -366,7 +379,7 @@ if qshop_settings.ENABLE_QSHOP_DELIVERY:
             return 0
 
 
-    class DeliveryCountry(import_item(qshop_settings.DELIVERY_COUNTRY_CLASS) if qshop_settings.DELIVERY_COUNTRY_CLASS else DeliveryCountryAbstract):
+    class DeliveryCountry(import_item(qshop_settings.DELIVERY_COUNTRY_CLASS)):
         pass
 
 
@@ -451,22 +464,6 @@ if qshop_settings.ENABLE_QSHOP_DELIVERY:
     class DeliveryType(import_item(qshop_settings.DELIVERY_TYPE_CLASS) if qshop_settings.DELIVERY_TYPE_CLASS else DeliveryTypeAbstract):
         pass
 
-    # class DeliveryTypeAddressAbstract(models.Model):
-    #     _translation_fields = ['title']
-    #     title = models.CharField(_('Address name'), max_length=100)
-    #     delivery_country = models.ManyToManyField('DeliveryType')
-
-    #     class Meta:
-    #         abstract = True
-    #         verbose_name = _('delivery type address')
-    #         verbose_name_plural = _('delivery type adresses')
-
-    #     def __str__(self):
-    #         return str(self.title)
-
-    # class DeliveryTypeAddress(import_item(qshop_settings.DELIVERY_TYPE_ADDRESS_CLASS) if qshop_settings.DELIVERY_TYPE_ADDRESS_CLASS else DeliveryTypeAddressAbstract):
-    #     pass
-
 
     class DeliveryCalculationAbstract(models.Model):
         value = models.DecimalField(max_digits=12, decimal_places=2, verbose_name=_('calculation value'))
@@ -484,5 +481,9 @@ if qshop_settings.ENABLE_QSHOP_DELIVERY:
                 "{} - {}".format(self.value, Currency.get_fprice(self.delivery_price, format_only=True))
                 )
 
+
     class DeliveryCalculation(import_item(qshop_settings.DELIVERY_CALCULATION_CLASS) if qshop_settings.DELIVERY_CALCULATION_CLASS else DeliveryCalculationAbstract):
         pass
+
+class Order(import_item(qshop_settings.CART_ORDER_CLASS) if qshop_settings.CART_ORDER_CLASS else OrderAbstractDefault):
+    pass

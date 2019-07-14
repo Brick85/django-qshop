@@ -26,13 +26,15 @@
         </div>
 
         <div class="j_legal_fields{% if form.person_type.value != "1" %} block-hide{% endif %}">
-            {% include 'qshop/cart/_order_field.html' with FIELD=form.country %}
-            {% include 'qshop/cart/_order_field.html' with FIELD=form.company_name %}
             {% include 'qshop/cart/_order_field.html' with FIELD=form.legal_name %}
             {% include 'qshop/cart/_order_field.html' with FIELD=form.reg_number %}
             {% include 'qshop/cart/_order_field.html' with FIELD=form.vat_reg_number %}
-            {% include 'qshop/cart/_order_field.html' with FIELD=form.juridical_address %}
+            {% include 'qshop/cart/_order_field.html' with FIELD=form.country %}
+            {% include 'qshop/cart/_order_field.html' with FIELD=form.city %}
+            {% include 'qshop/cart/_order_field.html' with FIELD=form.address %}
+            {% include 'qshop/cart/_order_field.html' with FIELD=form.zip_code %}
             {% include 'qshop/cart/_order_field.html' with FIELD=form.bank_name %}
+            {% include 'qshop/cart/_order_field.html' with FIELD=form.bank_account %}
             {% include 'qshop/cart/_order_field.html' with FIELD=form.iban %}
         </div>
 
@@ -51,10 +53,8 @@
 
 
             {% include 'qshop/cart/_order_field.html' with FIELD=form.delivery_city %}
-            {% include 'qshop/cart/_order_field.html' with FIELD=form.delivery_street %}
-            {% include 'qshop/cart/_order_field.html' with FIELD=form.delivery_house %}
-            {% include 'qshop/cart/_order_field.html' with FIELD=form.delivery_flat %}
-            {% include 'qshop/cart/_order_field.html' with FIELD=form.delivery_zip %}
+            {% include 'qshop/cart/_order_field.html' with FIELD=form.delivery_address %}
+            {% include 'qshop/cart/_order_field.html' with FIELD=form.delivery_zip_code %}
         </div>
 
         <div class="comments">
