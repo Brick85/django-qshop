@@ -45,10 +45,7 @@ def sendMail(mail_type, variables={}, subject=None, mails=None):
     if 'subject_prefix' in mailconf and mailconf['subject_prefix']:
         subject = "%s%s" % (__(mailconf['subject_prefix']), subject)
 
-    headers = {
-        'MIME-Version': '1.0'
-    }
-    email = EmailMessage(subject, body, mailconf['reply_to_mail'], mails, headers=headers)
+    email = EmailMessage(subject, body, mailconf['reply_to_mail'], mails)
     email.content_subtype = "html"
     email.send()
 
@@ -59,6 +56,6 @@ def sendMail(mail_type, variables={}, subject=None, mails=None):
             pass
         if 'admin_subject_prefix' in mailconf:
             subject = "%s%s" % (mailconf['admin_subject_prefix'], subject)
-        email = EmailMessage(subject, body, mailconf['reply_to_mail'], mailconf['admin_mails'], headers=headers)
+        email = EmailMessage(subject, body, mailconf['reply_to_mail'], mailconf['admin_mails'])
         email.content_subtype = "html"
         email.send()
