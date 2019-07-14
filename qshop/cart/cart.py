@@ -291,7 +291,7 @@ class Cart:
         })
 
     def checkout(self):
-        # self.cart.checked_out = True
+        self.cart.checked_out = True
         self.cart.save()
 
 
