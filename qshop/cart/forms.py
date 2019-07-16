@@ -64,7 +64,7 @@ else:
                 'phone',
                 'email',
                 'comments',
-
+                'i_agree',
                 # legal fields
                 'country',
                 'city',
@@ -119,6 +119,9 @@ else:
             self.fields['delivery_country'].queryset = DeliveryCountry.objects.exclude(deliverytype=None)
 
             self.fields['country'].queryset = DeliveryCountry.can_invoicing.all()
+
+            self.fields['i_agree'].required = True
+
 
         def refresh_instance_data(self):
             self.instance.cart = self.cart.cart

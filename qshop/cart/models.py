@@ -261,6 +261,8 @@ class OrderExtendedAbstractDefault(OrderAbstract):
     delivery_address = models.CharField(_('address'), max_length=128, blank=True, null=True)
     delivery_zip_code = models.CharField(_('zip'), max_length=128, blank=True, null=True)
 
+    i_agree = models.BooleanField(_('I agree with terms and conditions'), default=False)
+
     class Meta:
         abstract = True
         verbose_name = _('order')
