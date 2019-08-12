@@ -1,7 +1,7 @@
 class BasePayment(object):
 
-    def get_redirect_response(self):
-        raise NotImplementedError()
+    def get_redirect_response(self, order):
+        raise NotImplementedError('Method get_redirect_response not implemented!')
 
     def parse_response(self, request):
-        raise NotImplementedError()
+        raise NotImplementedError('Method parse_response not implemented!')

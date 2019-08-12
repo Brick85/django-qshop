@@ -66,13 +66,11 @@ if ENABLE_QSHOP_DELIVERY:
 
     if not CART_ORDER_CUSTOM_ADMIN:
         from .models import Order
-        # from forms import OrderAdminForm
-        # from psyreal.actions import export_as_csv
 
         @admin.register(Order)
         class OrderAdmin(admin.ModelAdmin):
             # form = OrderAdminForm
-            list_display = ('pk', '__str__', 'status', 'date_added')
+            list_display = ('pk', '__str__', 'status', 'cart_price', 'date_added')
             list_display_links = ('pk', '__str__')
             list_filter = ('status',)
             ordering = ['-date_added']

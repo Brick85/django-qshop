@@ -2,6 +2,7 @@ from qshop.qshop_settings import CART_ORDER_FORM, ENABLE_QSHOP_DELIVERY, DELIVER
 from django import forms
 from django.utils.translation import ugettext as _
 
+
 if CART_ORDER_FORM:
     from sitemenu import import_item
     OrderForm = import_item(CART_ORDER_FORM)
@@ -37,7 +38,7 @@ elif not ENABLE_QSHOP_DELIVERY:
             return order
 else:
     from django import forms
-    from .models import Order, DeliveryType, DeliveryCountry
+    from .models import DeliveryType, DeliveryCountry, Order
     from ..mails import sendMail
     from django.utils.translation import ugettext as _
 
@@ -63,25 +64,25 @@ else:
                 'phone',
                 'email',
                 'comments',
-
+                'i_agree',
                 # legal fields
                 'country',
-                'company_name',
+                'city',
+                'address',
+                'zip_code',
                 'legal_name',
                 'reg_number',
                 'vat_reg_number',
-                'juridical_address',
                 'bank_name',
+                'bank_account',
                 'iban',
 
                 # delivery
-                'delivery_country',
                 'delivery_type',
+                'delivery_country',
                 'delivery_city',
-                'delivery_street',
-                'delivery_house',
-                'delivery_flat',
-                'delivery_zip',
+                'delivery_address',
+                'delivery_zip_code',
             ]
 
             if ENABLE_PAYMENTS:
@@ -119,11 +120,15 @@ else:
 
             self.fields['country'].queryset = DeliveryCountry.can_invoicing.all()
 
+            self.fields['i_agree'].required = True
+
+
         def refresh_instance_data(self):
             self.instance.cart = self.cart.cart
             self.instance.cart_text = self.cart.as_table(standalone=True)
             self.instance.cart_price = self.cart.total_price()
             self.instance.delivery_price = self.cart.delivery_price()
+            self.instance.cart_vat_amount = self.cart.vat_amount()
 
         def clean(self):
             data = super(OrderForm, self).clean()
@@ -143,12 +148,11 @@ else:
             self.refresh_instance_data()
 
             if is_delivery == self._meta.model.DELIVERY_YES or is_delivery is None:
-                self.validate_required_field(data, 'delivery_country')
                 self.validate_required_field(data, 'delivery_type')
+                self.validate_required_field(data, 'delivery_country')
                 self.validate_required_field(data, 'delivery_city')
-                self.validate_required_field(data, 'delivery_street')
-                self.validate_required_field(data, 'delivery_house')
-                self.validate_required_field(data, 'delivery_zip')
+                self.validate_required_field(data, 'delivery_address')
+                self.validate_required_field(data, 'delivery_zip_code')
 
                 if delivery_country and delivery_type:
                     if not delivery_type.check_country(delivery_country.pk):
@@ -157,14 +161,15 @@ else:
                             ])
 
             if person_type == self._meta.model.LEGAL:
-                self.validate_required_field(data, 'country')
-                self.validate_required_field(data, 'company_name')
                 self.validate_required_field(data, 'legal_name')
                 self.validate_required_field(data, 'reg_number')
-                self.validate_required_field(data, 'juridical_address')
                 self.validate_required_field(data, 'bank_name')
+                self.validate_required_field(data, 'bank_account')
                 self.validate_required_field(data, 'iban')
-
+                self.validate_required_field(data, 'country')
+                self.validate_required_field(data, 'city')
+                self.validate_required_field(data, 'address')
+                self.validate_required_field(data, 'zip_code')
             return data
 
         def validate_required_field(self, cleaned_data, field_name, msg=None):
@@ -173,7 +178,10 @@ else:
             if(field_name in cleaned_data and not cleaned_data[field_name]):
                 self._errors[field_name] = self.error_class([msg])
 
+
         def save(self, commit=True):
+            if DELIVERY_REQUIRED:
+                self.instance.is_delivery = Order.DELIVERY_YES
             instance = super(OrderForm, self).save(commit)
             self.cart.checkout()
             return instance
