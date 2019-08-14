@@ -203,6 +203,6 @@ if ENABLE_PROMO_CODES:
             if not self.promo_code:
                 self.add_error('code', _('Invalid promo code'))
 
-            if self.promo_code and self.promo_code.min_sum > self.cart.total_price_wo_discount():
+            if self.promo_code and self.promo_code.min_sum > self.cart.total_price_wo_discount_wo_vat_reduction():
                 self.add_error('code', _('Cart total must be at least {}').format(self.promo_code.min_sum))
             return cleaned_data

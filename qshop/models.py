@@ -477,9 +477,9 @@ class PromoCodeAbstract(models.Model):
 
     def get_discount(self, cart):
         discount = 0
-        if cart.total_price_wo_discount() > self.min_sum and self.is_active:
+        if cart.total_price_wo_discount_wo_vat_reduction() > self.min_sum and self.is_active:
             if self.is_percent_discount:
-                discount = Decimal(cart.total_price_wo_discount()) * self.discount / 100
+                discount = Decimal(cart.total_price_wo_discount_wo_vat_reduction()) * self.discount / 100
             else:
                 discount = self.discount
         return discount

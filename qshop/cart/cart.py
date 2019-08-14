@@ -76,7 +76,7 @@ class Cart:
 
 
     def total_fprice_wo_discount(self):
-        return Currency.get_fprice(self.total_price_wo_discount(), format_only=True)
+        return Currency.get_fprice(self.total_price_wo_discount_wo_vat_reduction(), format_only=True)
 
     def get_currency(self):
         return Currency.get_default_currency()
