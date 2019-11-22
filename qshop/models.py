@@ -65,6 +65,11 @@ class PricingModel(object):
             return "%.0f" % (self.get_price_discount() * 100 / self.get_price_real() - 100)
 
 
+
+class CategoryManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(hidden=False)
+
 class ProductAbstract(models.Model, PricingModel):
     _translation_fields = ['name', 'description']
 
@@ -96,6 +101,9 @@ class ProductAbstract(models.Model, PricingModel):
     date_modified = models.DateTimeField(_('date modified'), auto_now=True)
 
     sort = models.IntegerField(_('sort'), default=0)
+
+    objects = models.Manager()
+    in_category_objects = CategoryManager()
 
     class Meta:
         verbose_name = _('product')

@@ -54,9 +54,9 @@ class CategoryData:
         if self.init_products is not None:
             products = self.init_products
         elif not self.menu.page_type == 'pdis':
-            products = Product.objects.filter(category=self.menu, hidden=False)
+            products = Product.in_category_objects.filter(category=self.menu)
         else:
-            products = Product.objects.filter(hidden=False).exclude(discount_price=None)
+            products = Product.in_category_objects.exclude(discount_price=None)
 
         for filter_q in self.get_q_filters():
             products = products.filter(filter_q)
