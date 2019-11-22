@@ -438,7 +438,8 @@ if qshop_settings.ENABLE_QSHOP_DELIVERY:
         def get_delivery_calculation(self, cart):
             ret = None
             if self.delivery_calculation == self.FLAT_QTY:
-                ret = self.deliverycalculation_set.filter(value__gte=cart.total_products()).first()
+
+                ret = self.deliverycalculation_set.filter(value__gte=cart.total_products_with_qty()).first()
             else:
                 ret = self.deliverycalculation_set.filter(value__gte=cart.total_price_wo_discount_wo_vat_reduction()).first()
 
