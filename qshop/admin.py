@@ -4,7 +4,7 @@ from .models import (
     Parameter, ProductToParameter, ParameterValue
 )
 
-from .admin_forms import ProductToParameterFormset, CategoryForm, PriceForm, ProductAdminForm
+from .admin_forms import ProductToParameterFormset, CategoryForm, PriceForm, ProductAdminForm, ProductToParameterForm
 from .admin_filters import ProductCategoryListFilter
 
 from django.conf import settings
@@ -44,6 +44,18 @@ if 'tinymce' in settings.INSTALLED_APPS:
     qshop_formfield_overrides = {
         models.TextField: {'widget': AdminTinyMCE},
     }
+elif 'ckeditor_uploader' in settings.INSTALLED_APPS:
+    from django.db import models
+    from ckeditor_uploader.widgets import CKEditorUploadingWidget
+    qshop_formfield_overrides = {
+        models.TextField: {'widget': CKEditorUploadingWidget},
+    }
+elif 'ckeditor' in settings.INSTALLED_APPS:
+    from django.db import models
+    from ckeditor.widgets import CKEditorWidget
+    qshop_formfield_overrides = {
+        models.TextField: {'widget': CKEditorWidget},
+    }
 else:
     qshop_formfield_overrides = {}
 
@@ -68,19 +80,28 @@ class ProductImageInline(getParentClass('TabularInline', ProductImage)):
 
 class ProductToParameterInline(getParentClass('TabularInline', ProductToParameter)):
     model = ProductToParameter
-    # formset = ProductToTypeFieldFormset
     extra = 0
     can_delete = False
-    # readonly_fields = ('parameter',)
+    form = ProductToParameterForm
     formset = ProductToParameterFormset
+    readonly_fields = ('get_parameter_name',)
     fieldsets = (
         (None, {
-            'fields': ('parameter', 'value'),
+            'fields': ('get_parameter_name', 'parameter', 'value'),
         }),
     )
 
-    def has_add_permission(self, request):
+    def has_add_permission(self, request, obj=None):
         return False
+
+    def get_queryset(self, request):
+        # TODO: move to Python 3.x syntax super()
+        return super(ProductToParameterInline, self).get_queryset(request).select_related('parameter')
+
+    def get_parameter_name(self, obj=None):
+        if obj:
+            return obj.parameter
+    get_parameter_name.short_description = 'Parameter'
 
 
 class ProductAdmin(getParentClass('ModelAdmin', Product)):

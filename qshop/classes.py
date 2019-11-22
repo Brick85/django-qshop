@@ -68,7 +68,10 @@ class CategoryData:
             sort = self.sort[1].replace('price', 'min_price')
             products = products.extra(select={'min_price': "IF(`qshop_product`.`discount_price`, `qshop_product`.`discount_price`, `qshop_product`.`price`)"}).order_by(sort)
         else:
-            products = products.order_by(self.sort[1])
+            sort = self.sort[1]
+            if isinstance(sort, str):
+                sort = (sort,)
+            products = products.order_by(*sort)
 
         products = products.distinct()
 
@@ -153,7 +156,7 @@ class CategoryData:
                     if not hasattr(Product, field_name):
                         raise Exception('[qShop exception] Filter configuration error: there is no {0} in Product class!'.format(field_name))
                     field = Product._meta.get_field(field_name)
-                    model = field.rel.to
+                    model = field.related_model
                     items = model.objects.filter(product__category=self.menu, product__hidden=False).distinct()
                     if items:
                         filters_order.append(filter_key)
@@ -355,7 +358,7 @@ class CategoryData:
     def _check_foreignkey_filter(self, filter_id, filter_data, products):
         field_name = FILTERS_FIELDS[filter_id]
         field = Product._meta.get_field(field_name)
-        model = field.rel.to
+        model = field.related_model
 
         model.objects.filter(product__category=self.menu).distinct()
 
