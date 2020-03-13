@@ -33,7 +33,7 @@ class Cart(models.Model):
         return str(self.date_modified)
 
     def get_cartobject(self):
-        from cart import Cart as CartObject
+        from .cart import Cart as CartObject
         return CartObject(None, self)
 
 
