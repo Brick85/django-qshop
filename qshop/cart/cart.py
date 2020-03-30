@@ -39,8 +39,6 @@ class Cart:
         if cart_id:
             try:
                 cart = models.Cart.objects.get(id=cart_id, checked_out=False)
-                if qshop_settings.ENABLE_PROMO_CODES and not cart.checked_out:
-                    cart.activate_promo_code()
             except models.Cart.DoesNotExist:
                 cart = self.new(request)
         else:
@@ -54,14 +52,14 @@ class Cart:
     def get_products(self):
         try:
             return self._products
-        except:
+        except Exception:
             self._products = self.cart.item_set.all()
             return self._products
 
     def total_price_wo_discount_wo_vat_reduction(self, in_default_currency=False):
         total_price = 0
         for item in self.get_products():
-            total_price += item.total_price(in_default_currency=in_default_currency)
+            total_price += item.total_price_wo_discount(in_default_currency=in_default_currency)
         return float(total_price)
 
     def total_price_with_discount_wo_vat_reduction(self, in_default_currency=False):
@@ -73,7 +71,6 @@ class Cart:
             else:
                 total_price = (100 - self.get_discount()) * Decimal(total_price / 100.0)
         return total_price
-
 
     def total_fprice_wo_discount(self):
         return Currency.get_fprice(self.total_price_wo_discount_wo_vat_reduction(), format_only=True)
@@ -106,7 +103,7 @@ class Cart:
     def delivery_price(self, in_default_currency=False):
         try:
             self._delivery_price
-        except:
+        except Exception:
             self._delivery_price = count_delivery_price(
                 price=self.total_price(in_default_currency=True),
                 weight=self.total_weight(),
@@ -125,7 +122,7 @@ class Cart:
         return False
 
     def get_discount(self):
-        return self.cart.discount
+        return self.cart.get_discount()
 
     def get_fdiscount(self):
         return Currency.get_fprice(self.get_discount(), format_only=True)
@@ -153,11 +150,10 @@ class Cart:
             return True
         return False
 
-
     def total_weight(self):
         try:
             return self._total_weight
-        except:
+        except Exception:
             total_weight = 0
             for item in self.get_products():
                 total_weight += item.product.weight * item.quantity
@@ -170,14 +166,14 @@ class Cart:
     def total_products(self):
         try:
             return self._count
-        except:
+        except Exception:
             self._count = self.cart.item_set.count()
         return self._count
 
     def total_products_with_qty(self):
         try:
             return self._count_with_qty
-        except:
+        except Exception:
             self._count_with_qty = 0
             for item in self.get_products():
                 self._count_with_qty += item.quantity
@@ -293,7 +289,6 @@ class Cart:
     def checkout(self):
         self.cart.checked_out = True
         self.cart.save()
-
 
     def set_promo_code(self, promo_code):
         self.cart.promo_code = promo_code
