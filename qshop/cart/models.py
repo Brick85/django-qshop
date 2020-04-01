@@ -147,8 +147,7 @@ class Item(models.Model):
             return Decimal(self.single_price(in_default_currency)) - self.single_price_discount(in_default_currency)
 
         def total_discount(self, in_default_currency=False):
-            print(self.quantity * self.single_price_discount(in_default_currency))
-            return self.quantity * self.single_price_discount(in_default_currency)
+            return Decimal(self.quantity * self.single_price_discount(in_default_currency)).quantize(Decimal('0.01'))
 
         def single_price_discount(self, in_default_currency=False):
             return Decimal(self.single_price(in_default_currency)) * Decimal(0 + (self.discount_percent(in_default_currency) / 100))
