@@ -1,6 +1,5 @@
 import datetime
-
-from django.conf import settings
+from decimal import Decimal
 from django.db import models
 from django.http import HttpResponseRedirect
 from django.urls import reverse
@@ -43,13 +42,6 @@ class Cart(models.Model):
         from .cart import Cart as CartObject
         return CartObject(None, self)
 
-    def activate_promo_code(self):
-        if self.promo_code:
-            self.discount = self.promo_code.get_discount(self.get_cartobject())
-        else:
-            self.discount = 0
-        self.save()
-
     @property
     def order(self):
         order = self.order_set.first()
@@ -63,6 +55,32 @@ class Cart(models.Model):
         return "-"
     get_order_html.short_description = "Order ID"
 
+    def get_discount(self, in_default_currency=False):
+        if qshop_settings.ENABLE_PROMO_CODES:
+            discount = Decimal('0')
+            for item in self.item_set.all():
+                discount += item.total_discount(in_default_currency)
+            return discount
+        return self.discount
+
+    if qshop_settings.ENABLE_PROMO_CODES:
+        @property
+        def can_use_promocode(self):
+            try:
+                return self.__can_use_promocode
+            except Exception:
+                self.__can_use_promocode = (
+                    self.promo_code
+                    and self.get_cartobject().total_price_wo_discount_wo_vat_reduction() > self.promo_code.min_sum
+                    and self.promo_code.is_active
+                )
+                return self.__can_use_promocode
+
+        @property
+        def discount_percent_from_fixed_discount(self):
+            return Decimal(
+                self.promo_code.discount * 100 / Decimal(self.get_cartobject().total_price_wo_discount_wo_vat_reduction())
+            )
 
 class ItemManager(models.Manager):
     def get(self, *args, **kwargs):
@@ -90,14 +108,49 @@ class Item(models.Model):
     def __str__(self):
         return '%s - %s' % (self.quantity, self.unit_price)
 
-    def total_price(self, in_default_currency=False):
+    def single_price(self, in_default_currency=False):
         if in_default_currency:
             single_price = self.unit_price
         else:
             single_price = Currency.get_price(self.unit_price)
+        return single_price
 
-        price = self.quantity * single_price
-        return price
+    def total_price(self, in_default_currency=False):
+        if qshop_settings.ENABLE_PROMO_CODES:
+            return self.total_price_with_discount(in_default_currency)
+        return self.total_price_wo_discount
+
+    def total_price_wo_discount(self, in_default_currency=False):
+        return self.quantity * self.single_price(in_default_currency)
+
+    def total_fprice_wo_discount(self):
+        return Currency.get_fprice(self.total_price_wo_discount(), format_only=True)
+
+    if qshop_settings.ENABLE_PROMO_CODES:
+
+        def discount_percent(self, in_default_currency=False):
+            discount_percent = 0
+            if self.cart.can_use_promocode:
+                if self.cart.promo_code.is_percent_discount:
+                    discount_percent = self.cart.promo_code.discount
+                else:
+                    discount_percent = self.get_discount_percent_from_fixed_discount(in_default_currency)
+            return discount_percent
+
+        def get_discount_percent_from_fixed_discount(self, in_default_currency=False):
+            return self.cart.discount_percent_from_fixed_discount
+
+        def total_price_with_discount(self, in_default_currency=False):
+            return self.quantity * self.single_price_with_discount(in_default_currency)
+
+        def single_price_with_discount(self, in_default_currency=False):
+            return Decimal(self.single_price(in_default_currency)) - self.single_price_discount(in_default_currency)
+
+        def total_discount(self, in_default_currency=False):
+            return Decimal(self.quantity * self.single_price_discount(in_default_currency)).quantize(Decimal('0.01'))
+
+        def single_price_discount(self, in_default_currency=False):
+            return Decimal(self.single_price(in_default_currency)) * Decimal(0 + (self.discount_percent(in_default_currency) / 100))
 
     def total_fprice(self):
         return Currency.get_fprice(self.total_price(), format_only=True)
@@ -380,10 +433,8 @@ if qshop_settings.ENABLE_QSHOP_DELIVERY:
 
             return 0
 
-
     class DeliveryCountry(import_item(qshop_settings.DELIVERY_COUNTRY_CLASS)):
         pass
-
 
     class DeliveryTypeAbstract(models.Model):
         _translation_fields = ['title', 'estimated_time']
@@ -463,10 +514,8 @@ if qshop_settings.ENABLE_QSHOP_DELIVERY:
         def __str__(self):
             return str(self.title)
 
-
     class DeliveryType(import_item(qshop_settings.DELIVERY_TYPE_CLASS) if qshop_settings.DELIVERY_TYPE_CLASS else DeliveryTypeAbstract):
         pass
-
 
     class DeliveryCalculationAbstract(models.Model):
         value = models.DecimalField(max_digits=12, decimal_places=2, verbose_name=_('calculation value'))
@@ -482,8 +531,7 @@ if qshop_settings.ENABLE_QSHOP_DELIVERY:
         def __str__(self):
             return mark_safe(
                 "{} - {}".format(self.value, Currency.get_fprice(self.delivery_price, format_only=True))
-                )
-
+            )
 
     class DeliveryCalculation(import_item(qshop_settings.DELIVERY_CALCULATION_CLASS) if qshop_settings.DELIVERY_CALCULATION_CLASS else DeliveryCalculationAbstract):
         pass

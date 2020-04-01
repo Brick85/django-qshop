@@ -43,7 +43,7 @@
                             {% if item.product.get_discount_percent %}{{ item.product.get_discount_percent }}%{% else %}{% endif %}
                         </td>
                         <td class="price">{{ item.product.get_fprice }}</td>
-                        <td class="total">{{ item.total_fprice }}
+                        <td class="total">{{ item.total_fprice_wo_discount }}
                         </td>
                     </tr>
                     {% endfor %}
