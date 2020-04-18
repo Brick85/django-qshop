@@ -9,7 +9,7 @@ from qshop.qshop_settings import DELIVERY_REQUIRED, ENABLE_PAYMENTS
 
 class DeliveryCountrySelect(forms.Select):
     def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
-        option = super(DeliveryCountrySelect, self).create_option(name, value, label, selected, index, subindex, attrs)
+        option = super().create_option(name, value, label, selected, index, subindex, attrs)
         if option['value']:
             delivery_type_ids = DeliveryType.objects.filter(delivery_country__id=option['value']).values_list('id', flat=True)
             option['attrs']['data-countries-pks'] = ','.join([str(pk) for pk in delivery_type_ids])
@@ -96,7 +96,7 @@ class OrderExtendedForm(forms.ModelForm):
         self.instance.cart_vat_amount = self.cart.vat_amount()
 
     def clean(self):
-        data = super(OrderForm, self).clean()
+        data = super().clean()
         person_type = data.get('person_type')
         is_delivery = data.get('is_delivery')
         delivery_country = data.get('delivery_country')
@@ -147,6 +147,6 @@ class OrderExtendedForm(forms.ModelForm):
     def save(self, commit=True):
         if DELIVERY_REQUIRED:
             self.instance.is_delivery = Order.DELIVERY_YES
-        instance = super(OrderExtendedForm, self).save(commit)
+        instance = super().save(commit)
         self.cart.checkout()
         return instance
