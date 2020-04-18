@@ -2,7 +2,7 @@ from django import template
 from ..models import Currency
 from ..cart.cart import Cart
 from ..functions import get_catalogue_root
-
+from decimal import Decimal
 register = template.Library()
 
 
@@ -66,9 +66,9 @@ def set_currencies_list(context):
 def qshop_cart_total_price(context, as_var=None):
     cart = Cart(context['request'])
     if as_var:
-        context[as_var] = cart.total_price()
+        context[as_var] = round(cart.total_price(), 2)
         return ''
-    return cart.total_price()
+    return round(cart.total_price(), 2)
 
 @register.simple_tag(takes_context=True)
 def qshop_cart_currency(context, as_var=None):
