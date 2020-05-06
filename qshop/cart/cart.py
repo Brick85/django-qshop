@@ -110,8 +110,10 @@ class Cart:
                 cart=self
             )
         if in_default_currency:
-            return float(self._delivery_price)
-        return Currency.get_price(self._delivery_price)
+            dprice = self._delivery_price
+        else:
+            dprice = Currency.get_price(self._delivery_price)
+        return Decimal(dprice)
 
     def delivery_fprice(self):
         return Currency.get_fprice(self.delivery_price(), format_only=True)
