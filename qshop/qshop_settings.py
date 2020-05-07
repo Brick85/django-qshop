@@ -53,6 +53,7 @@ if ENABLE_QSHOP_DELIVERY:
 # PROMOCODE OPTIONS
 ENABLE_PROMO_CODES = getattr(settings, 'QSHOP_ENABLE_PROMO_CODES', False)
 PROMO_CODE_CLASS = getattr(settings, 'QSHOP_PROMO_CODE_CLASS', False)
+PROMO_CODE_FORM = getattr(settings, 'QSHOP_PROMO_CODE_FORM', False)
 
 MAIL_TYPES = getattr(settings, 'QSHOP_MAIL_TYPES', {
     'order_sended': {
