@@ -14,7 +14,6 @@ class DeliveryCountrySelect(forms.Select):
             delivery_type_ids = DeliveryType.objects.filter(delivery_country__id=option['value']).values_list('id', flat=True)
             option['attrs']['data-countries-pks'] = ','.join([str(pk) for pk in delivery_type_ids])
 
-
         return option
 
 
@@ -30,6 +29,7 @@ class OrderExtendedForm(forms.ModelForm):
             'email',
             'comments',
             'i_agree',
+
             # legal fields
             'country',
             'city',
@@ -77,14 +77,14 @@ class OrderExtendedForm(forms.ModelForm):
         # need to annulate, because delivery price and vat reduction are saved in model Cart
         self.cart.set_delivery_price(0)
         self.cart.set_vat_reduction(0)
+
         super().__init__(*args, **kwargs)
         self.fields['delivery_type'].empty_label = None
         self.refresh_instance_data()
+
         # if any delivery type dont exist in this delivery_country
         self.fields['delivery_country'].queryset = DeliveryCountry.objects.exclude(deliverytype=None)
-
         self.fields['country'].queryset = DeliveryCountry.can_invoicing.all()
-
         self.fields['i_agree'].required = True
 
 
@@ -94,50 +94,63 @@ class OrderExtendedForm(forms.ModelForm):
         self.instance.cart_price = self.cart.total_price()
         self.instance.delivery_price = self.cart.delivery_price()
         self.instance.cart_vat_amount = self.cart.vat_amount()
-
+    
     def clean(self):
         data = super().clean()
-        person_type = data.get('person_type')
-        is_delivery = data.get('is_delivery')
-        delivery_country = data.get('delivery_country')
-        delivery_type = data.get('delivery_type', None)
-        vat_nr = data.get('vat_reg_number', None)
-        country = data.get('country')
+        self.person_type = data.get('person_type')
+        self.delivery_country = data.get('delivery_country')
+        self.delivery_type = data.get('delivery_type', None)
+        self.is_delivery = data.get('is_delivery')
+        self.vat_nr = data.get('vat_reg_number', None)
+        self.country = data.get('country')
 
-        if delivery_type:
-            self.cart.set_delivery_price(delivery_type.get_delivery_price(delivery_country, self.cart))
 
-        if country:
-            self.cart.set_vat_reduction(country.get_vat_reduction(vat_nr, person_type))
+        if self.delivery_type:
+            self.cart.set_delivery_price(self.delivery_type.get_delivery_price(self.delivery_country, self.cart))
+
+        if self.delivery_country:
+            self.fields['delivery_type'].queryset = DeliveryType.objects.filter(delivery_country=self.delivery_country)
+        else:
+            self.fields['delivery_type'].queryset = DeliveryType.objects.none()
+
+        if self.country:
+            self.cart.set_vat_reduction(self.country.get_vat_reduction(self.vat_nr, self.person_type))
 
         self.refresh_instance_data()
+        self.validate_legal_fields(data)
+        self.clean_delivery_fields(data)
 
-        if is_delivery == self._meta.model.DELIVERY_YES or is_delivery is None:
-            self.validate_required_field(data, 'delivery_type')
-            self.validate_required_field(data, 'delivery_country')
-            self.validate_required_field(data, 'delivery_city')
-            self.validate_required_field(data, 'delivery_address')
-            self.validate_required_field(data, 'delivery_zip_code')
+        return data
 
-            if delivery_country and delivery_type:
-                if not delivery_type.check_country(delivery_country.pk):
+
+    def process_delivery_data(self, data):
+        return ['delivery_type', 'delivery_country', 'delivery_city', 'delivery_address', 'delivery_zip_code']
+
+
+    def clean_delivery_fields(self, data):
+        if self.is_delivery == self._meta.model.DELIVERY_YES or self.is_delivery is None:
+            for field in self.process_delivery_data(data):
+                self._validate_required_field(data, field)
+
+            if self.delivery_country and self.delivery_type:
+                if not self.delivery_type.check_country(self.delivery_country.pk):
                     self._errors['delivery_type'] = self.error_class([
                             _('This delivery type cannot deliver to choosed country')
                         ])
 
-        if person_type == self._meta.model.LEGAL:
-            self.validate_required_field(data, 'legal_name')
-            self.validate_required_field(data, 'reg_number')
-            self.validate_required_field(data, 'bank_name')
-            self.validate_required_field(data, 'bank_account')
-            self.validate_required_field(data, 'iban')
-            self.validate_required_field(data, 'country')
-            self.validate_required_field(data, 'city')
-            self.validate_required_field(data, 'address')
-            self.validate_required_field(data, 'zip_code')
-        return data
 
-    def validate_required_field(self, cleaned_data, field_name, msg=None):
+    def get_required_legal_fields(self):
+        return ['legal_name', 'reg_number', 'bank_name', 'bank_account', 'iban', 'country', 'city', 'address', 'zip_code']
+
+
+    def validate_legal_fields(self, data):
+        if self.person_type == self._meta.model.LEGAL:
+            for field in self.get_required_legal_fields():
+                self._validate_required_field(data, field)
+
+
+
+    def _validate_required_field(self, cleaned_data, field_name, msg=None):
         if not msg:
             msg = _('This field is required.')
         if(field_name in cleaned_data and not cleaned_data[field_name]):

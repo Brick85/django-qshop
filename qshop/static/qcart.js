@@ -4,50 +4,19 @@ if (!window.QApp) {
 
 $.extend(QApp, {
     init: function(){
-      LEGAL_FIELDS_WRAP = ".j_legal_fields";
-      DELIVERY_FIELDS_WRAP = ".j_delivery_fields";
-      HIDE_CLASS = "block-hide";
-
-      DELIVER_COUNTRY_FIELD = $('[name="delivery_country"]');
-      TOGGLE_SCOPE = $('[name="delivery_country"]').data('toggle-scope');
-      TOGGLE_TEMPLATE = $('[name="delivery_country"]').data('toggle-template');
-
-      this.initPersonTypeChoose();
-      this.initIsDeliveryChoose();
-      this.initDeliveryCountryChoose();
+      AJAX_CONTENT_WRAP = ".j_order-form-wrapper";
       this.initAssignEventsRefreshCart();
     },
 
-    initDeliveryCountryChoose: function() {
-      QApp.deliveryCountryChoose( DELIVER_COUNTRY_FIELD.find(':selected') );
-      DELIVER_COUNTRY_FIELD.change(function() {
-        QApp.deliveryCountryChoose( $(this).children('option:selected') );
-        // QApp.ajaxRefreshOrderProducts();
-      });
-    },
-
-    deliveryCountryChoose: function(allowed_countries) {
-      $(TOGGLE_TEMPLATE, TOGGLE_SCOPE).hide();
-
-      if(allowed_countries.data('countries-pks') == undefined)
-        return;
-
-      allowed_countries = allowed_countries.data('countries-pks').toString().split(',');
-
-      $.each(allowed_countries, function( index, value ) {
-        $(TOGGLE_TEMPLATE + value, TOGGLE_SCOPE).show();
-      });
-
-    },
-
     initAssignEventsRefreshCart: function() {
-      $( '[name="vat_reg_number"]' ).blur(function() {
+      $(AJAX_CONTENT_WRAP).on("blur", '[name="vat_reg_number"]', function() {
         QApp.ajaxRefreshOrderProducts();
       });
 
-      $('[name="delivery_type"], [name="country"]').add(DELIVER_COUNTRY_FIELD).change(function() {
+      $(AJAX_CONTENT_WRAP).on("change", '[name="is_delivery"], [name="delivery_type"], [name="country"], [name="delivery_country"], [name="person_type"]', function() {
         QApp.ajaxRefreshOrderProducts();
       });
+
     },
 
     ajaxRefreshOrderProducts: function() {
@@ -56,29 +25,10 @@ $.extend(QApp, {
           url: $('.j_cart_products').data('refresh-url'),
           data: $('.j_order-form').serialize(),
           success: function(data, status) {
-              $('.j_cart_products').html($('.j_cart_products', data).html());
-
+            $('.j_order-form-wrapper').html($('.j_order-form-wrapper', data).html());
           }
       });
-    },
-
-    initPersonTypeChoose: function() {
-      $(':radio[name="person_type"]').change(function() {
-        QApp.showHideBlock(LEGAL_FIELDS_WRAP, $(this).val(), 0);
-      });
-    },
-
-    initIsDeliveryChoose: function() {
-      $(':radio[name="is_delivery"]').change(function() {
-        QApp.showHideBlock(DELIVERY_FIELDS_WRAP, $(this).val(), 0);
-      });
-    },
-
-    showHideBlock: function(fields_wrap, selected_val, hide_if) {
-      if(selected_val == hide_if) $(fields_wrap).addClass(HIDE_CLASS);
-      else $(fields_wrap).removeClass(HIDE_CLASS);
     }
-
 });
 
 $(function(){

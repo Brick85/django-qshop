@@ -145,6 +145,13 @@ class AjaxOrderDetailView(OrderDetailView):
     def form_valid(self, form):
         return self.form_invalid(form)
 
+    def form_invalid(self, form):
+        # remove html errors from fields
+        fnames_errors = list(form.errors.keys())
+        for field_name in fnames_errors:
+            form.errors.pop(field_name)
+
+        return super().form_invalid(form)
 
 def cart_order_success(request):
     order_pk = request.session.get('order_pk', None)

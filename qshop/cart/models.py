@@ -499,7 +499,9 @@ if qshop_settings.ENABLE_QSHOP_DELIVERY:
         def get_delivery_price(self, country, cart):
             if self.check_country(country):
                 dcalc = self.get_delivery_calculation(cart)
-                return dcalc.delivery_price
+
+                if hasattr(dcalc, "delivery_price"):
+                    return dcalc.delivery_price
 
             return 0
 
