@@ -2,7 +2,7 @@ import pprint
 import urllib
 import StringIO
 
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.core.mail import mail_admins
 from django.utils.http import urlquote
 from django.http import HttpResponseRedirect

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.shortcuts import render_to_response
 from django.conf import settings
 from base64 import b64encode, b64decode
