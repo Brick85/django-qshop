@@ -6,17 +6,6 @@ from .models import DeliveryCountry, DeliveryType, Order
 from qshop.qshop_settings import DELIVERY_REQUIRED, ENABLE_PAYMENTS
 
 
-
-class DeliveryCountrySelect(forms.Select):
-    def create_option(self, name, value, label, selected, index, subindex=None, attrs=None):
-        option = super().create_option(name, value, label, selected, index, subindex, attrs)
-        if option['value']:
-            delivery_type_ids = DeliveryType.objects.filter(delivery_country__id=option['value']).values_list('id', flat=True)
-            option['attrs']['data-countries-pks'] = ','.join([str(pk) for pk in delivery_type_ids])
-
-        return option
-
-
 class OrderExtendedForm(forms.ModelForm):
     class Meta:
         model = Order
@@ -60,10 +49,6 @@ class OrderExtendedForm(forms.ModelForm):
             'person_type': forms.RadioSelect,
             'is_delivery': forms.RadioSelect,
             'delivery_type': forms.RadioSelect,
-            'delivery_country': DeliveryCountrySelect(attrs={
-                'data-toggle-scope': '.j_person_type-wrap',
-                'data-toggle-template': '.j_toggle'
-            })
         }
 
     class Media:
@@ -94,7 +79,7 @@ class OrderExtendedForm(forms.ModelForm):
         self.instance.cart_price = self.cart.total_price()
         self.instance.delivery_price = self.cart.delivery_price()
         self.instance.cart_vat_amount = self.cart.vat_amount()
-    
+            
     def clean(self):
         data = super().clean()
         self.person_type = data.get('person_type')
@@ -104,14 +89,11 @@ class OrderExtendedForm(forms.ModelForm):
         self.vat_nr = data.get('vat_reg_number', None)
         self.country = data.get('country')
 
+        self.fields['delivery_type'].queryset = self.get_delivery_types()
 
         if self.delivery_type:
             self.cart.set_delivery_price(self.delivery_type.get_delivery_price(self.delivery_country, self.cart))
 
-        if self.delivery_country:
-            self.fields['delivery_type'].queryset = DeliveryType.objects.filter(delivery_country=self.delivery_country)
-        else:
-            self.fields['delivery_type'].queryset = DeliveryType.objects.none()
 
         if self.country:
             self.cart.set_vat_reduction(self.country.get_vat_reduction(self.vat_nr, self.person_type))
@@ -121,6 +103,13 @@ class OrderExtendedForm(forms.ModelForm):
         self.clean_delivery_fields(data)
 
         return data
+
+
+    def get_delivery_types(self):
+        if self.delivery_country:
+            return DeliveryType.objects.filter(delivery_country=self.delivery_country)
+        
+        return DeliveryType.objects.none()
 
 
     def process_delivery_data(self, data):
