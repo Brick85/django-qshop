@@ -1,7 +1,7 @@
 from qshop.payment_vendors.payment import BasePayment
 from django.conf import settings
 from django.shortcuts import render_to_response
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 import hashlib
 
 
