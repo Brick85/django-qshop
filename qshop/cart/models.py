@@ -313,6 +313,7 @@ class OrderExtendedAbstractDefault(OrderAbstract):
     delivery_city = models.CharField(_('city'), max_length=128, blank=True, null=True)
     delivery_address = models.CharField(_('address'), max_length=128, blank=True, null=True)
     delivery_zip_code = models.CharField(_('zip'), max_length=128, blank=True, null=True)
+    delivery_pickup_point = models.ForeignKey('PickupPoint', blank=True, null=True, on_delete=models.SET_NULL)
 
     i_agree = models.BooleanField(_('I agree with terms and conditions'), default=False)
 
@@ -447,13 +448,19 @@ if qshop_settings.ENABLE_QSHOP_DELIVERY:
 
         )
         title = models.CharField(_('Delivery type name'), max_length=100)
+        min_order_amount = models.DecimalField(_('Min order amount'), max_digits=12, decimal_places=2, null=True, blank=True)
+        max_order_amount = models.DecimalField(_('Max order amount'), max_digits=12, decimal_places=2, null=True, blank=True)
         delivery_country = models.ManyToManyField('DeliveryCountry')
         estimated_time = models.CharField(_('Estimated time'), max_length=100)
+
+
         delivery_calculation = models.SmallIntegerField(
             _('Delivery calculation'),
             choices=PRICING_MODEL_CHOICES,
             default=FLAT_QTY
         )
+
+
 
         class Meta:
             abstract = True
@@ -536,6 +543,28 @@ if qshop_settings.ENABLE_QSHOP_DELIVERY:
             )
 
     class DeliveryCalculation(import_item(qshop_settings.DELIVERY_CALCULATION_CLASS) if qshop_settings.DELIVERY_CALCULATION_CLASS else DeliveryCalculationAbstract):
+        pass
+
+    class PickupPointAbstract(models.Model):
+        title = models.CharField('title', max_length=100)
+        address = models.CharField(_('address'), max_length=100, db_index=True)
+        zip_code = models.CharField(_('zip code'), max_length=12)
+        longitude = models.CharField(_('longitude'), max_length=15, help_text='X COORDINATE')
+        latitude = models.CharField(_('latitude'), max_length=15, help_text='Y COORDINATE')
+        is_active = models.BooleanField(_('active'), default=True)
+        delivery_type = models.ForeignKey('DeliveryType', on_delete=models.CASCADE)
+        sortorder = models.SmallIntegerField(_('sort'), default=0)
+
+        class Meta:
+            abstract = True
+            verbose_name = _('Pickup Point')
+            verbose_name_plural = _('Pickup Points')
+            ordering = ['sortorder']
+
+        def __str__(self):
+            return self.title
+
+    class PickupPoint(import_item(qshop_settings.PICKUP_POINT_CLASS) if qshop_settings.PICKUP_POINT_CLASS else PickupPointAbstract):
         pass
 
 class Order(import_item(qshop_settings.CART_ORDER_CLASS) if qshop_settings.CART_ORDER_CLASS else OrderAbstractDefault):

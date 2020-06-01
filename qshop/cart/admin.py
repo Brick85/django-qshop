@@ -3,6 +3,7 @@ from django.contrib import admin
 
 from qshop.qshop_settings import CART_ORDER_CUSTOM_ADMIN, ENABLE_QSHOP_DELIVERY
 
+
 if not CART_ORDER_CUSTOM_ADMIN and not ENABLE_QSHOP_DELIVERY:
     from django.contrib import admin
     from .models import Order
@@ -43,8 +44,9 @@ else:
 
 
 if ENABLE_QSHOP_DELIVERY:
-    from .models import DeliveryCountry, DeliveryType, DeliveryCalculation
+    from .models import DeliveryCountry, DeliveryType, DeliveryCalculation, PickupPoint
     from qshop.admin import getParentClass
+
 
     @admin.register(DeliveryCountry)
     class DeliveryCountryAdmin(getParentClass('ModelAdmin', DeliveryCountry)):
@@ -56,12 +58,17 @@ if ENABLE_QSHOP_DELIVERY:
     class DeliveryCalculationInline(admin.TabularInline):
         model = DeliveryCalculation
 
+
+    class PickupPointInline(admin.TabularInline):
+        model = PickupPoint
+
+
     @admin.register(DeliveryType)
     class DeliveryTypeAdmin(getParentClass('ModelAdmin', DeliveryType)):
         list_display = ['title', 'countries_html', 'delivery_calculation',  'calculation_html']
         filter_horizontal = ['delivery_country']
         list_filter = ['delivery_country', 'delivery_calculation', 'delivery_country__vat_behavior']
-        inlines = [DeliveryCalculationInline]
+        inlines = [DeliveryCalculationInline, PickupPointInline]
 
 
     if not CART_ORDER_CUSTOM_ADMIN:

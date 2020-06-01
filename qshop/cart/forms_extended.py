@@ -4,6 +4,9 @@ from django.utils.translation import ugettext as _
 from ..mails import sendMail
 from .models import DeliveryCountry, DeliveryType, Order
 from qshop.qshop_settings import DELIVERY_REQUIRED, ENABLE_PAYMENTS
+from .models import PickupPoint
+from django.db.models import Q
+
 
 
 class OrderExtendedForm(forms.ModelForm):
@@ -37,6 +40,7 @@ class OrderExtendedForm(forms.ModelForm):
             'delivery_city',
             'delivery_address',
             'delivery_zip_code',
+            'delivery_pickup_point'
         ]
 
         if ENABLE_PAYMENTS:
@@ -67,7 +71,7 @@ class OrderExtendedForm(forms.ModelForm):
         self.fields['delivery_type'].empty_label = None
         self.refresh_instance_data()
 
-        # if any delivery type dont exist in this delivery_country
+        # if any delivery type didnt exist in this delivery_country
         self.fields['delivery_country'].queryset = DeliveryCountry.objects.exclude(deliverytype=None)
         self.fields['country'].queryset = DeliveryCountry.can_invoicing.all()
         self.fields['i_agree'].required = True
@@ -79,7 +83,7 @@ class OrderExtendedForm(forms.ModelForm):
         self.instance.cart_price = self.cart.total_price()
         self.instance.delivery_price = self.cart.delivery_price()
         self.instance.cart_vat_amount = self.cart.vat_amount()
-            
+
     def clean(self):
         data = super().clean()
         self.person_type = data.get('person_type')
@@ -107,17 +111,40 @@ class OrderExtendedForm(forms.ModelForm):
 
     def get_delivery_types(self):
         if self.delivery_country:
-            return DeliveryType.objects.filter(delivery_country=self.delivery_country)
-        
+            return DeliveryType.objects.filter(
+                Q(delivery_country=self.delivery_country),
+                Q(min_order_amount__lte=self.cart.total_price()) | Q(min_order_amount__isnull=True),
+                Q(max_order_amount__gte=self.cart.total_price()) | Q(max_order_amount__isnull=True)
+            )
+
         return DeliveryType.objects.none()
 
 
     def process_delivery_data(self, data):
-        return ['delivery_type', 'delivery_country', 'delivery_city', 'delivery_address', 'delivery_zip_code']
+        delivery_type = data.get('delivery_type', None)
+        required_fields = ['delivery_type']
+        if delivery_type:
+            if delivery_type.pickuppoint_set.first():
+                del self.fields['delivery_city']
+                del self.fields['delivery_zip_code']
+                del self.fields['delivery_address']
+                required_fields = required_fields + ['delivery_country', 'delivery_pickup_point']
+            else:
+                del self.fields['delivery_pickup_point']
+                required_fields = required_fields + ['delivery_country', 'delivery_city', 'delivery_address', 'delivery_zip_code']
+
+        return required_fields
+
+    def clean_delivery_country(self):
+        data = self.cleaned_data['delivery_country']
+        if data:
+            self.fields['delivery_pickup_point'].queryset = PickupPoint.objects.filter(delivery_type__delivery_country=data)
+        return data
 
 
     def clean_delivery_fields(self, data):
         if self.is_delivery == self._meta.model.DELIVERY_YES or self.is_delivery is None:
+            # import ipdb; ipdb.set_trace()
             for field in self.process_delivery_data(data):
                 self._validate_required_field(data, field)
 
