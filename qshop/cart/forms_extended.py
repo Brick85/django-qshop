@@ -123,6 +123,7 @@ class OrderExtendedForm(forms.ModelForm):
     def process_delivery_data(self, data):
         delivery_type = data.get('delivery_type', None)
         required_fields = ['delivery_type']
+        # import ipdb; ipdb.set_trace()
         if delivery_type:
             if delivery_type.pickuppoint_set.first():
                 del self.fields['delivery_city']
@@ -132,11 +133,16 @@ class OrderExtendedForm(forms.ModelForm):
             else:
                 del self.fields['delivery_pickup_point']
                 required_fields = required_fields + ['delivery_country', 'delivery_city', 'delivery_address', 'delivery_zip_code']
-
+        else:
+            del self.fields['delivery_city']
+            del self.fields['delivery_zip_code']
+            del self.fields['delivery_address']
+            del self.fields['delivery_pickup_point']
         return required_fields
 
     def clean_delivery_country(self):
         data = self.cleaned_data['delivery_country']
+
         if data:
             self.fields['delivery_pickup_point'].queryset = PickupPoint.objects.filter(delivery_type__delivery_country=data)
         return data
@@ -144,7 +150,6 @@ class OrderExtendedForm(forms.ModelForm):
 
     def clean_delivery_fields(self, data):
         if self.is_delivery == self._meta.model.DELIVERY_YES or self.is_delivery is None:
-            # import ipdb; ipdb.set_trace()
             for field in self.process_delivery_data(data):
                 self._validate_required_field(data, field)
 

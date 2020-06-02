@@ -549,8 +549,8 @@ if qshop_settings.ENABLE_QSHOP_DELIVERY:
         title = models.CharField('title', max_length=100)
         address = models.CharField(_('address'), max_length=100, db_index=True)
         zip_code = models.CharField(_('zip code'), max_length=12)
-        longitude = models.CharField(_('longitude'), max_length=15, help_text='X COORDINATE')
-        latitude = models.CharField(_('latitude'), max_length=15, help_text='Y COORDINATE')
+        longitude = models.CharField(_('longitude'), max_length=15, help_text='X COORDINATE', blank=True, null=True)
+        latitude = models.CharField(_('latitude'), max_length=15, help_text='Y COORDINATE', blank=True, null=True)
         is_active = models.BooleanField(_('active'), default=True)
         delivery_type = models.ForeignKey('DeliveryType', on_delete=models.CASCADE)
         sortorder = models.SmallIntegerField(_('sort'), default=0)
@@ -562,7 +562,7 @@ if qshop_settings.ENABLE_QSHOP_DELIVERY:
             ordering = ['sortorder']
 
         def __str__(self):
-            return self.title
+            return f"{self.title} ({self.zip_code})"
 
     class PickupPoint(import_item(qshop_settings.PICKUP_POINT_CLASS) if qshop_settings.PICKUP_POINT_CLASS else PickupPointAbstract):
         pass
