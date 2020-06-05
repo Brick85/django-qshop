@@ -162,14 +162,13 @@ if ENABLE_QSHOP_DELIVERY:
 
 
         def get_required_legal_fields(self):
-            return ['legal_name', 'reg_number', 'bank_name', 'bank_account', 'iban', 'country', 'city', 'address', 'zip_code']
+            return ['legal_name', 'reg_number', 'country', 'city', 'address', 'zip_code']
 
 
         def validate_legal_fields(self, data):
             if self.person_type == self._meta.model.LEGAL:
                 for field in self.get_required_legal_fields():
                     self._validate_required_field(data, field)
-
 
 
         def _validate_required_field(self, cleaned_data, field_name, msg=None):
