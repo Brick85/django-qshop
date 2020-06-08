@@ -33,7 +33,7 @@ class Cart(models.Model):
         return str(self.date_modified)
 
     def get_cartobject(self):
-        from cart import Cart as CartObject
+        from .cart import Cart as CartObject
         return CartObject(None, self)
 
 
@@ -46,7 +46,7 @@ class ItemManager(models.Manager):
         return super(ItemManager, self).get(*args, **kwargs)
 
 
-class Item(models.Model):
+class ItemAbstract(models.Model):
     cart = models.ForeignKey(Cart, verbose_name=_('cart'), on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(verbose_name=_('quantity'))
     unit_price = models.DecimalField(max_digits=12, decimal_places=2, verbose_name=_('unit price'))
@@ -59,6 +59,7 @@ class Item(models.Model):
         verbose_name = _('item')
         verbose_name_plural = _('items')
         ordering = ('cart',)
+        abstract = True
 
     def __str__(self):
         return '%s - %s' % (self.quantity, self.unit_price)
@@ -184,4 +185,7 @@ class OrderAbstractDefault(OrderAbstract):
 
 
 class Order(import_item(qshop_settings.CART_ORDER_CLASS) if qshop_settings.CART_ORDER_CLASS else OrderAbstractDefault):
+    pass
+
+class Item(import_item(qshop_settings.ITEM_CLASS) if qshop_settings.ITEM_CLASS else ItemAbstract):
     pass

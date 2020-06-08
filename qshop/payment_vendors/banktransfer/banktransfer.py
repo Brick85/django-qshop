@@ -1,5 +1,5 @@
 from qshop.payment_vendors.payment import BasePayment
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import HttpResponseRedirect
 
 class BanktransferPayment(BasePayment):

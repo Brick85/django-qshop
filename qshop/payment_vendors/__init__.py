@@ -1,4 +1,3 @@
-from banktransfer.banktransfer import BanktransferPayment
 from qshop import qshop_settings
 
 if qshop_settings.ENABLE_PAYMENTS:
