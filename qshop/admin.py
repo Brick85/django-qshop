@@ -113,8 +113,8 @@ class ProductAdmin(getParentClass('ModelAdmin', Product)):
     actions = ['link_to_category', 'unlink_from_category', 'change_price', 'set_discount']
 
     search_fields = ['articul','name']
-    # filter_horizontal = ('category',)
-
+    filter_horizontal = ('category',)
+    save_on_top = True
     formfield_overrides = qshop_formfield_overrides
 
     form = ProductAdminForm
