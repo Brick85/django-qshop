@@ -52,8 +52,8 @@
                 {% include 'qshop/cart/_order_field.html' with FIELD=form.delivery_country %}
                 {% include 'qshop/cart/_order_field_options.html' with FIELD=form.delivery_type %}
 
-                
-                {% if form.instance.delivery_country %}                  
+
+                {% if form.instance.delivery_country %}
                     {% include 'qshop/cart/_order_field.html' with FIELD=form.delivery_city %}
                     {% include 'qshop/cart/_order_field.html' with FIELD=form.delivery_address %}
                     {% include 'qshop/cart/_order_field.html' with FIELD=form.delivery_zip_code %}
