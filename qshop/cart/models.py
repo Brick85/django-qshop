@@ -284,7 +284,7 @@ class OrderExtendedAbstractDefault(OrderAbstract):
     # INDIVIDUAL PERSON
     first_name = models.CharField(_('first name'), max_length=70)
     last_name = models.CharField(_('last name'), max_length=70)
-    phone = models.CharField(_('phone'), max_length=32, blank=True, null=True)
+    phone = models.CharField(_('phone'), max_length=32, null=True)
     email = models.EmailField(_('email'))
     comments = models.TextField(_('comments'), blank=True, null=True)
 
