@@ -1,11 +1,15 @@
-from django.forms.models import BaseInlineFormSet
-from .models import ParameterValue, Parameter, Product
-from qshop.admin_widgets import CategoryCheckboxSelectMultiple
-from sitemenu.sitemenu_settings import MENUCLASS
-from sitemenu import import_item
-from django import forms
 import re
+
+from django import forms
+from django.core.exceptions import ValidationError
+from django.forms.models import BaseInlineFormSet
 from django.utils.translation import ugettext_lazy as _
+from qshop.admin_widgets import CategoryCheckboxSelectMultiple
+from sitemenu import import_item
+from sitemenu.sitemenu_settings import MENUCLASS
+
+from .models import Parameter, ParameterValue, Product
+
 Menu = import_item(MENUCLASS)
 
 
@@ -82,5 +86,8 @@ class ProductAdminForm(forms.ModelForm):
                     i += 1
             except Product.DoesNotExist:
                 check = False
+
+        if " " in data:
+            raise ValidationError("Articul must not contain whitespace characters")
 
         return data
