@@ -124,7 +124,6 @@ if ENABLE_QSHOP_DELIVERY:
         def process_delivery_data(self, data):
             delivery_type = data.get('delivery_type', None)
             required_fields = ['delivery_type']
-            # import ipdb; ipdb.set_trace()
             if delivery_type:
                 if delivery_type.pickuppoint_set.first():
                     del self.fields['delivery_city']
