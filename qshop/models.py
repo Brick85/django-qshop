@@ -155,7 +155,7 @@ class ProductAbstract(models.Model, PricingModel):
             return self._current_category
         except:
             try:
-                self._current_category = self.category.all()[0]
+                self._current_category = self.category.filter(enabled=True)[0]
                 return self._current_category
             except:
                 pass
