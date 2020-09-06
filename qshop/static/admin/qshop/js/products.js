@@ -22,4 +22,4 @@
 
     });
 
-})(jQuery);
+})(django.jQuery);

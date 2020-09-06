@@ -5,4 +5,4 @@
         }
         $('.vTextField').first().focus();
     });
-})(jQuery);
+})(django.jQuery);
