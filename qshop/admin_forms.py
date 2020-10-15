@@ -58,9 +58,6 @@ class ProductAdminForm(forms.ModelForm):
     class Meta:
         model = Product
         fields = '__all__'
-        widgets = {
-            'category': CategoryCheckboxSelectMultiple(),
-        }
 
     def __init__(self, *args, **kwargs):
         super(ProductAdminForm, self).__init__(*args, **kwargs)
