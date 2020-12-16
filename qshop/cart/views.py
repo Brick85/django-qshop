@@ -7,11 +7,17 @@ from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, get_object_or_404
 from django.views.generic import CreateView, TemplateView, FormView
 from qshop import qshop_settings
-from .cart import Cart, ItemTooMany
+from .cart import ItemTooMany
 from .forms import OrderForm
 from ..models import Product
 from .models import Order
+from qshop.qshop_settings import CART_CLASS
 
+if CART_CLASS:
+    from sitemenu import import_item
+    Cart = import_item(CART_CLASS)
+else:
+    from .cart import Cart
 
 def add_to_cart(request, product_id):
     cart = Cart(request)
