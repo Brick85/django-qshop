@@ -494,14 +494,11 @@ if qshop_settings.ENABLE_QSHOP_DELIVERY:
             return True if ret else False
 
         def get_delivery_calculation(self, cart):
-            ret = None
             if self.delivery_calculation == self.FLAT_QTY:
-
-                ret = self.deliverycalculation_set.filter(value__gte=cart.total_products_with_qty()).first()
+                return self.deliverycalculation_set.filter(value__gte=cart.total_products_with_qty()).first()
             else:
-                ret = self.deliverycalculation_set.filter(value__gte=cart.total_price_wo_discount_wo_vat_reduction()).first()
+                return self.deliverycalculation_set.filter(value__gte=cart.total_price_wo_discount_wo_vat_reduction()).first()
 
-            return ret
 
         def get_delivery_price(self, country, cart):
             if self.check_country(country):

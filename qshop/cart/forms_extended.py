@@ -111,12 +111,19 @@ if ENABLE_QSHOP_DELIVERY:
 
 
         def get_delivery_types(self):
+            included_dtypes_ids = []
             if self.delivery_country:
-                return DeliveryType.objects.filter(
+                delivery_types = DeliveryType.objects.filter(
                     Q(delivery_country=self.delivery_country),
                     Q(min_order_amount__lte=self.cart.total_price()) | Q(min_order_amount__isnull=True),
                     Q(max_order_amount__gte=self.cart.total_price()) | Q(max_order_amount__isnull=True)
+
                 )
+                for dtype in delivery_types:
+                    if dtype.get_delivery_calculation(self.cart):
+                        included_dtypes_ids.append(dtype.pk)
+
+                return DeliveryType.objects.filter(pk__in=included_dtypes_ids)
 
             return DeliveryType.objects.none()
 
