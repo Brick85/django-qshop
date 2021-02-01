@@ -20,12 +20,14 @@ $.extend(QApp, {
     },
 
     ajaxRefreshOrderProducts: function() {
+      var event = jQuery.Event("qsop_cart_ajax_updated")
       $.ajax({
           type: "POST",
           url: $('.j_cart_products').data('refresh-url'),
           data: $('.j_order-form').serialize(),
           success: function(data, status) {
             $('.j_order-form-wrapper').html($('.j_order-form-wrapper', data).html());
+            $("body").trigger(event);
           }
       });
     }

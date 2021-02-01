@@ -82,6 +82,7 @@ if ENABLE_QSHOP_DELIVERY:
 
 
         def restore_field_calculated_values(self):
+            self.process_delivery_data(self.instance.delivery_type)
             self.cart.set_delivery_price(self.instance.delivery_type.get_delivery_price(self.instance.delivery_country, self.cart))
             if self.instance.country:
                 self.cart.set_vat_reduction(self.instance.country.get_vat_reduction(self.instance.vat_reg_number, self.instance.person_type))
@@ -138,17 +139,22 @@ if ENABLE_QSHOP_DELIVERY:
             return DeliveryType.objects.none()
 
 
-        def process_delivery_data(self, data):
-            delivery_type = data.get('delivery_type', None)
+        def process_delivery_data(self, delivery_type):
             required_fields = ['delivery_type']
             if delivery_type:
                 if delivery_type.pickuppoint_set.first():
-                    del self.fields['delivery_city']
-                    del self.fields['delivery_zip_code']
-                    del self.fields['delivery_address']
+                    try:
+                        del self.fields['delivery_city']
+                        del self.fields['delivery_zip_code']
+                        del self.fields['delivery_address']
+                    except KeyError:
+                        pass
                     required_fields = required_fields + ['delivery_country', 'delivery_pickup_point']
                 else:
-                    del self.fields['delivery_pickup_point']
+                    try:
+                        del self.fields['delivery_pickup_point']
+                    except KeyError:
+                        pass
                     required_fields = required_fields + ['delivery_country', 'delivery_city', 'delivery_address', 'delivery_zip_code']
             else:
                 del self.fields['delivery_city']
@@ -158,16 +164,16 @@ if ENABLE_QSHOP_DELIVERY:
             return required_fields
 
         def clean_delivery_country(self):
-            data = self.cleaned_data['delivery_country']
+            delivery_country = self.cleaned_data['delivery_country']
 
-            if data:
-                self.fields['delivery_pickup_point'].queryset = PickupPoint.objects.filter(delivery_type__delivery_country=data)
-            return data
+            if delivery_country and "delivery_pickup_point" in self.fields:
+                self.fields['delivery_pickup_point'].queryset = PickupPoint.objects.filter(delivery_type__delivery_country=delivery_country)
+            return delivery_country
 
 
         def clean_delivery_fields(self, data):
             if self.is_delivery == self._meta.model.DELIVERY_YES or self.is_delivery is None:
-                for field in self.process_delivery_data(data):
+                for field in self.process_delivery_data(data.get('delivery_type', None)):
                     self._validate_required_field(data, field)
 
                 if self.delivery_country and self.delivery_type:
