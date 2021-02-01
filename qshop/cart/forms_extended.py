@@ -77,6 +77,16 @@ if ENABLE_QSHOP_DELIVERY:
             self.fields['country'].queryset = DeliveryCountry.can_invoicing.all()
             self.fields['i_agree'].required = True
 
+            if self.instance.pk:
+                self.restore_field_calculated_values()
+
+
+        def restore_field_calculated_values(self):
+            self.cart.set_delivery_price(self.instance.delivery_type.get_delivery_price(self.instance.delivery_country, self.cart))
+            if self.instance.country:
+                self.cart.set_vat_reduction(self.instance.country.get_vat_reduction(self.instance.vat_reg_number, self.instance.person_type))
+            self.fields['delivery_type'].queryset = self.get_delivery_types(self.instance.delivery_country)
+
 
         def refresh_instance_data(self):
             self.instance.cart = self.cart.cart
@@ -84,6 +94,7 @@ if ENABLE_QSHOP_DELIVERY:
             self.instance.cart_price = self.cart.total_price()
             self.instance.delivery_price = self.cart.delivery_price()
             self.instance.cart_vat_amount = self.cart.vat_amount()
+
 
         def clean(self):
             data = super().clean()
@@ -94,11 +105,10 @@ if ENABLE_QSHOP_DELIVERY:
             self.vat_nr = data.get('vat_reg_number', None)
             self.country = data.get('country')
 
-            self.fields['delivery_type'].queryset = self.get_delivery_types()
+            self.fields['delivery_type'].queryset = self.get_delivery_types(self.delivery_country)
 
             if self.delivery_type:
                 self.cart.set_delivery_price(self.delivery_type.get_delivery_price(self.delivery_country, self.cart))
-
 
             if self.country:
                 self.cart.set_vat_reduction(self.country.get_vat_reduction(self.vat_nr, self.person_type))
@@ -110,11 +120,11 @@ if ENABLE_QSHOP_DELIVERY:
             return data
 
 
-        def get_delivery_types(self):
+        def get_delivery_types(self, delivery_country):
             included_dtypes_ids = []
-            if self.delivery_country:
+            if delivery_country:
                 delivery_types = DeliveryType.objects.filter(
-                    Q(delivery_country=self.delivery_country),
+                    Q(delivery_country=delivery_country),
                     Q(min_order_amount__lte=self.cart.total_price()) | Q(min_order_amount__isnull=True),
                     Q(max_order_amount__gte=self.cart.total_price()) | Q(max_order_amount__isnull=True)
 
