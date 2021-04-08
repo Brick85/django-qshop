@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: svmebeles\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-09-12 01:25+0300\n"
-"PO-Revision-Date: 2020-07-24 02:03+0300\n"
+"PO-Revision-Date: 2021-04-08 18:49+0300\n"
 "Last-Translator: alexey <alexey@trialine.lv>\n"
 "Language-Team: qt <a@trialine.lv>\n"
 "Language: lv\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : "
 "2);\n"
-"X-Generator: Poedit 2.2.4\n"
+"X-Generator: Poedit 2.4.2\n"
 
 #: .\admin.py:169
 #, python-brace-format
@@ -306,11 +306,11 @@ msgstr ""
 
 #: .\cart\models.py:307
 msgid "Take tax off a cart price"
-msgstr ""
+msgstr "Noņemt PVN no groza"
 
 #: .\cart\models.py:308
 msgid "Take tax off a cart price if legal entity with VAT"
-msgstr ""
+msgstr "Noņemt PVN no groza ja juridiskā persona PVN maksātājs"
 
 #: .\cart\models.py:310
 msgid "Country name"
@@ -318,19 +318,19 @@ msgstr "Valsts nosaukums"
 
 #: .\cart\models.py:312
 msgid "VAT behavior reason, if reduce"
-msgstr ""
+msgstr "PVN samazināšanas iemesls"
 
 #: .\cart\models.py:313
 msgid "Can draw up an invoice?"
-msgstr ""
+msgstr "Vai varam piestādīt rēķinu?"
 
 #: .\cart\models.py:313
 msgid "If legal entity"
-msgstr ""
+msgstr "Ja juridiska persona"
 
 #: .\cart\models.py:314
 msgid "Country 2 symbols ISO code"
-msgstr ""
+msgstr "Valsts 2 simbolu ISO kods"
 
 #: .\cart\models.py:315
 msgid "Position"
@@ -341,18 +341,16 @@ msgid "delivery country"
 msgstr "valsts"
 
 #: .\cart\models.py:324
-#, fuzzy
-#| msgid "discount price"
 msgid "delivery countries"
-msgstr "akcijas cena"
+msgstr "piegādes valstis"
 
 #: .\cart\models.py:357
 msgid "Amount of the items quantity"
-msgstr ""
+msgstr "Atkarībā no preču daudzuma"
 
 #: .\cart\models.py:358
 msgid "Amount of the order price"
-msgstr ""
+msgstr "Atkarībā no groza cenas"
 
 #: .\cart\models.py:361
 msgid "Delivery type name"
@@ -360,21 +358,19 @@ msgstr "Piegādes tipa nosaukums"
 
 #: .\cart\models.py:363
 msgid "Estimated time"
-msgstr ""
+msgstr "Paredzamais laiks"
 
 #: .\cart\models.py:364
 msgid "Delivery calculation"
-msgstr ""
+msgstr "Piegādes aprēķins"
 
 #: .\cart\models.py:369
 msgid "delivery types"
 msgstr "piegādes tipi"
 
 #: .\cart\models.py:450
-#, fuzzy
-#| msgid "product variation value"
 msgid "calculation value"
-msgstr "preces variācijas vērtība"
+msgstr "aprēķināta vērtība"
 
 #: .\cart\models.py:451 .\models.py:83 .\models.py:121 .\models.py:255
 msgid "price"
@@ -382,11 +378,11 @@ msgstr "cena"
 
 #: .\cart\models.py:456
 msgid "delivery calculation"
-msgstr ""
+msgstr "piegādes aprēķins"
 
 #: .\cart\models.py:457
 msgid "delivery calculations"
-msgstr ""
+msgstr "piegādes aprēķini"
 
 #: .\cart\views.py:36
 msgid "Wrong product."
