@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: svmebeles\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2018-09-12 01:25+0300\n"
-"PO-Revision-Date: 2021-04-08 18:49+0300\n"
+"PO-Revision-Date: 2021-04-08 19:00+0300\n"
 "Last-Translator: alexey <alexey@trialine.lv>\n"
 "Language-Team: qt <a@trialine.lv>\n"
 "Language: lv\n"
@@ -302,7 +302,7 @@ msgstr "pasta indekss"
 
 #: .\cart\models.py:306
 msgid "Nothing to do"
-msgstr ""
+msgstr "Neko nedarīt"
 
 #: .\cart\models.py:307
 msgid "Take tax off a cart price"
