@@ -134,7 +134,10 @@ class ProductAdmin(getParentClass('ModelAdmin', Product)):
                     if 'producttoparameter_set-TOTAL_FORMS' in request.POST:
                         for i in range(0, int(request.POST['producttoparameter_set-TOTAL_FORMS'])):
                             try:
-                                if int(request.POST['producttoparameter_set-{0}-parameter'.format(i)]) == parameter.pk:
+                                if (
+                                    int(request.POST['producttoparameter_set-{0}-parameter'.format(i)]) == parameter.pk
+                                    and request.POST.get('producttoparameter_set-{0}-value'.format(i), None)
+                                ):
                                     ptp.value_id = int(request.POST['producttoparameter_set-{0}-value'.format(i)])
                             except ValueError:
                                 pass
