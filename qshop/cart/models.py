@@ -21,7 +21,7 @@ if qshop_settings.ENABLE_PROMO_CODES:
     from qshop.models import PromoCode
 
 
-class Cart(models.Model):
+class CartAbstract(models.Model):
     date_added = models.DateTimeField(_('creation date'), auto_now_add=True)
     date_modified = models.DateTimeField(_('modification date'), auto_now=True)
     checked_out = models.BooleanField(default=False, verbose_name=_('checked out'))
@@ -31,6 +31,7 @@ class Cart(models.Model):
         promo_code = models.ForeignKey(PromoCode, on_delete=models.SET_NULL, null=True, blank=True, related_name="promocode")
 
     class Meta:
+        abstract = True
         verbose_name = _('cart')
         verbose_name_plural = _('carts')
         ordering = ('-date_modified',)
@@ -91,8 +92,8 @@ class ItemManager(models.Manager):
         return super(ItemManager, self).get(*args, **kwargs)
 
 
-class Item(models.Model):
-    cart = models.ForeignKey(Cart, verbose_name=_('cart'), on_delete=models.CASCADE)
+class ItemAbstract(models.Model):
+    cart = models.ForeignKey('Cart', verbose_name=_('cart'), on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField(verbose_name=_('quantity'))
     unit_price = models.DecimalField(max_digits=12, decimal_places=2, verbose_name=_('unit price'))
     _real_product = models.ForeignKey(Product, on_delete=models.CASCADE)
@@ -101,6 +102,7 @@ class Item(models.Model):
     objects = ItemManager()
 
     class Meta:
+        abstract = True
         verbose_name = _('item')
         verbose_name_plural = _('items')
         ordering = ('cart',)
@@ -180,7 +182,7 @@ class OrderAbstract(models.Model):
     date_added = models.DateTimeField(_('date added'), auto_now_add=True)
     status = models.PositiveSmallIntegerField(_('status'), choices=STATUSES, default=1)
     manager_comments = models.TextField(_('manager comments'), blank=True)
-    cart = models.ForeignKey(Cart, verbose_name=_('cart'), editable=False, on_delete=models.CASCADE)
+    cart = models.ForeignKey('Cart', verbose_name=_('cart'), editable=False, on_delete=models.CASCADE)
     cart_text = models.TextField(_('cart text'), editable=False)
 
     if qshop_settings.ENABLE_PAYMENTS:
@@ -192,7 +194,7 @@ class OrderAbstract(models.Model):
             choices=[(item, _(item)) for item in qshop_settings.PAYMENT_METHODS_ENABLED],
             default=qshop_settings.PAYMENT_METHODS_ENABLED[0]
         )
-        payment_id = models.CharField(_('payment id'), max_length=256, null=True)
+        payment_id = models.CharField(_('payment id'), max_length=256, blank=True, null=True)
 
     class Meta:
         verbose_name = _('client order')
@@ -305,7 +307,7 @@ class OrderExtendedAbstractDefault(OrderAbstract):
     shipping_date = models.DateField(_('Shipping date'), blank=True, null=True)
     delivery_type = models.ForeignKey('DeliveryType', verbose_name=_('delivery type'), related_name="delivery_typ", blank=True, null=True, on_delete=models.SET_NULL)
     delivery_price = models.DecimalField(max_digits=12, decimal_places=2, verbose_name=_('delivery price'), null=True, blank=True)
-    cart_price = models.DecimalField(max_digits=12, decimal_places=2, verbose_name=_('cart price'), null=True)
+    cart_price = models.DecimalField(max_digits=12, decimal_places=2, verbose_name=_('cart price'), blank=True, null=True)
     cart_vat_amount = models.DecimalField(max_digits=12, decimal_places=2, verbose_name=_('vat amount'), null=True)
 
     # SHIPPING
@@ -565,4 +567,12 @@ if qshop_settings.ENABLE_QSHOP_DELIVERY:
         pass
 
 class Order(import_item(qshop_settings.CART_ORDER_CLASS) if qshop_settings.CART_ORDER_CLASS else OrderAbstractDefault):
+    pass
+
+
+class Item(import_item(qshop_settings.ITEM_CLASS) if qshop_settings.ITEM_CLASS else ItemAbstract):
+    pass
+
+
+class Cart(import_item(qshop_settings.CART_MODEL_CLASS) if qshop_settings.CART_MODEL_CLASS else CartAbstract):
     pass
