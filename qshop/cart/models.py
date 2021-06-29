@@ -384,6 +384,9 @@ class OrderExtendedAbstractDefault(OrderAbstract):
 
         return ""
 
+    def get_total_price(self):
+        return (self.cart_price + self.delivery_price).quantize(Decimal('0.01'))
+
 
 if qshop_settings.ENABLE_QSHOP_DELIVERY:
     class InvoiceManager(models.Manager):
