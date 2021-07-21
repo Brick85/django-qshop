@@ -48,6 +48,8 @@ def sendMail(mail_type, variables={}, subject=None, mails=None):
     email = EmailMessage(subject, body, mailconf['reply_to_mail'], mails)
     if 'cc' in mailconf:
         email.cc = mailconf['cc']
+    if 'bcc' in mailconf:
+        email.bcc = mailconf['bcc']
     email.content_subtype = "html"
     email.send()
 
