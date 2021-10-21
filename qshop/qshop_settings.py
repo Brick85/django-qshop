@@ -5,6 +5,7 @@ if not 'sitemenu' in settings.INSTALLED_APPS:
     raise Exception('Error! qShop requires django-sitemenu!')
 
 PRODUCTS_ON_PAGE = getattr(settings, 'QSHOP_PRODUCTS_ON_PAGE', 10)
+PRODUCT_ADMIN_CATEGORY_CHECKBOX_WIDGET_ENABLED = getattr(settings, 'QSHOP_PRODUCT_ADMIN_CATEGORY_CHECKBOX_WIDGET_ENABLED', False)
 
 
 PRODUCT_CLASS = getattr(settings, 'QSHOP_PRODUCT_CLASS', None)
