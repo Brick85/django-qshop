@@ -5,6 +5,7 @@ if not 'sitemenu' in settings.INSTALLED_APPS:
     raise Exception('Error! qShop requires django-sitemenu!')
 
 PRODUCTS_ON_PAGE = getattr(settings, 'QSHOP_PRODUCTS_ON_PAGE', 10)
+PRODUCT_ADMIN_CATEGORY_CHECKBOX_WIDGET_ENABLED = getattr(settings, 'QSHOP_PRODUCT_ADMIN_CATEGORY_CHECKBOX_WIDGET_ENABLED', False)
 
 
 PRODUCT_CLASS = getattr(settings, 'QSHOP_PRODUCT_CLASS', None)
@@ -27,6 +28,8 @@ LOAD_ADDITIONAL_MODELS = getattr(settings, 'QSHOP_LOAD_ADDITIONAL_MODELS', None)
 CART_CLASS = getattr(settings, 'QSHOP_CART_CLASS', 'qshop.cart.cart.Cart') # cart class
 CART_ORDER_CLASS = getattr(settings, 'QSHOP_CART_ORDER_CLASS', None) # cart model
 CART_ORDER_FORM = getattr(settings, 'QSHOP_CART_ORDER_FORM', None)
+CART_MODEL_CLASS = getattr(settings, 'QSHOP_CART_MODEL_CLASS', None)
+ITEM_CLASS = getattr(settings, 'QSHOP_ITEM_CLASS', None)
 
 CART_ORDER_CUSTOM_ADMIN = getattr(settings, 'QSHOP_CART_ORDER_CUSTOM_ADMIN', False)
 CART_ORDER_VIEW = getattr(settings, 'QSHOP_CART_ORDER_VIEW', False)
