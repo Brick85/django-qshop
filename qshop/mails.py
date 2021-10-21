@@ -46,6 +46,8 @@ def sendMail(mail_type, variables={}, subject=None, mails=None):
         subject = "%s%s" % (__(mailconf['subject_prefix']), subject)
 
     email = EmailMessage(subject, body, mailconf['reply_to_mail'], mails)
+    if 'cc' in mailconf:
+        email.cc = mailconf['cc']
     email.content_subtype = "html"
     email.send()
 
