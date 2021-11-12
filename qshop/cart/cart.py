@@ -44,7 +44,8 @@ class Cart:
         else:
             cart = self.new(request)
         self.cart = cart
-        self.update_prices()
+        if not cart.checked_out:
+            self.update_prices()
 
     def __iter__(self):
         for item in self.get_products():
@@ -53,9 +54,14 @@ class Cart:
     def update_prices(self):
         items = []
         for item in self.get_products():
-            item.unit_price = item.get_product().get_price(default_currency=True)
-            items.append(item)
+            self.check_item(item)
+            if item.id:
+                item.unit_price = item.get_product().get_price(default_currency=True)
+                items.append(item)
         models.Item.objects.bulk_update(items, ['unit_price'])
+
+    def check_item(self, item):
+        pass
 
     def get_products(self):
         try:
