@@ -7,6 +7,7 @@ from django.utils.translation import ugettext_lazy as _
 from qshop.admin_widgets import CategoryCheckboxSelectMultiple
 from sitemenu import import_item
 from sitemenu.sitemenu_settings import MENUCLASS
+from .qshop_settings import PRODUCT_ADMIN_CATEGORY_CHECKBOX_WIDGET_ENABLED
 
 from .models import Parameter, ParameterValue, Product
 
@@ -29,7 +30,7 @@ class ProductToParameterFormset(BaseInlineFormSet):
             try:
                 value_key = 'producttoparameter_set-{0}-parameter'.format(index)
                 values = ParameterValue.objects.filter(parameter_id=form.data[value_key])
-            except:
+            except Exception:
                 pass
         form.fields['value'].queryset = values
 
@@ -58,6 +59,10 @@ class ProductAdminForm(forms.ModelForm):
     class Meta:
         model = Product
         fields = '__all__'
+        if PRODUCT_ADMIN_CATEGORY_CHECKBOX_WIDGET_ENABLED:
+            widgets = {
+                'category': CategoryCheckboxSelectMultiple(),
+            }
 
     def __init__(self, *args, **kwargs):
         super(ProductAdminForm, self).__init__(*args, **kwargs)
@@ -71,7 +76,7 @@ class ProductAdminForm(forms.ModelForm):
         data = self.cleaned_data['articul']
         try:
             data = re.match("(.*)-copy-\d+", data).groups()[0]
-        except:
+        except Exception:
             pass
         orig_data = data
         i = 1

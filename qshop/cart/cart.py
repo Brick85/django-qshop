@@ -44,16 +44,30 @@ class Cart:
         else:
             cart = self.new(request)
         self.cart = cart
+        if not cart.checked_out:
+            self.update_prices()
 
     def __iter__(self):
         for item in self.get_products():
             yield item
 
+    def update_prices(self):
+        items = []
+        for item in self.get_products():
+            self.check_item(item)
+            if item.id:
+                item.unit_price = item.get_product().get_price(default_currency=True)
+                items.append(item)
+        models.Item.objects.bulk_update(items, ['unit_price'])
+
+    def check_item(self, item):
+        pass
+
     def get_products(self):
         try:
             return self._products
         except Exception:
-            self._products = self.cart.item_set.all()
+            self._products = self.cart.item_set.all().select_related('_real_product')
             return self._products
 
     def total_price_wo_discount_wo_vat_reduction(self, in_default_currency=False):
