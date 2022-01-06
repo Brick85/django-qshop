@@ -70,7 +70,7 @@ class CategoryData:
         else:
             sort = self.sort[1]
             if isinstance(sort, str):
-                sort = (sort,)
+                sort = (sort, 'id')
             products = products.order_by(*sort)
 
         products = products.distinct()
