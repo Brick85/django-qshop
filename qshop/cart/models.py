@@ -120,7 +120,7 @@ class ItemAbstract(models.Model):
     def total_price(self, in_default_currency=False):
         if qshop_settings.ENABLE_PROMO_CODES:
             return self.total_price_with_discount(in_default_currency)
-        return self.total_price_wo_discount()
+        return self.total_price_wo_discount(in_default_currency)
 
     def total_price_wo_discount(self, in_default_currency=False):
         return self.quantity * self.single_price(in_default_currency)

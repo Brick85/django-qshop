@@ -2,7 +2,7 @@
 from setuptools import setup
 
 setup(name='django-qshop',
-      version='1.2.13',
+      version='1.2.14',
       description='E-commerce for django. Requires django-sitemenu. Beta version.',
       long_description='E-commerce for django. Requires django-sitemenu. Beta version.',
       author='Vital Belikov',
