@@ -16,6 +16,9 @@ from .qshop_settings import (
     PARAMETER_CLASS, PARAMETER_VALUE_CLASS, PRODUCT_TO_PARAMETER_CLASS, CURRENCY_CLASS, LOAD_ADDITIONAL_MODELS, PROMO_CODE_CLASS
 )
 
+import re
+from django.core.exceptions import ValidationError
+
 Menu = import_item(MENUCLASS)
 
 
@@ -70,6 +73,13 @@ class CategoryManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().filter(hidden=False)
 
+def articul_validate(articul):
+    if not re.match("^[A-Za-z0-9_.-]+\Z$", articul):
+        raise ValidationError(
+            _('Enter a valid “slug” consisting of letters, numbers, underscores, dots or hyphens'),
+            params={'articul': articul},
+        )
+
 class ProductAbstract(models.Model, PricingModel):
     _translation_fields = ['name', 'description']
 
@@ -84,7 +94,7 @@ class ProductAbstract(models.Model, PricingModel):
 
     has_variations = models.BooleanField(_('has variations'), default=False, editable=False)
     parameters_set = models.ForeignKey('ParametersSet', verbose_name=_('parameters set'), on_delete=models.CASCADE)
-    articul = models.SlugField(_('articul'), unique=True)
+    articul = models.CharField(_('articul'), max_length=255, validators=[articul_validate], unique=True)
     hidden = models.BooleanField(_('hidden'), default=False)
     name = models.CharField(_('product name'), max_length=128)
     price = models.DecimalField(_('price'), max_digits=12, decimal_places=2, default=0)
