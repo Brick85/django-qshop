@@ -561,7 +561,7 @@ if qshop_settings.ENABLE_QSHOP_DELIVERY:
             abstract = True
             verbose_name = _('Pickup Point')
             verbose_name_plural = _('Pickup Points')
-            ordering = ['sortorder']
+            ordering = ['sortorder', 'title']
 
         def __str__(self):
             return f"{self.title} ({self.zip_code})"
