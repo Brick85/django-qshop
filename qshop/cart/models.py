@@ -1,5 +1,6 @@
 import datetime
 from decimal import Decimal
+from ipaddress import ip_address
 from django.db import models
 from django.http import HttpResponseRedirect
 from django.urls import reverse
@@ -380,6 +381,8 @@ class OrderExtendedAbstractDefault(OrderAbstract):
 
     def get_delivery_address(self):
         if self.is_delivery_needed:
+            if self.delivery_pickup_point:
+                return f"{self.delivery_pickup_point.__str__()}"
             return f"{self.delivery_address}, {self.delivery_city}, {self.delivery_zip_code}, {self.delivery_country}"
 
         return ""
