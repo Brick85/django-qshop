@@ -1,7 +1,10 @@
 from django.conf import settings
 from django.contrib import admin
+from qshop.qshop_settings import (CART_ORDER_CUSTOM_ADMIN, ENABLE_QSHOP_DELIVERY, 
+                                    ENABLE_DPD_PARCEL_SYNC, ENABLE_OMNIVA_PARCEL_SYNC)
 
-from qshop.qshop_settings import CART_ORDER_CUSTOM_ADMIN, ENABLE_QSHOP_DELIVERY
+from django_object_actions import DjangoObjectActions
+from django.contrib import messages
 
 
 if not CART_ORDER_CUSTOM_ADMIN and not ENABLE_QSHOP_DELIVERY:
@@ -46,8 +49,6 @@ else:
 if ENABLE_QSHOP_DELIVERY:
     from .models import DeliveryCountry, DeliveryType, DeliveryCalculation, PickupPoint
     from qshop.admin import getParentClass
-
-
     @admin.register(DeliveryCountry)
     class DeliveryCountryAdmin(getParentClass('ModelAdmin', DeliveryCountry)):
         list_display = ['title', 'iso2_code',  'vat_behavior', 'can_draw_up_an_invoice', 'sort_order']
@@ -62,13 +63,39 @@ if ENABLE_QSHOP_DELIVERY:
     class PickupPointInline(admin.TabularInline):
         model = PickupPoint
 
-
     @admin.register(DeliveryType)
-    class DeliveryTypeAdmin(getParentClass('ModelAdmin', DeliveryType)):
+    class DeliveryTypeAdmin(DjangoObjectActions, getParentClass('ModelAdmin', DeliveryType)):
         list_display = ['title', 'countries_html', 'delivery_calculation',  'calculation_html']
         filter_horizontal = ['delivery_country']
         list_filter = ['delivery_country', 'delivery_calculation', 'delivery_country__vat_behavior']
         inlines = [DeliveryCalculationInline, PickupPointInline]
+        change_actions = []
+
+        def get_change_actions(self, request, object_id, form_url):
+            actions = super().get_change_actions(request, object_id, form_url)
+            actions = list(actions)
+            actions_list = {
+                'omniva': ENABLE_OMNIVA_PARCEL_SYNC,
+                'dpd': ENABLE_DPD_PARCEL_SYNC,
+            }
+
+            if actions_list['omniva']:
+                actions.append('sync_omniva_parcels_action')
+
+            if actions_list['dpd']:
+                actions.append('sync_dpd_parcels_action')
+                
+            return actions
+        
+        def sync_omniva_parcels_action(self, request, obj):
+            obj.sync_omniva_parcel(request, obj)
+            messages.add_message(request, messages.INFO, 'Omniva parcel machines information loaded successfully.')
+        sync_omniva_parcels_action.label = "Sync Omniva"
+
+        def sync_dpd_parcels_action(self, request, obj):
+            obj.sync_dpd_parcel(request, obj)
+            messages.add_message(request, messages.INFO, 'DPD parcel machines information loaded successfully.')
+        sync_dpd_parcels_action.label = "Sync DPD"
 
 
     if not CART_ORDER_CUSTOM_ADMIN:
