@@ -9,7 +9,9 @@ from django.utils.translation import ugettext_lazy as _
 from qshop.mails import sendMail
 from qshop import qshop_settings
 from sitemenu import import_item
-
+import json
+import requests
+from urllib.request import urlretrieve
 from ..models import Currency, Product, ProductVariation
 
 PAYMENT_CLASSES = {}
@@ -453,8 +455,8 @@ if qshop_settings.ENABLE_QSHOP_DELIVERY:
         PRICING_MODEL_CHOICES = (
             (FLAT_QTY, _('Amount of the items quantity')),
             (DEPENDS_ON_SUM, _('Amount of the order price')),
-
         )
+
         title = models.CharField(_('Delivery type name'), max_length=100)
         min_order_amount = models.DecimalField(_('Min order amount'), max_digits=12, decimal_places=2, null=True, blank=True)
         max_order_amount = models.DecimalField(_('Max order amount'), max_digits=12, decimal_places=2, null=True, blank=True)
@@ -467,8 +469,6 @@ if qshop_settings.ENABLE_QSHOP_DELIVERY:
             choices=PRICING_MODEL_CHOICES,
             default=FLAT_QTY
         )
-
-
 
         class Meta:
             abstract = True
@@ -528,11 +528,59 @@ if qshop_settings.ENABLE_QSHOP_DELIVERY:
         def __str__(self):
             return str(self.title)
 
+
+        def sync_dpd_parcel(self, *args, **options):
+            paracel_machines = json.loads(requests.get("http://ftp.dpdbaltics.com/PickupParcelShopData.json").content)
+            if paracel_machines:
+                self.pickuppoint_set.update(is_active=False)
+                delivery_countries = self.delivery_country.values_list('iso2_code', flat=True)
+                for paracel_machine in paracel_machines:
+                    if paracel_machine['zipCode'] and paracel_machine['countryCode'] in delivery_countries:
+                        self.pickuppoint_set.update_or_create(
+                            zip_code = paracel_machine['zipCode'],
+                            defaults={
+                                'title': paracel_machine['companyName'],
+                                'address': paracel_machine['street'],
+                                'latitude': paracel_machine['longitude'],
+                                'longitude': paracel_machine['latitude'],
+                                'is_active': True,
+                            }
+                        )
+
+
+        def sync_omniva_parcel(self, *args, **options):
+            paracel_machines = json.loads(requests.get("https://www.omniva.ee/locations.json").content)
+            if paracel_machines:
+                self.pickuppoint_set.update(is_active=False)
+                delivery_countries = self.delivery_country.values_list('iso2_code', flat=True)
+                for paracel_machine in paracel_machines:
+                    # TYPE Value 0 = Parcel machine (all Baltic countries)
+                    if paracel_machine['TYPE'] == "0" and paracel_machine['ZIP'] and paracel_machine['A0_NAME'] in delivery_countries:
+                        self.pickuppoint_set.update_or_create(
+                            zip_code = paracel_machine['ZIP'],
+                            defaults={
+                                'title': paracel_machine['NAME'],
+                                'address': self.get_omniva_address(paracel_machine),
+                                'latitude': paracel_machine['Y_COORDINATE'],
+                                'longitude': paracel_machine['X_COORDINATE'],
+                                'is_active': True,
+                            }
+                        )
+
+
+        def get_omniva_address(self, paracel_machine):
+            if paracel_machine['A2_NAME'] == "NULL":
+                return "{}".format(paracel_machine['A1_NAME'])
+            return "{}, {}".format(
+                paracel_machine['A1_NAME'],
+                paracel_machine['A2_NAME'].replace(', {}'.format(paracel_machine['A1_NAME']), "")
+            )
+
     class DeliveryType(import_item(qshop_settings.DELIVERY_TYPE_CLASS) if qshop_settings.DELIVERY_TYPE_CLASS else DeliveryTypeAbstract):
         pass
 
     class DeliveryCalculationAbstract(models.Model):
-        value = models.DecimalField(max_digits=12, decimal_places=2, verbose_name=_('calculation value'))
+        value = models.DecimalField(max_digits=12, decimal_places=2, verbose_name=_('up to'))
         delivery_price = models.DecimalField(max_digits=12, decimal_places=2, verbose_name=_('price'))
         delivery_type = models.ForeignKey('DeliveryType', on_delete=models.CASCADE)
 
