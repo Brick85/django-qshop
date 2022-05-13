@@ -580,7 +580,7 @@ if qshop_settings.ENABLE_QSHOP_DELIVERY:
         pass
 
     class DeliveryCalculationAbstract(models.Model):
-        value = models.DecimalField(max_digits=12, decimal_places=2, verbose_name=_('calculation value'))
+        value = models.DecimalField(max_digits=12, decimal_places=2, verbose_name=_('delivery calculation value'))
         delivery_price = models.DecimalField(max_digits=12, decimal_places=2, verbose_name=_('price'))
         delivery_type = models.ForeignKey('DeliveryType', on_delete=models.CASCADE)
 
