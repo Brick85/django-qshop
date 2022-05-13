@@ -1,6 +1,6 @@
 from django.conf import settings
 from django.contrib import admin
-from qshop.qshop_settings import (CART_ORDER_CUSTOM_ADMIN, ENABLE_QSHOP_DELIVERY, 
+from qshop.qshop_settings import (CART_ORDER_CUSTOM_ADMIN, ENABLE_QSHOP_DELIVERY,
                                     ENABLE_DPD_PARCEL_SYNC, ENABLE_OMNIVA_PARCEL_SYNC)
 
 from django_object_actions import DjangoObjectActions
@@ -71,22 +71,12 @@ if ENABLE_QSHOP_DELIVERY:
         inlines = [DeliveryCalculationInline, PickupPointInline]
         change_actions = []
 
-        def get_change_actions(self, request, object_id, form_url):
-            actions = super().get_change_actions(request, object_id, form_url)
-            actions = list(actions)
-            actions_list = {
-                'omniva': ENABLE_OMNIVA_PARCEL_SYNC,
-                'dpd': ENABLE_DPD_PARCEL_SYNC,
-            }
+        if ENABLE_OMNIVA_PARCEL_SYNC:
+            change_actions.append('sync_omniva_parcels_action')
 
-            if actions_list['omniva']:
-                actions.append('sync_omniva_parcels_action')
+        if ENABLE_DPD_PARCEL_SYNC:
+            change_actions.append('sync_dpd_parcels_action')
 
-            if actions_list['dpd']:
-                actions.append('sync_dpd_parcels_action')
-                
-            return actions
-        
         def sync_omniva_parcels_action(self, request, obj):
             obj.sync_omniva_parcel(request, obj)
             messages.add_message(request, messages.INFO, 'Omniva parcel machines information loaded successfully.')
