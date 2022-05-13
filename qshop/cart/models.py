@@ -455,8 +455,8 @@ if qshop_settings.ENABLE_QSHOP_DELIVERY:
         PRICING_MODEL_CHOICES = (
             (FLAT_QTY, _('Amount of the items quantity')),
             (DEPENDS_ON_SUM, _('Amount of the order price')),
-
         )
+
         title = models.CharField(_('Delivery type name'), max_length=100)
         min_order_amount = models.DecimalField(_('Min order amount'), max_digits=12, decimal_places=2, null=True, blank=True)
         max_order_amount = models.DecimalField(_('Max order amount'), max_digits=12, decimal_places=2, null=True, blank=True)
@@ -580,7 +580,7 @@ if qshop_settings.ENABLE_QSHOP_DELIVERY:
         pass
 
     class DeliveryCalculationAbstract(models.Model):
-        value = models.DecimalField(max_digits=12, decimal_places=2, verbose_name=_('delivery calculation value'))
+        value = models.DecimalField(max_digits=12, decimal_places=2, verbose_name=_('up to'))
         delivery_price = models.DecimalField(max_digits=12, decimal_places=2, verbose_name=_('price'))
         delivery_type = models.ForeignKey('DeliveryType', on_delete=models.CASCADE)
 
