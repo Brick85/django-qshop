@@ -34,7 +34,6 @@ if qshop_settings.ENABLE_PAYMENTS:
 
         @csrf_exempt
         def vendors_payment_webmoney_fail(request):
-            print(request.POST)
             return HttpResponseRedirect(reverse('cart_order_error'))
 
         @csrf_exempt

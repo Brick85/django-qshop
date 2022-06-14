@@ -5,35 +5,63 @@ if not 'sitemenu' in settings.INSTALLED_APPS:
     raise Exception('Error! qShop requires django-sitemenu!')
 
 PRODUCTS_ON_PAGE = getattr(settings, 'QSHOP_PRODUCTS_ON_PAGE', 10)
+PRODUCT_ADMIN_CATEGORY_CHECKBOX_WIDGET_ENABLED = getattr(settings, 'QSHOP_PRODUCT_ADMIN_CATEGORY_CHECKBOX_WIDGET_ENABLED', False)
 
 
-PRODUCT_CLASS              = getattr(settings, 'QSHOP_PRODUCT_CLASS',              None)
+PRODUCT_CLASS = getattr(settings, 'QSHOP_PRODUCT_CLASS', None)
 
-VARIATION_VALUE_CLASS      = getattr(settings, 'QSHOP_VARIATION_VALUE_CLASS',      None)
-VARIATION_CLASS            = getattr(settings, 'QSHOP_VARIATION_CLASS',            None)
+VARIATION_VALUE_CLASS = getattr(settings, 'QSHOP_VARIATION_VALUE_CLASS', None)
+VARIATION_CLASS = getattr(settings, 'QSHOP_VARIATION_CLASS', None)
 
-PRODUCT_IMAGE_CLASS        = getattr(settings, 'QSHOP_PRODUCT_IMAGE_CLASS',        None)
+PRODUCT_IMAGE_CLASS = getattr(settings, 'QSHOP_PRODUCT_IMAGE_CLASS', None)
 
-PARAMETERS_SET_CLASS       = getattr(settings, 'QSHOP_PARAMETERS_SET_CLASS',       None)
-PARAMETER_CLASS            = getattr(settings, 'QSHOP_PARAMETER_CLASS',            None)
-PARAMETER_VALUE_CLASS      = getattr(settings, 'QSHOP_PARAMETER_VALUE_CLASS',      None)
+PARAMETERS_SET_CLASS = getattr(settings, 'QSHOP_PARAMETERS_SET_CLASS', None)
+PARAMETER_CLASS = getattr(settings, 'QSHOP_PARAMETER_CLASS', None)
+PARAMETER_VALUE_CLASS = getattr(settings, 'QSHOP_PARAMETER_VALUE_CLASS', None)
 PRODUCT_TO_PARAMETER_CLASS = getattr(settings, 'QSHOP_PRODUCT_TO_PARAMETER_CLASS', None)
 
-CURRENCY_CLASS             = getattr(settings, 'QSHOP_CURRENCY_CLASS',             None)
+CURRENCY_CLASS = getattr(settings, 'QSHOP_CURRENCY_CLASS', None)
 
-ITEM_CLASS                 = getattr(settings, 'QSHOP_ITEM_CLASS',                 None)
-
-LOAD_ADDITIONAL_MODELS     = getattr(settings, 'QSHOP_LOAD_ADDITIONAL_MODELS',     None)
+LOAD_ADDITIONAL_MODELS = getattr(settings, 'QSHOP_LOAD_ADDITIONAL_MODELS', None)
 
 
-CART_ORDER_CLASS = getattr(settings, 'QSHOP_CART_ORDER_CLASS', None)
+CART_CLASS = getattr(settings, 'QSHOP_CART_CLASS', 'qshop.cart.cart.Cart') # cart class
+CART_ORDER_CLASS = getattr(settings, 'QSHOP_CART_ORDER_CLASS', None) # cart model
 CART_ORDER_FORM = getattr(settings, 'QSHOP_CART_ORDER_FORM', None)
+CART_MODEL_CLASS = getattr(settings, 'QSHOP_CART_MODEL_CLASS', None)
+ITEM_CLASS = getattr(settings, 'QSHOP_ITEM_CLASS', None)
 
 CART_ORDER_CUSTOM_ADMIN = getattr(settings, 'QSHOP_CART_ORDER_CUSTOM_ADMIN', False)
 CART_ORDER_VIEW = getattr(settings, 'QSHOP_CART_ORDER_VIEW', False)
 
 CART_TABLE_LINK_ADD = getattr(settings, 'QSHOP_CART_TABLE_LINK_ADD', None)
 CART_TABLE_IMAGE_ADD = getattr(settings, 'QSHOP_CART_TABLE_IMAGE_ADD', None)
+
+
+# DELIVERY OPTIONS
+ENABLE_QSHOP_DELIVERY = getattr(settings, 'QSHOP_ENABLE_QSHOP_DELIVERY', False)
+DELIVERY_REQUIRED = getattr(settings, 'QSHOP_DELIVERY_REQUIRED', False)
+VAT_PERCENTS = getattr(settings, 'QSHOP_VAT_PERCENTS', 21)
+DELIVERY_COUNTRY_CLASS = getattr(settings, 'QSHOP_DELIVERY_COUNTRY_CLASS', 'qshop.cart.models.DeliveryCountryAbstract')
+DELIVERY_TYPE_CLASS = getattr(settings, 'QSHOP_DELIVERY_TYPE_CLASS', None)
+DELIVERY_CALCULATION_CLASS = getattr(settings, 'QSHOP_DELIVERY_CALCULATION_CLASS', None)
+PICKUP_POINT_CLASS = getattr(settings, 'QSHOP_PICKUP_POINT_CLASS', None)
+ENABLE_OMNIVA_PARCEL_SYNC = getattr(settings, 'QSHOP_ENABLE_OMNIVA_PARCEL_SYNC', False)
+ENABLE_DPD_PARCEL_SYNC = getattr(settings, 'QSHOP_ENABLE_DPD_PARCEL_SYNC', False)
+
+
+# DELIVERY_TYPE_ADDRESS_CLASS = getattr(settings, 'QSHOP_DELIVERY_TYPE_ADDRESS_CLASS', None)
+
+# EXTEND CART OPTION
+
+if ENABLE_QSHOP_DELIVERY:
+    if not CART_ORDER_CLASS:
+        CART_ORDER_CLASS = 'qshop.cart.models.OrderExtendedAbstractDefault'
+
+# PROMOCODE OPTIONS
+ENABLE_PROMO_CODES = getattr(settings, 'QSHOP_ENABLE_PROMO_CODES', False)
+PROMO_CODE_CLASS = getattr(settings, 'QSHOP_PROMO_CODE_CLASS', False)
+PROMO_CODE_FORM = getattr(settings, 'QSHOP_PROMO_CODE_FORM', False)
 
 MAIL_TYPES = getattr(settings, 'QSHOP_MAIL_TYPES', {
     'order_sended': {

@@ -17,6 +17,9 @@ from decimal import Decimal
 from django.utils.translation import ugettext_lazy as _
 from django.utils.datastructures import MultiValueDictKeyError
 
+from qshop.qshop_settings import ENABLE_PROMO_CODES
+
+
 Menu = import_item(MENUCLASS)
 
 
@@ -110,8 +113,9 @@ class ProductAdmin(getParentClass('ModelAdmin', Product)):
     list_filter = ('parameters_set', ProductCategoryListFilter)
     actions = ['link_to_category', 'unlink_from_category', 'change_price', 'set_discount']
 
-    # filter_horizontal = ('category',)
-
+    search_fields = ['articul','name']
+    filter_horizontal = ('category',)
+    save_on_top = True
     formfield_overrides = qshop_formfield_overrides
 
     form = ProductAdminForm
@@ -131,7 +135,10 @@ class ProductAdmin(getParentClass('ModelAdmin', Product)):
                     if 'producttoparameter_set-TOTAL_FORMS' in request.POST:
                         for i in range(0, int(request.POST['producttoparameter_set-TOTAL_FORMS'])):
                             try:
-                                if int(request.POST['producttoparameter_set-{0}-parameter'.format(i)]) == parameter.pk:
+                                if (
+                                    int(request.POST['producttoparameter_set-{0}-parameter'.format(i)]) == parameter.pk
+                                    and request.POST.get('producttoparameter_set-{0}-value'.format(i), None)
+                                ):
                                     ptp.value_id = int(request.POST['producttoparameter_set-{0}-value'.format(i)])
                             except (KeyError, MultiValueDictKeyError):
                                 pass
@@ -282,6 +289,7 @@ class ProductAdmin(getParentClass('ModelAdmin', Product)):
         })
     set_discount.short_description = _(u"Set discount by percent")
 
+
 admin.site.register(Product, ProductAdmin)
 
 
@@ -304,10 +312,21 @@ class ParameterValueAdmin(getParentClass('ModelAdmin', ParameterValue)):
             settings.STATIC_URL + 'admin/qshop/js/products_parametervalues.js',
         )
 
+
 admin.site.register(ParameterValue, ParameterValueAdmin)
 
 
 class ProductVariationValueAdmin(getParentClass('ModelAdmin', ProductVariationValue)):
     list_display = ('value',)
 
+
 admin.site.register(ProductVariationValue, ProductVariationValueAdmin)
+
+
+if ENABLE_PROMO_CODES:
+    from .models import PromoCode
+
+    class PromoCodeAdmin(getParentClass('ModelAdmin', PromoCode)):
+        list_display = ('code', 'discount', 'discount_type', 'is_active')
+        search_fields = ('code',)
+    admin.site.register(PromoCode, PromoCodeAdmin)

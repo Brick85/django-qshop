@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.conf import settings
 from django.template.loader import render_to_string
 
@@ -42,57 +44,90 @@ class Cart:
         else:
             cart = self.new(request)
         self.cart = cart
+        if not cart.checked_out:
+            self.update_prices()
 
     def __iter__(self):
         for item in self.get_products():
             yield item
 
+    def update_prices(self):
+        items = []
+        for item in self.get_products():
+            self.check_item(item)
+            if item.id:
+                item.unit_price = item.get_product().get_price(default_currency=True)
+                items.append(item)
+        models.Item.objects.bulk_update(items, ['unit_price'])
+
+    def check_item(self, item):
+        pass
+
     def get_products(self):
         try:
             return self._products
-        except:
-            self._products = self.cart.item_set.all()
+        except Exception:
+            self._products = self.cart.item_set.all().select_related('_real_product')
             return self._products
 
-    def total_price_wo_discount(self, in_default_currency=False):
+    def total_price_wo_discount_wo_vat_reduction(self, in_default_currency=False):
         total_price = 0
         for item in self.get_products():
-            total_price += item.total_price(in_default_currency=in_default_currency)
+            total_price += item.total_price_wo_discount(in_default_currency=in_default_currency)
         return float(total_price)
 
+    def total_price_with_discount_wo_vat_reduction(self, in_default_currency=False):
+        total_price = self.total_price_wo_discount_wo_vat_reduction(in_default_currency)
+
+        if self.has_discount():
+            if qshop_settings.ENABLE_PROMO_CODES:
+                total_price = Decimal(total_price) - self.get_discount()
+            else:
+                total_price = (100 - self.get_discount()) * Decimal(total_price / 100.0)
+        return total_price
+
     def total_fprice_wo_discount(self):
-        return Currency.get_fprice(self.total_price_wo_discount(), format_only=True)
+        return Currency.get_fprice(self.total_price_wo_discount_wo_vat_reduction(), format_only=True)
 
     def get_currency(self):
         return Currency.get_default_currency()
 
     def total_price(self, in_default_currency=False):
-        total_price = self.total_price_wo_discount(in_default_currency)
-        if self.has_discount():
-            total_price = (100.0 - self.get_discount()) * total_price / 100.0
-        return total_price
+        total_price = self.total_price_with_discount_wo_vat_reduction(in_default_currency)
+
+        return Decimal(total_price - self.vat_amount(in_default_currency))
+
+    def vat_amount(self, in_default_currency=False):
+        if self.has_vat_reduction():
+            return self.total_price_with_discount_wo_vat_reduction(in_default_currency) * self.get_vat_reduction() / 121
+        return 0
 
     def total_fprice(self):
         return Currency.get_fprice(self.total_price(), format_only=True)
 
     def total_price_with_delivery(self):
-        return self.total_price() + self.delivery_price()
+        return self.total_price() + Decimal(self.delivery_price())
 
     def total_fprice_with_delivery(self):
         return Currency.get_fprice(self.total_price_with_delivery(), format_only=True)
 
+    def set_delivery_price(self, price):
+        self._delivery_price = price
+
     def delivery_price(self, in_default_currency=False):
         try:
             self._delivery_price
-        except:
+        except Exception:
             self._delivery_price = count_delivery_price(
                 price=self.total_price(in_default_currency=True),
                 weight=self.total_weight(),
                 cart=self
             )
         if in_default_currency:
-            return float(self._delivery_price)
-        return Currency.get_price(self._delivery_price)
+            dprice = self._delivery_price
+        else:
+            dprice = Currency.get_price(self._delivery_price)
+        return Decimal(dprice)
 
     def delivery_fprice(self):
         return Currency.get_fprice(self.delivery_price(), format_only=True)
@@ -103,17 +138,38 @@ class Cart:
         return False
 
     def get_discount(self):
-        return self.cart.discount
+        return self.cart.get_discount()
 
-    def set_discount(self, discount):
+    def get_fdiscount(self):
+        return Currency.get_fprice(self.get_discount(), format_only=True)
+
+    def get_discount_reason(self):
+        return self.cart.discount_reason
+
+    def set_discount(self, discount, reason=""):
         self.cart.discount = discount
-        self.clear_cache()
+        self.cart.discount_reason = reason
+
+        # self.clear_cache()
         self.cart.save()
+
+    def set_vat_reduction(self, percents):
+        self.cart.vat_reduction = percents
+        # self.clear_cache()
+        self.cart.save()
+
+    def get_vat_reduction(self):
+        return self.cart.vat_reduction
+
+    def has_vat_reduction(self):
+        if self.get_vat_reduction() > 0:
+            return True
+        return False
 
     def total_weight(self):
         try:
             return self._total_weight
-        except:
+        except Exception:
             total_weight = 0
             for item in self.get_products():
                 total_weight += item.product.weight * item.quantity
@@ -126,14 +182,14 @@ class Cart:
     def total_products(self):
         try:
             return self._count
-        except:
+        except Exception:
             self._count = self.cart.item_set.count()
         return self._count
 
     def total_products_with_qty(self):
         try:
             return self._count_with_qty
-        except:
+        except Exception:
             self._count_with_qty = 0
             for item in self.get_products():
                 self._count_with_qty += item.quantity
@@ -149,12 +205,6 @@ class Cart:
         if not self.cart.id:
             self.cart.save()
             self.__request.session[CART_ID] = self.cart.id
-
-    # def get_session_id(self, request):
-    #     return request.session[CART_ID]
-
-    # def set_session_id(self, request, cart_id):
-    #     request.session[CART_ID] = cart_id
 
     def add(self, product, quantity=1):
         self.create_cart()
@@ -254,4 +304,8 @@ class Cart:
 
     def checkout(self):
         self.cart.checked_out = True
+        self.cart.save()
+
+    def set_promo_code(self, promo_code):
+        self.cart.promo_code = promo_code
         self.cart.save()

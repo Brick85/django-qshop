@@ -1,11 +1,16 @@
-from django.forms.models import BaseInlineFormSet
-from .models import ParameterValue, Parameter, Product
-from qshop.admin_widgets import CategoryCheckboxSelectMultiple
-from sitemenu.sitemenu_settings import MENUCLASS
-from sitemenu import import_item
-from django import forms
 import re
+
+from django import forms
+from django.core.exceptions import ValidationError
+from django.forms.models import BaseInlineFormSet
 from django.utils.translation import ugettext_lazy as _
+from qshop.admin_widgets import CategoryCheckboxSelectMultiple
+from sitemenu import import_item
+from sitemenu.sitemenu_settings import MENUCLASS
+from .qshop_settings import PRODUCT_ADMIN_CATEGORY_CHECKBOX_WIDGET_ENABLED
+
+from .models import Parameter, ParameterValue, Product
+
 Menu = import_item(MENUCLASS)
 
 
@@ -25,7 +30,7 @@ class ProductToParameterFormset(BaseInlineFormSet):
             try:
                 value_key = 'producttoparameter_set-{0}-parameter'.format(index)
                 values = ParameterValue.objects.filter(parameter_id=form.data[value_key])
-            except:
+            except Exception:
                 pass
         form.fields['value'].queryset = values
 
@@ -54,9 +59,10 @@ class ProductAdminForm(forms.ModelForm):
     class Meta:
         model = Product
         fields = '__all__'
-        widgets = {
-            'category': CategoryCheckboxSelectMultiple(),
-        }
+        if PRODUCT_ADMIN_CATEGORY_CHECKBOX_WIDGET_ENABLED:
+            widgets = {
+                'category': CategoryCheckboxSelectMultiple(),
+            }
 
     def __init__(self, *args, **kwargs):
         super(ProductAdminForm, self).__init__(*args, **kwargs)
@@ -70,7 +76,7 @@ class ProductAdminForm(forms.ModelForm):
         data = self.cleaned_data['articul']
         try:
             data = re.match("(.*)-copy-\d+", data).groups()[0]
-        except:
+        except Exception:
             pass
         orig_data = data
         i = 1
@@ -82,5 +88,8 @@ class ProductAdminForm(forms.ModelForm):
                     i += 1
             except Product.DoesNotExist:
                 check = False
+
+        if " " in data:
+            raise ValidationError("Articul must not contain whitespace characters")
 
         return data

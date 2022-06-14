@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.db import models
 from django.conf import settings
 from django.urls import reverse
@@ -11,8 +13,11 @@ from sitemenu import import_item
 from sitemenu.helpers import upload_to_slugify
 from .qshop_settings import (
     PRODUCT_CLASS, VARIATION_CLASS, VARIATION_VALUE_CLASS, PRODUCT_IMAGE_CLASS, PARAMETERS_SET_CLASS,
-    PARAMETER_CLASS, PARAMETER_VALUE_CLASS, PRODUCT_TO_PARAMETER_CLASS, CURRENCY_CLASS, LOAD_ADDITIONAL_MODELS
+    PARAMETER_CLASS, PARAMETER_VALUE_CLASS, PRODUCT_TO_PARAMETER_CLASS, CURRENCY_CLASS, LOAD_ADDITIONAL_MODELS, PROMO_CODE_CLASS
 )
+
+import re
+from django.core.exceptions import ValidationError
 
 Menu = import_item(MENUCLASS)
 
@@ -63,6 +68,18 @@ class PricingModel(object):
             return "%.0f" % (self.get_price_discount() * 100 / self.get_price_real() - 100)
 
 
+
+class CategoryManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(hidden=False)
+
+def articul_validate(articul):
+    if not re.match("^[A-Za-z0-9_.-]+\Z$", articul):
+        raise ValidationError(
+            _('Enter a valid “slug” consisting of letters, numbers, underscores, dots or hyphens'),
+            params={'articul': articul},
+        )
+
 class ProductAbstract(models.Model, PricingModel):
     _translation_fields = ['name', 'description']
 
@@ -77,7 +94,7 @@ class ProductAbstract(models.Model, PricingModel):
 
     has_variations = models.BooleanField(_('has variations'), default=False, editable=False)
     parameters_set = models.ForeignKey('ParametersSet', verbose_name=_('parameters set'), on_delete=models.CASCADE)
-    articul = models.SlugField(_('articul'), unique=True)
+    articul = models.CharField(_('articul'), max_length=255, validators=[articul_validate], unique=True)
     hidden = models.BooleanField(_('hidden'), default=False)
     name = models.CharField(_('product name'), max_length=128)
     price = models.DecimalField(_('price'), max_digits=12, decimal_places=2, default=0)
@@ -94,6 +111,9 @@ class ProductAbstract(models.Model, PricingModel):
     date_modified = models.DateTimeField(_('date modified'), auto_now=True)
 
     sort = models.IntegerField(_('sort'), default=0)
+
+    objects = models.Manager()
+    in_category_objects = CategoryManager()
 
     class Meta:
         verbose_name = _('product')
@@ -145,7 +165,7 @@ class ProductAbstract(models.Model, PricingModel):
             return self._current_category
         except:
             try:
-                self._current_category = self.category.all()[0]
+                self._current_category = self.category.filter(enabled=True)[0]
                 return self._current_category
             except:
                 pass
@@ -432,6 +452,56 @@ class CurrencyAbstract(models.Model):
     def get_price_notoverloadable(price):
         return float(price) / Currency.get_default_currency().rate
 
+
+class PromoCodeAbstract(models.Model):
+    PERCENT = 0
+    FIXED = 1
+    DISCOUNT_TYPE_CHOICES = (
+        (PERCENT, _('percent')),
+        (FIXED, _('fixed'))
+    )
+
+    is_active = models.BooleanField(_('is active'), default=True)
+    code = models.CharField(_('code'), max_length=50, unique=True)
+    discount = models.DecimalField(_('discount'), max_digits=9, decimal_places=2, default=0)
+    discount_type = models.PositiveSmallIntegerField(_('discount type'), choices=DISCOUNT_TYPE_CHOICES, default=PERCENT)
+    min_sum = models.DecimalField(
+        _('min sum'), max_digits=9, decimal_places=2, default=0, help_text=_('min cart sum to apply discount')
+    )
+
+
+    class Meta:
+        verbose_name = 'Promo Code'
+        verbose_name_plural = 'Promo Codes'
+        abstract = True
+
+    def __str__(self):
+        return self.code
+
+    @property
+    def is_percent_discount(self):
+        return self.discount_type == self.PERCENT
+
+    @property
+    def is_fixed_discount(self):
+        return self.discount_type == self.FIXED
+
+    @staticmethod
+    def find_by_code(code):
+        try:
+            return PromoCode.objects.get(code=code, is_active=True)
+        except PromoCode.DoesNotExist:
+            return None
+
+    def get_discount(self, cart):
+        discount = 0
+        if cart.total_price_wo_discount_wo_vat_reduction() > self.min_sum and self.is_active:
+            if self.is_percent_discount:
+                discount = Decimal(cart.total_price_wo_discount_wo_vat_reduction()) * self.discount / 100
+            else:
+                discount = self.discount
+        return discount
+
 # Create real classes
 
 
@@ -470,6 +540,12 @@ class ProductToParameter(import_item(PRODUCT_TO_PARAMETER_CLASS) if PRODUCT_TO_P
 class Currency(import_item(CURRENCY_CLASS) if CURRENCY_CLASS else CurrencyAbstract):
     pass
 
+
+class PromoCode(import_item(PROMO_CODE_CLASS) if PROMO_CODE_CLASS else PromoCodeAbstract):
+    pass
+
+
 if LOAD_ADDITIONAL_MODELS:
     for add_model in LOAD_ADDITIONAL_MODELS:
         import_item(add_model)
+

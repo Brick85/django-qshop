@@ -43,7 +43,7 @@
                             {% if item.product.get_discount_percent %}{{ item.product.get_discount_percent }}%{% else %}{% endif %}
                         </td>
                         <td class="price">{{ item.product.get_fprice }}</td>
-                        <td class="total">{{ item.total_fprice }}
+                        <td class="total">{{ item.total_fprice_wo_discount }}
                         </td>
                     </tr>
                     {% endfor %}
@@ -54,16 +54,32 @@
                     </tr>
                 </tbody>
                 <tfoot>
+                    {% if cart.has_discount and apply_promo_form %}
+                        <tr class="refresh">
+                            <td class="tt" colspan="5">{% trans "Total without discount" %}:</td>
+                            <td class="total">{{ cart.total_fprice_wo_discount }}</td>
+                        </tr>
+                        <tr class="refresh">
+                            <td class="tt" colspan="5">{% trans "Discount" %}:</td>
+                            <td class="total">{{ cart.get_fdiscount }}</td>
+                        </tr>
+                    {% endif %}
                     <tr class="refresh">
                         <td class="tt" colspan="5">{% trans "Total price" %}:</td>
                         <td class="total">{{ cart.total_fprice }}</td>
                     </tr>
                 </tfoot>
             </table>
+            </form>
+            {% if apply_promo_form %}
+                <form action="{% url 'apply_promo' %}" method="POST">{% csrf_token %}
+                    {{ apply_promo_form.code }}
+                    <input type="submit" value="{% trans "Apply promo code" %}" />
+                </form>
+            {% endif %}
             <div class="clear"></div>
             <a href="{% url 'order_cart' %}">{% trans "Make Order" %}</a>
             <div class="clear"></div>
-            </form>
         {% endif %}
 </div>
 {% endblock shopcontent %}

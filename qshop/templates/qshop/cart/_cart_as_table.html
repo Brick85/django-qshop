@@ -19,34 +19,50 @@
             </td>
             <td>{{ item.product.get_fprice }}</td>
             <td>{{ item.quantity }}</td>
-            <td>{{ item.total_fprice }}</td>
+            <td>{{ item.total_fprice_wo_discount }}</td>
         </tr>
         {% endfor %}
     </tbody>
     <tfoot>
-        {% if cart.has_discount %}
+        {% if cart.has_discount or cart.has_vat_reduction %}
             <tr>
                 <td colspan="3">{% trans "Original Price" %}:</td>
                 <td><b>{{ cart.total_fprice_wo_discount }}</b></td>
             </tr>
+        {% endif %}
+
+        {% if cart.has_discount %}
             <tr>
-                <td colspan="3">{% trans "Discount" %}:</td>
+                {% trans "Discount" as discount_name %}
+                <td colspan="3">{{ cart.get_discount_reason|default:discount_name }}:</td>
                 <td><b>{{ cart.get_discount }}%</b></td>
             </tr>
+        {% endif %}
+
+        {% if cart.has_vat_reduction %}
             <tr>
-                <td colspan="3">{% trans "Discounted Price" %}:</td>
-                <td><b>{{ cart.total_fprice }}</b></td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="3">{% trans "Price" %}:</td>
-                <td><b>{{ cart.total_fprice }}</b></td>
+                <td colspan="3">{% trans 'VAT reduction' %}</td>
+                <td><b>-{{ cart.get_vat_reduction }}%</b></td>
             </tr>
         {% endif %}
+
         <tr>
-            <td colspan="3">{% trans "Delivery" %}:</td>
-            <td><b>{{ cart.delivery_fprice }}</b></td>
+            <td colspan="3">
+                {% if cart.has_discount %}
+                    {% trans "Price" %}:
+                {% endif %}
+            </td>
+            <td><b>{{ cart.total_fprice }}</b></td>
         </tr>
+
+
+        {% if cart.delivery_price %}
+            <tr>
+                <td colspan="3">{% trans "Delivery" %}:</td>
+                <td><b>{{ cart.delivery_fprice }}</b></td>
+            </tr>
+        {% endif %}
+
         <tr>
             <td colspan="3">{% trans "Total price" %}:</td>
             <td><b>{{ cart.total_fprice_with_delivery }}</b></td>

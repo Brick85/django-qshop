@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% load i18n static %}
+
+
+{% block body_id %}cart_order_body{% endblock %}
+
+{% block content %}
+<div class="cart" id="step2">
+    {% if form.non_field_errors %}
+    <div class="non-field-errors">
+        {% for err in form.non_field_errors %}
+        <p class="form-error">{{ err }}</p>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <form method="post" action="{% url 'order_cart' %}" novalidate class="j_order-form" id="order-form">{% csrf_token %}
+        <div class="j_order-form-wrapper">
+
+            {% include 'qshop/cart/_order_field.html' with FIELD=form.person_type %}
+
+            <div class="j_individual_fields">
+                {% include 'qshop/cart/_order_field.html' with FIELD=form.first_name %}
+                {% include 'qshop/cart/_order_field.html' with FIELD=form.last_name %}
+                {% include 'qshop/cart/_order_field.html' with FIELD=form.phone %}
+                {% include 'qshop/cart/_order_field.html' with FIELD=form.email %}
+            </div>
+
+            <div class="j_legal_fields{% if form.person_type.value != "1" %} block-hide{% endif %}">
+                {% include 'qshop/cart/_order_field.html' with FIELD=form.legal_name %}
+                {% include 'qshop/cart/_order_field.html' with FIELD=form.reg_number %}
+                {% include 'qshop/cart/_order_field.html' with FIELD=form.vat_reg_number %}
+                {% include 'qshop/cart/_order_field.html' with FIELD=form.country %}
+                {% include 'qshop/cart/_order_field.html' with FIELD=form.city %}
+                {% include 'qshop/cart/_order_field.html' with FIELD=form.address %}
+                {% include 'qshop/cart/_order_field.html' with FIELD=form.zip_code %}
+                {% include 'qshop/cart/_order_field.html' with FIELD=form.bank_name %}
+                {% include 'qshop/cart/_order_field.html' with FIELD=form.bank_account %}
+                {% include 'qshop/cart/_order_field.html' with FIELD=form.iban %}
+            </div>
+
+            {% if form.payment_method %}
+                <div>{% include 'qshop/cart/_order_field.html' with FIELD=form.payment_method %}</div>
+            {% endif %}
+
+            {% if form.is_delivery %}
+                {% include 'qshop/cart/_order_field.html' with FIELD=form.is_delivery %}
+            {% endif %}
+
+
+            <div class="j_delivery_fields{% if form.is_delivery.value != "1" and form.is_delivery %} block-hide{% endif %}">
+                {% include 'qshop/cart/_order_field.html' with FIELD=form.delivery_country %}
+
+
+                {% if form.instance.delivery_country %}
+                    {% include 'qshop/cart/_order_field_options.html' with FIELD=form.delivery_type %}
+                {% endif %}
+
+                {% if form.instance.delivery_type %}
+                    {% if form.delivery_pickup_point %}
+                        {% include 'qshop/cart/_order_field.html' with FIELD=form.delivery_pickup_point %}
+                    {% endif %}
+                    {% if form.delivery_city %}
+                        {% include 'qshop/cart/_order_field.html' with FIELD=form.delivery_city %}
+                    {% endif %}
+                    {% if form.delivery_address %}
+                        {% include 'qshop/cart/_order_field.html' with FIELD=form.delivery_address %}
+                    {% endif %}
+                    {% if form.delivery_zip_code %}
+                        {% include 'qshop/cart/_order_field.html' with FIELD=form.delivery_zip_code %}
+                    {% endif %}
+                {% endif %}
+
+            </div>
+
+            <div class="comments">
+                {% include 'qshop/cart/_order_field.html' with FIELD=form.comments %}
+            </div>
+
+
+            <div class="j_cart_products" data-refresh-url="{% url 'ajax_order_cart' %}">
+                {{ form.instance.cart_text }}
+            </div>
+
+            <div class="checkout">
+                <input type="submit" value="{% trans "Process order" %}" />
+            </div>
+        </div>
+    </form>
+    <div class="clear"></div>
+</div>
+
+{% block qjquery_load %}
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha256-3edrmyuQ0w65f8gfBsqowzjJe2iM6n0nKciPUp8y+7E=" crossorigin="anonymous"></script>
+{% endblock qjquery_load %}
+
+{{ form.media }}
+
+{% endblock content %}

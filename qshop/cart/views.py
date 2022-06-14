@@ -5,18 +5,19 @@ from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render, get_object_or_404
-
-from .cart import Cart, ItemTooMany
-from ..models import Product
+from django.views.generic import CreateView, TemplateView, FormView
+from qshop import qshop_settings
+from .cart import ItemTooMany
 from .forms import OrderForm
+from ..models import Product
 from .models import Order
+from qshop.qshop_settings import CART_CLASS
 
-from qshop.qshop_settings import CART_ORDER_VIEW
-
-if CART_ORDER_VIEW:
+if CART_CLASS:
     from sitemenu import import_item
-    qshop_order_view = import_item(CART_ORDER_VIEW)
-
+    Cart = import_item(CART_CLASS)
+else:
+    from .cart import Cart
 
 def add_to_cart(request, product_id):
     cart = Cart(request)
@@ -102,11 +103,97 @@ def update_cart(request):
     return HttpResponseRedirect(reverse('cart'))
 
 
-def show_cart(request):
-    cart = Cart(request)
-    return render(request, 'qshop/cart/cart.html', {
-        'cart': cart,
+
+class CartDetailView(TemplateView):
+    template_name = "qshop/cart/cart.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['cart'] = Cart(self.request)
+        if qshop_settings.ENABLE_PROMO_CODES:
+            context['apply_promo_form'] = ApplyPromoForm()
+        return context
+
+
+class OrderDetailView(CreateView):
+    form_class = OrderForm
+    template_name = 'qshop/cart/order_extended.html'
+
+    @property
+    def cart(self):
+        cart = Cart(self.request)
+        return cart
+
+    def get(self, request, *args, **kwargs):
+        if self.cart.total_products() < 1:
+            return HttpResponseRedirect(reverse('cart'))
+        return super().get(request, *args, **kwargs)
+
+    def get_form_kwargs(self):
+        kwargs = super(OrderDetailView, self).get_form_kwargs()
+        kwargs['cart'] = self.cart
+        return kwargs
+
+    def form_valid(self, form):
+        try:
+            order = form.save()
+            order.finish_order(self.request)
+            self.request.session['order_pk'] = order.pk
+            return order.get_redirect_response()
+        except ItemTooMany:
+            messages.add_message(self.request, messages.WARNING, _('Someone already bought product that you are trying to buy.'))
+
+        return super(OrderDetailView, self).form_valid(form)
+
+
+class AjaxOrderDetailView(OrderDetailView):
+    # need to return cart html always even if form_valid, because we need to show refreshed cart items before checkout
+    def form_valid(self, form):
+        return self.form_invalid(form)
+
+    def form_invalid(self, form):
+        # remove html errors from fields
+        fnames_errors = list(form.errors.keys())
+        for field_name in fnames_errors:
+            form.errors.pop(field_name)
+
+        return super().form_invalid(form)
+
+def cart_order_success(request):
+    order_pk = request.session.get('order_pk', None)
+    try:
+        del request.session['order_pk']
+    except Exception:
+        pass
+    try:
+        order = Order.objects.get(pk=order_pk)
+    except Exception:
+        return HttpResponseRedirect('/')
+    return render(request, 'qshop/cart/order_success.html', {
+        'order': order,
     })
+
+
+@csrf_exempt
+def cart_order_cancelled(request, order_id=None):
+    if order_id:
+        order = get_object_or_404(Order, pk=order_id, paid=False)
+        order.status = 4
+        order.add_log_message('Order canceled!')
+        order.save()
+    return render(request, 'qshop/cart/order_cancelled.html', {
+    })
+
+
+def cart_order_error(request):
+    return render(request, 'qshop/cart/order_error.html', {
+    })
+
+from qshop.qshop_settings import CART_ORDER_VIEW
+
+if CART_ORDER_VIEW:
+    from sitemenu import import_item
+    qshop_order_view = import_item(CART_ORDER_VIEW)
 
 
 def order_cart(request):
@@ -139,32 +226,28 @@ def order_cart(request):
     })
 
 
-def cart_order_success(request):
-    order_pk = request.session.get('order_pk', None)
-    try:
-        del request.session['order_pk']
-    except:
-        pass
-    try:
-        order = Order.objects.get(pk=order_pk)
-    except:
-        return HttpResponseRedirect('/')
-    return render(request, 'qshop/cart/order_success.html', {
-        'order': order,
-    })
+if qshop_settings.ENABLE_PROMO_CODES:
+    from .forms import ApplyPromoForm
 
+    class ApplyPromoView(FormView):
+        form_class = ApplyPromoForm
+        template_name = 'qshop/cart/cart.html'
 
-@csrf_exempt
-def cart_order_cancelled(request, order_id=None):
-    if order_id:
-        order = get_object_or_404(Order, pk=order_id, paid=False)
-        order.status = 4
-        order.add_log_message('Order canceled!')
-        order.save()
-    return render(request, 'qshop/cart/order_cancelled.html', {
-    })
+        def get_success_url(self):
+            messages.add_message(self.request, messages.INFO, _(u'Promo code applied successfully.'))
+            return reverse('cart')
 
+        def get_context_data(self, **kwargs):
+            kwargs = super(ApplyPromoView, self).get_context_data(**kwargs)
+            kwargs['cart'] = Cart(self.request)
+            kwargs['apply_promo_form'] = kwargs['form']
+            return kwargs
 
-def cart_order_error(request):
-    return render(request, 'qshop/cart/order_error.html', {
-    })
+        def get_form_kwargs(self):
+            kwargs = super(ApplyPromoView, self).get_form_kwargs()
+            kwargs['cart'] = Cart(self.request)
+            return kwargs
+
+        def form_valid(self, form):
+            form.cart.set_promo_code(form.promo_code)
+            return super(ApplyPromoView, self).form_valid(form)

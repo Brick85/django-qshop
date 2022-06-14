@@ -1,37 +1,26 @@
-from qshop.qshop_settings import CART_ORDER_FORM
+from qshop.qshop_settings import CART_ORDER_FORM, ENABLE_QSHOP_DELIVERY, DELIVERY_REQUIRED, ENABLE_PAYMENTS, ENABLE_PROMO_CODES, PROMO_CODE_FORM
+from django import forms
 
 if CART_ORDER_FORM:
     from sitemenu import import_item
     OrderForm = import_item(CART_ORDER_FORM)
+
+elif not ENABLE_QSHOP_DELIVERY:
+    from .forms_simple import OrderBaseForm
+    class OrderForm(OrderBaseForm):
+        pass
 else:
-    from django import forms
-    from .models import Order
-    from ..mails import sendMail
-    from django.utils.translation import ugettext as _
+    from .forms_extended import OrderExtendedForm
+    class OrderForm(OrderExtendedForm):
+        pass
 
-    class OrderForm(forms.ModelForm):
 
-        class Meta:
-            model = Order
-            exclude = ('date_added', 'status', 'manager_comments', 'cart', 'cart_text')
+if ENABLE_PROMO_CODES:
+    if PROMO_CODE_FORM:
+        from sitemenu import import_item
+        ApplyPromoForm = import_item(PROMO_CODE_FORM)
+    else:
+        from .forms_simple import ApplyPromoFormBase
 
-        def save(self, cart, *args, **kwargs):
-            kwargs['commit'] = False
-            order = super(OrderForm, self).save(*args, **kwargs)
-
-            order.cart = cart.cart
-            order.cart_text = cart.as_table(standalone=True)
-
-            order.save()
-
-            if hasattr(order, 'email'):
-                sendMail(
-                    'order_sended',
-                    variables={
-                        'order': order,
-                    },
-                    subject=_("Your order %s accepted") % order.get_id(),
-                    mails=[order.email]
-                )
-
-            return order
+        class ApplyPromoForm(ApplyPromoFormBase):
+            pass
